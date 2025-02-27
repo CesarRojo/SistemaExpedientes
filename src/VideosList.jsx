@@ -42,7 +42,7 @@ const VideosList = () => {
       {videos.length === 0 ? (
         <p>No hay videos subidos</p>
       ) : (
-        <div>
+        <div className="flex flex-row">
           {videos.map((video) => (
             <div key={video.id}>
               <p>{video.filename}</p>
