@@ -1,4 +1,8 @@
+import axios from "axios";
 import { useEffect, useState } from "react";
+import io from 'socket.io-client';
+
+const socket = io("http://localhost:5005");
 
 const API_URL = "http://localhost:5005/api"; // URL de la API
 
@@ -7,13 +11,30 @@ const VideosList = () => {
 
   useEffect(() => {
     fetchVideos();
+
+    // Escuchar eventos de WebSocket
+    socket.on('videoUploaded', (newVideo) => {
+      console.log('Nuevo video subido siuu:', newVideo.video); //Se entra a newVideo.video porque ahi es donde están los datos del video para que se pueda cargar correctamente
+      // Actualizar la lista de videos
+      setVideos(prevVideos => [...prevVideos, newVideo.video]);
+    });
+
+    socket.on('videoDeleted', (id) => {
+      console.log('Video eliminado:', id);
+      // Actualizar la lista de videos eliminando el video correspondiente
+      setVideos(prevVideos => prevVideos.filter(video => video.id !== id));
+    });
+
+    return () => {
+      socket.off('videoUploaded');
+      socket.off('videoDeleted');
+    };
   }, []);
 
   const fetchVideos = async () => {
     try {
-      const response = await fetch(`${API_URL}/videos`);
-      const data = await response.json();
-      setVideos(data);
+      const response = await axios.get(`${API_URL}/videos`);
+      setVideos(response.data);
     } catch (error) {
       console.error("Error al obtener los videos:", error);
     }
@@ -43,8 +64,8 @@ const VideosList = () => {
         <p>No hay videos subidos</p>
       ) : (
         <div className="flex flex-row">
-          {videos.map((video) => (
-            <div key={video.id}>
+          {videos.map((video, index) => (
+            <div key={index}>
               <p>{video.filename}</p>
               <video width="300" controls>
                 <source src={`http://localhost:5005${video.path}`} type="video/mp4" />
