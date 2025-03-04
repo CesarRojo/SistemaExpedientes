@@ -2,9 +2,9 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import io from 'socket.io-client';
 
-const socket = io("http://localhost:5005");
+const socket = io("http://172.30.190.91:5005");
 
-const API_URL = "http://localhost:5005/api"; // URL de la API
+const API_URL = "http://172.30.190.91:5005/api"; // URL de la API o de tu servidor si usas npm run dev -- --host en la api
 
 const VideosList = () => {
   const [videos, setVideos] = useState([]);
@@ -20,9 +20,12 @@ const VideosList = () => {
     });
 
     socket.on('videoDeleted', (id) => {
-      console.log('Video eliminado:', id);
       // Actualizar la lista de videos eliminando el video correspondiente
-      setVideos(prevVideos => prevVideos.filter(video => video.id !== id));
+      setVideos(prevVideos => {
+        //Se entra a id.videoId porque es donde está el id del video que se quiere eliminar y se parsea a entero porque se manda como un string desde el servidor
+        const updatedVideos = prevVideos.filter(video => video.id !== parseInt(id.videoId));
+        return updatedVideos;
+      });
     });
 
     return () => {
@@ -68,7 +71,7 @@ const VideosList = () => {
             <div key={index}>
               <p>{video.filename}</p>
               <video width="300" controls>
-                <source src={`http://localhost:5005${video.path}`} type="video/mp4" />
+                <source src={`http://172.30.190.91:5005${video.path}`} type="video/mp4" />
                 Tu navegador no soporta el video.
               </video>
               <button onClick={() => deleteVideo(video.id)}>Eliminar</button>

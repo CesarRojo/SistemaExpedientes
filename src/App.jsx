@@ -35,7 +35,7 @@ const App = () => {
 
     setUploading(true);
     try {
-      const response = await axios.post("http://localhost:5005/api/upload", formData, {
+      const response = await axios.post("http://172.30.190.91:5005/api/upload", formData, {
         headers: { "Content-Type": "multipart/form-data" }
       });
 
