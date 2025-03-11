@@ -6,18 +6,18 @@ const Login = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
-  const login = useAuthStore((state) => state.login);
+  const login = useAuthStore((state) => state.login); //Se saca el login del archivo authStore.js
 
   const handleLogin = async (e) => {
     e.preventDefault();
     await login(username, password);
-    if (useAuthStore.getState().isAuthenticated) {
-      navigate('/Videos');
+    if (useAuthStore.getState().isAuthenticated) { //Si está autenticado
+      navigate('/Videos'); //Mandar a la pagina principal (en este caso manda a la de videos)
     } else {
-      alert('Credenciales incorrectas');
+      alert('Credenciales incorrectas'); //Si la autenticacion falla
     }
   };
-
+  
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <div className="w-full max-w-md p-8 space-y-6 bg-white rounded shadow-md">
