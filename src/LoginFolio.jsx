@@ -1,29 +1,33 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import useAuthStore from './authStore';
 
 const LoginFolio = () => {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+  const [folio, setFolio] = useState('');
   const navigate = useNavigate();
+  const loginWithFolio = useAuthStore((state) => state.loginWithFolio);
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    // Aquí puedes agregar la lógica de autenticación
-    console.log('Usuario:', username);
-    console.log('Contraseña:', password);
+    await loginWithFolio(parseInt(folio));
+    if (useAuthStore.getState().isAuthenticated) {
+      navigate('/Videos');
+    } else {
+      alert('Folio incorrecto');
+    }
   };
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <div className="w-full max-w-md p-8 space-y-6 bg-white rounded shadow-md">
-        <h1 className="text-2xl font-bold text-center">Login Folio</h1>
+        <h1 className="text-2xl font-bold text-center">Login con Folio</h1>
         <form onSubmit={handleLogin} className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700">Folio:</label>
             <input
               type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              value={folio}
+              onChange={(e) => setFolio(e.target.value)}
               required
               className="w-full px-3 py-2 mt-1 border rounded-md focus:outline-none focus:ring focus:ring-indigo-200"
             />

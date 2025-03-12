@@ -4,7 +4,8 @@ import VideosList from './VideosList';
 import SubirVideos from './SubirVideos';
 import LoginFolio from './LoginFolio';
 import EntrevIniForm from './EntrevIni';
-import FechaForm from './fechaa';
+import TablaEntrevistas from './TablaEntrevistas';
+import TablaUsuarios from './TablaUsuarios';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import useAuthStore from './authStore';
 
@@ -20,6 +21,8 @@ function App() {
         <Route path="/SubirVideos" element={isAuthenticated ? <SubirVideos /> : <Navigate to="/" />} />
         <Route path="/LoginFolio" element={<LoginFolio />} />
         <Route path="/EntrevIni" element={<EntrevIniForm />} />
+        <Route path="/TablaEntrev" element={<TablaEntrevistas />} />
+        <Route path="/TablaUsers" element={<TablaUsuarios />} />
       </Routes>
     </Router>
   );

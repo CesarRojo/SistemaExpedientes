@@ -2,9 +2,9 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import io from 'socket.io-client';
 
-const socket = io("http://192.168.1.68:5005");
+const socket = io("http://172.30.121.146:5005");
 
-const API_URL = "http://192.168.1.68:5005/api"; // URL de la API o de tu servidor si usas npm run dev -- --host en la api
+const API_URL = "http://172.30.121.146:5005/api"; // URL de la API o de tu servidor si usas npm run dev -- --host en la api
 
 const VideosList = () => {
   const [videos, setVideos] = useState([]);
@@ -71,7 +71,7 @@ const VideosList = () => {
             <div key={index}>
               <p>{video.filename}</p>
               <video width="300" controls>
-                <source src={`http://192.168.1.68:5005${video.path}`} type="video/mp4" />
+                <source src={`http://172.30.121.146:5005${video.path}`} type="video/mp4" />
                 Tu navegador no soporta el video.
               </video>
               <button onClick={() => deleteVideo(video.idVideo)}>Eliminar</button>

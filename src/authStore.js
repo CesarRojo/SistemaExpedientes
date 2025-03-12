@@ -8,7 +8,16 @@ const useAuthStore = create(persist(
     user: null,
     login: async (username, password) => {
       try {
-        const response = await axios.post('http://192.168.1.68:5005/auth/login', { username, password });
+        const response = await axios.post('http://172.30.121.146:5005/auth/login', { username, password });
+        set({ isAuthenticated: true, user: response.data.user });
+      } catch (error) {
+        console.error('Error al iniciar sesión:', error);
+        set({ isAuthenticated: false, user: null });
+      }
+    },
+    loginWithFolio: async (folio) => {
+      try {
+        const response = await axios.post('http://172.30.121.146:5005/auth/loginFolio', { folio });
         set({ isAuthenticated: true, user: response.data.user });
       } catch (error) {
         console.error('Error al iniciar sesión:', error);
