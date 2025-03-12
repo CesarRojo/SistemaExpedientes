@@ -34,7 +34,7 @@ const EntrevIniForm = () => {
     fonacot: '',
     infonavit: '',
     antecedentesPen: '',
-    fecha: '',
+    fecha: '', // Añadir campo de fecha
     image: '',
     encinte: '',
     tricky: '',
@@ -64,7 +64,7 @@ const EntrevIniForm = () => {
   useEffect(() => {
     const fetchLastFolio = async () => {
       try {
-        const response = await axios.get('http://172.30.190.91:5005/folio');
+        const response = await axios.get('http://192.168.1.68:5005/folio/last');
         const lastFolio = response.data.numFolio;
         setNumFolio(lastFolio + 2);
       } catch (error) {
@@ -83,18 +83,23 @@ const EntrevIniForm = () => {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const dataToSubmit = { ...formData, numFolio };
-    // Aquí puedes manejar el envío del formulario, por ejemplo, enviando los datos a una API
-    console.log(dataToSubmit);
+    try {
+      const response = await axios.post('http://192.168.1.68:5005/entrevIni', dataToSubmit);
+      console.log('Response:', response.data);
+    } catch (error) {
+      console.error('Error submitting the form:', error);
+    }
   };
 
   const renderInput = (key) => {
     const isNumberField = ['numIngresos', 'cant_hijos', 'renta', 'fonacot', 'infonavit', 'edad', 'bonoContr'].includes(key);
+    const isDateField = key === 'fecha';
     return (
       <input
-        type={isNumberField ? 'number' : 'text'}
+        type={isDateField ? 'date' : isNumberField ? 'number' : 'text'}
         name={key}
         value={formData[key]}
         onChange={handleChange}
