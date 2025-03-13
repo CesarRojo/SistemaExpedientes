@@ -12,14 +12,15 @@ const Login = () => {
     e.preventDefault();
     await login(username, password);
     if (useAuthStore.getState().isAuthenticated) { //Si está autenticado
-      navigate('/Videos'); //Mandar a la pagina principal (en este caso manda a la de videos)
+      navigate('/home'); //Mandar a la pagina principal
     } else {
       alert('Credenciales incorrectas'); //Si la autenticacion falla
     }
   };
   
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
+    <div className="flex items-center justify-center min-h-screen bg-gray-100 flex-col">
+      <h1 className="text-6xl font-bold text-center font-protest title-log mb-30">Kiroku</h1>
       <div className="w-full max-w-md p-8 space-y-6 bg-white rounded shadow-md">
         <h1 className="text-2xl font-bold text-center">Login</h1>
         <form onSubmit={handleLogin} className="space-y-4">
@@ -50,20 +51,6 @@ const Login = () => {
             Iniciar Sesión
           </button>
         </form>
-        <div className="flex justify-between mt-4">
-          <button
-            onClick={() => navigate('/SubirVideos')}
-            className="px-4 py-2 font-bold text-white bg-green-600 rounded-md hover:bg-green-700 focus:outline-none focus:ring focus:ring-green-200"
-          >
-            Subir Videos
-          </button>
-          <button
-            onClick={() => navigate('/Videos')}
-            className="px-4 py-2 font-bold text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring focus:ring-blue-200"
-          >
-            Ver Videos
-          </button>
-        </div>
         <div className="flex justify-center mt-4">
           <button
             onClick={() => navigate('/LoginFolio')}

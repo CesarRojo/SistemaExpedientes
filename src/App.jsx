@@ -6,6 +6,8 @@ import LoginFolio from './LoginFolio';
 import EntrevIniForm from './EntrevIni';
 import TablaEntrevistas from './TablaEntrevistas';
 import TablaUsuarios from './TablaUsuarios';
+import Home from './Home';
+import Navbar from './Navbar';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import useAuthStore from './authStore';
 
@@ -15,14 +17,16 @@ function App() {
 
   return (
     <Router>
+      {isAuthenticated && <Navbar />} {/* Renderiza el Navbar solo si está autenticado */}
       <Routes>
-        <Route path="/" element={<Login />} />
+        <Route path="/" element={isAuthenticated ? <Navigate to="/home" /> : <Login />} />
+        <Route path="/home" element={isAuthenticated ? <Home /> : <Navigate to="/" />} />
         <Route path="/Videos" element={isAuthenticated ? <VideosList /> : <Navigate to="/" />} />
         <Route path="/SubirVideos" element={isAuthenticated ? <SubirVideos /> : <Navigate to="/" />} />
-        <Route path="/LoginFolio" element={<LoginFolio />} />
-        <Route path="/EntrevIni" element={<EntrevIniForm />} />
-        <Route path="/TablaEntrev" element={<TablaEntrevistas />} />
-        <Route path="/TablaUsers" element={<TablaUsuarios />} />
+        <Route path="/LoginFolio" element={isAuthenticated ? <Navigate to="/home" /> : <LoginFolio />} />
+        <Route path="/EntrevIni" element={isAuthenticated ? <EntrevIniForm /> : <Navigate to="/" />} />
+        <Route path="/TablaEntrev" element={isAuthenticated ? <TablaEntrevistas /> : <Navigate to="/" />} />
+        <Route path="/TablaUsers" element={isAuthenticated ? <TablaUsuarios /> : <Navigate to="/" />} />
       </Routes>
     </Router>
   );
