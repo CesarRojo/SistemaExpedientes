@@ -1,13 +1,16 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import io from 'socket.io-client';
+import useAuthStore from './authStore';
 
-const socket = io("http://172.30.190.86:5005");
+const socket = io("http://172.30.190.88:5005");
 
-const API_URL = "http://172.30.190.86:5005/api"; // URL de la API o de tu servidor si usas npm run dev -- --host en la api
+const API_URL = "http://172.30.190.88:5005/api"; // URL de la API o de tu servidor si usas npm run dev -- --host en la api
 
 const VideosList = () => {
   const [videos, setVideos] = useState([]);
+  const [watchedCount, setWatchedCount] = useState(0); // Contador de videos vistos
+  const markVideosAsWatched = useAuthStore((state) => state.markVideosAsWatched); // Función para marcar videos como vistos
 
   useEffect(() => {
     fetchVideos();
@@ -60,6 +63,17 @@ const VideosList = () => {
     }
   };
 
+  const handleVideoEnded = () => {
+    setWatchedCount(prevCount => {
+      const newCount = prevCount + 1;
+      // Si el contador de videos vistos es igual al total de videos, marca todos como vistos
+      if (newCount === videos.length) {
+        console.log("Todos los videos vistos");
+      }
+      return newCount;
+    });
+  };
+
   return (
     <div>
       <h2>Videos Subidos</h2>
@@ -70,8 +84,8 @@ const VideosList = () => {
           {videos.map((video, index) => (
             <div key={index}>
               <p>{video.filename}</p>
-              <video width="300" controls>
-                <source src={`http://172.30.190.86:5005${video.path}`} type="video/mp4" />
+              <video width="300" controls onEnded={handleVideoEnded}>
+                <source src={`http://172.30.190.88:5005${video.path}`} type="video/mp4" />
                 Tu navegador no soporta el video.
               </video>
               <button onClick={() => deleteVideo(video.idVideo)}>Eliminar</button>

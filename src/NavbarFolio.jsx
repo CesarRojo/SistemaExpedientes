@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import useAuthStore from './authStore';
 
-const Navbar = () => {
+const NavbarFolio = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const user = useAuthStore((state) => state.user);
   const logout = useAuthStore((state) => state.logout);
@@ -31,8 +31,7 @@ const Navbar = () => {
       <ul className="flex space-x-4">
         <li><Link to="/home" className="hover:text-gray-300">Inicio</Link></li>
         <li><Link to="/Videos" className="hover:text-gray-300">Videos</Link></li>
-        <li><Link to="/SubirVideos" className="hover:text-gray-300">Subir Videos</Link></li>
-        <li><Link to="/TablaEntrev" className="hover:text-gray-300">Tabla de Entrevistas</Link></li>
+        <li><Link to="/TablaEntrev" className="hover:text-gray-300">Examen Medico</Link></li>
       </ul>
       <div className="relative">
         <button 
@@ -56,4 +55,4 @@ const Navbar = () => {
   );
 };
 
-export default Navbar;
+export default NavbarFolio;

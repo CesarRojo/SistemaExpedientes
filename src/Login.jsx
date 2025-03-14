@@ -20,7 +20,7 @@ const Login = () => {
   
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100 flex-col">
-      <h1 className="text-6xl font-bold text-center font-protest title-log mb-30">Kiroku</h1>
+      <h1 className="text-6xl font-bold text-center title-log mb-30">Kiroku 記録</h1>
       <div className="w-full max-w-md p-8 space-y-6 bg-white rounded shadow-md">
         <h1 className="text-2xl font-bold text-center">Login</h1>
         <form onSubmit={handleLogin} className="space-y-4">
