@@ -5,12 +5,10 @@ const Home = () => {
   const user = useAuthStore((state) => state.user);
 
   const nombreUsuario = () => {
-    if (user.noReloj && user.folio.Usuario !== null) {
-      return user.folio.Usuario.nombre + ' ' + user.folio.Usuario.apellidoPat;
-    }else if(!user.Usuario){
+    if (!user.fullName) {
       return `Usuario-${user.numFolio}`;
     }else{
-      return user.Usuario.nombre + ' ' + user.Usuario.apellidoPat;
+      return user.fullName;
     }
   }
 

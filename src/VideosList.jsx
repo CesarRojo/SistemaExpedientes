@@ -3,14 +3,16 @@ import { useEffect, useState } from "react";
 import io from 'socket.io-client';
 import useAuthStore from './authStore';
 
-const socket = io("http://172.30.190.88:5005");
+const socket = io("http://172.30.190.89:5005");
 
-const API_URL = "http://172.30.190.88:5005/api"; // URL de la API o de tu servidor si usas npm run dev -- --host en la api
+const API_URL = "http://172.30.190.89:5005/api";
 
 const VideosList = () => {
   const [videos, setVideos] = useState([]);
   const [watchedCount, setWatchedCount] = useState(0); // Contador de videos vistos
   const markVideosAsWatched = useAuthStore((state) => state.markVideosAsWatched); // Función para marcar videos como vistos
+  const user = useAuthStore((state) => state.user);
+  const idFolio = user?.idFolio;
 
   useEffect(() => {
     fetchVideos();
@@ -64,15 +66,17 @@ const VideosList = () => {
   };
 
   const handleVideoEnded = () => {
-    setWatchedCount(prevCount => {
-      const newCount = prevCount + 1;
-      // Si el contador de videos vistos es igual al total de videos, marca todos como vistos
-      if (newCount === videos.length) {
-        console.log("Todos los videos vistos");
-      }
-      return newCount;
-    });
+    setWatchedCount(prevCount => prevCount + 1);
   };
+
+  // Efecto para marcar videos como vistos
+  useEffect(() => {
+    if (watchedCount === videos.length && videos.length > 0) {
+      if (idFolio) {
+        markVideosAsWatched(idFolio); // Llamar a la función para actualizar el estado de vioVideos
+      }
+    }
+  }, [watchedCount, videos.length, markVideosAsWatched, idFolio]);
 
   return (
     <div>
@@ -85,7 +89,7 @@ const VideosList = () => {
             <div key={index}>
               <p>{video.filename}</p>
               <video width="300" controls onEnded={handleVideoEnded}>
-                <source src={`http://172.30.190.88:5005${video.path}`} type="video/mp4" />
+                <source src={`http://172.30.190.89:5005${video.path}`} type="video/mp4" />
                 Tu navegador no soporta el video.
               </video>
               <button onClick={() => deleteVideo(video.idVideo)}>Eliminar</button>

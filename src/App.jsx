@@ -13,23 +13,22 @@ import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-d
 import useAuthStore from './authStore';
 
 function App() {
-  //Comprobacion de si está autenticado para proteger las rutas en caso de que se quieran acceder directamente desde la url
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated); 
-  const loginType = useAuthStore((state) => state.loginType); // Obtiene el tipo de inicio de sesión
-  const hasWatchedAllVideos = useAuthStore((state) => state.hasWatchedAllVideos); // Obtiene el estado de videos vistos
+  const loginType = useAuthStore((state) => state.loginType); 
+  const hasWatchedAllVideos = useAuthStore((state) => state.hasWatchedAllVideos); 
 
   return (
     <Router>
-      {isAuthenticated && (loginType === 'normal' ? <Navbar /> : <NavbarFolio />)} {/* Renderiza la navbar según el tipo de inicio de sesión */}
+      {isAuthenticated && (loginType === 'normal' ? <Navbar /> : <NavbarFolio />)}
       <Routes>
         <Route path="/" element={isAuthenticated ? <Navigate to="/home" /> : <Login />} />
         <Route path="/home" element={isAuthenticated ? <Home /> : <Navigate to="/" />} />
-        <Route path="/Videos" element={isAuthenticated ? (!hasWatchedAllVideos ? <VideosList /> : <Navigate to="/home" />) : <Navigate to="/" />} />
-        <Route path="/SubirVideos" element={isAuthenticated ? <SubirVideos /> : <Navigate to="/" />} />
+        <Route path="/Videos" element={isAuthenticated ? <VideosList /> : <Navigate to="/" />} />
+        <Route path="/SubirVideos" element={isAuthenticated ? (loginType === 'folio' && !hasWatchedAllVideos ? <Navigate to="/Videos" /> : <SubirVideos />) : <Navigate to="/" />} />
         <Route path="/LoginFolio" element={isAuthenticated ? <Navigate to="/home" /> : <LoginFolio />} />
-        <Route path="/EntrevIni" element={isAuthenticated ? <EntrevIniForm /> : <Navigate to="/" />} />
-        <Route path="/TablaEntrev" element={isAuthenticated ? <TablaEntrevistas /> : <Navigate to="/" />} />
-        <Route path="/TablaUsers" element={isAuthenticated ? <TablaUsuarios /> : <Navigate to="/" />} />
+        <Route path="/EntrevIni" element={isAuthenticated ? (loginType === 'folio' && !hasWatchedAllVideos ? <Navigate to="/Videos" /> : <EntrevIniForm />) : <Navigate to="/" />} />
+        <Route path="/TablaEntrev" element={isAuthenticated ? (loginType === 'folio' && !hasWatchedAllVideos ? <Navigate to="/Videos" /> : <TablaEntrevistas />) : <Navigate to="/" />} />
+        <Route path="/TablaUsers" element={isAuthenticated ? (loginType === 'folio' && !hasWatchedAllVideos ? <Navigate to="/Videos" /> : <TablaUsuarios />) : <Navigate to="/" />} />
       </Routes>
     </Router>
   );

@@ -10,8 +10,21 @@ const useAuthStore = create(persist(
     hasWatchedAllVideos: false, // Estado para controlar si ha visto todos los videos
     login: async (username, password) => {
       try {
-        const response = await axios.post('http://172.30.190.88:5005/auth/login', { username, password });
-        set({ isAuthenticated: true, user: response.data.user, loginType: 'normal' }); // Actualiza el tipo de inicio de sesión
+        const response = await axios.post('http://172.30.190.89:5005/auth/login', { username, password });
+
+        // Extraer solo la información necesaria
+        const { user } = response.data;
+        const { noReloj, folio, roles } = user;
+
+        // Estructurar el usuario de manera más clara
+        const structuredUser = {
+          username: noReloj,
+          folioId: folio?.Usuario?.idUsuario || null,
+          fullName: `${folio?.Usuario?.nombre || ''} ${folio?.Usuario?.apellidoPat || ''}`.trim(),
+          roles: roles.map(role => role.rol.level), // Extrae solo los niveles de rol
+        };
+
+        set({ isAuthenticated: true, user: structuredUser, loginType: 'normal' }); // Actualiza el tipo de inicio de sesión
       } catch (error) {
         console.error('Error al iniciar sesión:', error);
         set({ isAuthenticated: false, user: null, loginType: null });
@@ -19,15 +32,36 @@ const useAuthStore = create(persist(
     },
     loginWithFolio: async (folio) => {
       try {
-        const response = await axios.post('http://172.30.190.88:5005/auth/loginFolio', { folio });
-        set({ isAuthenticated: true, user: response.data.user, loginType: 'folio' }); // Actualiza el tipo de inicio de sesión
+        const response = await axios.post('http://172.30.190.89:5005/auth/loginFolio', { folio });
+
+        // Extraer solo la información necesaria
+        const { user } = response.data;
+        const { idFolio, numFolio, Usuario, Extras } = user;
+
+        // Estructura el usuario de manera más clara
+        const structuredUser  = {
+          idFolio,
+          numFolio,
+          fullName: `${Usuario?.nombre || ''} ${Usuario?.apellidoPat || ''}`.trim(),
+          hasWatchedAllVideos: Extras?.vioVideos || false, // Estado de si ha visto todos los videos
+        };
+
+        set({ isAuthenticated: true, user: structuredUser, loginType: 'folio', hasWatchedAllVideos: structuredUser.hasWatchedAllVideos }); // Actualiza el tipo de inicio de sesión
       } catch (error) {
         console.error('Error al iniciar sesión:', error);
         set({ isAuthenticated: false, user: null, loginType: null });
       }
     },
     logout: () => set({ isAuthenticated: false, user: null, loginType: null, hasWatchedAllVideos: false }), // Resetea el tipo de inicio de sesión al cerrar sesión
-    markVideosAsWatched: () => set({ hasWatchedAllVideos: true }), // Función para marcar videos como vistos
+    markVideosAsWatched: async (idFolio) => {
+      try {
+        await axios.put(`http://172.30.190.89:5005/folio/extras/${idFolio}`);
+        set({ hasWatchedAllVideos: true });
+        console.log("Estado de vioVideos actualizado a true");
+      } catch (error) {
+        console.error("Error al actualizar el estado de vioVideos:", error);
+      }
+    },
   }),
   {
     name: 'auth-storage', // nombre del almacenamiento en localStorage
