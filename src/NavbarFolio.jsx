@@ -29,7 +29,7 @@ const NavbarFolio = () => {
       <ul className="flex space-x-4">
         <li><Link to="/home" className="hover:text-gray-300">Inicio</Link></li>
         <li><Link to="/Videos" className="hover:text-gray-300">Videos</Link></li>
-        <li><Link to="/TablaEntrev" className="hover:text-gray-300">Examen Medico</Link></li>
+        <li><Link to="/ExamMedico" className="hover:text-gray-300">Examen Medico</Link></li>
       </ul>
       <div className="relative">
         <button 

@@ -9,6 +9,8 @@ import TablaUsuarios from './TablaUsuarios';
 import Home from './Home';
 import Navbar from './Navbar';
 import NavbarFolio from './NavbarFolio';
+import ExamenMedico from './ExamMedico';
+import ExploracionFisica from './ExpFisica';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import useAuthStore from './authStore';
 
@@ -29,6 +31,8 @@ function App() {
         <Route path="/EntrevIni" element={isAuthenticated ? (loginType === 'folio' && !hasWatchedAllVideos ? <Navigate to="/Videos" /> : <EntrevIniForm />) : <Navigate to="/" />} />
         <Route path="/TablaEntrev" element={isAuthenticated ? (loginType === 'folio' && !hasWatchedAllVideos ? <Navigate to="/Videos" /> : <TablaEntrevistas />) : <Navigate to="/" />} />
         <Route path="/TablaUsers" element={isAuthenticated ? (loginType === 'folio' && !hasWatchedAllVideos ? <Navigate to="/Videos" /> : <TablaUsuarios />) : <Navigate to="/" />} />
+        <Route path="/ExamMedico" element={isAuthenticated ? (loginType === 'folio' && !hasWatchedAllVideos ? <Navigate to="/Videos" /> : <ExamenMedico />) : <Navigate to="/" />} />
+        <Route path="/ExpFisica" element={isAuthenticated ? (loginType === 'folio' && !hasWatchedAllVideos ? <Navigate to="/Videos" /> : <ExploracionFisica />) : <Navigate to="/" />} />
       </Routes>
     </Router>
   );

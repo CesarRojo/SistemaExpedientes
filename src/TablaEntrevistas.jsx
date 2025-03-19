@@ -9,7 +9,7 @@ const TablaEntrevistas = () => {
   useEffect(() => {
     const fetchDatos = async () => {
       try {
-        const response = await axios.get('http://172.30.190.89:5005/entrevIni');
+        const response = await axios.get('http://172.30.190.112:5005/entrevIni');
         setDatos(response.data);
       } catch (error) {
         console.error('Error fetching data:', error);

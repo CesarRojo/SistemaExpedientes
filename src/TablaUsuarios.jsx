@@ -9,7 +9,7 @@ const TablaUsuarios = () => {
   useEffect(() => {
     const fetchDatos = async () => {
       try {
-        const response = await axios.get('http://172.30.190.89:5005/usuario');
+        const response = await axios.get('http://172.30.190.112:5005/usuario');
         console.log(response.data);
         setDatos(response.data);
       } catch (error) {
