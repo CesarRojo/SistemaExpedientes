@@ -39,7 +39,7 @@ const ExamenMedico = () => {
 
   const fetchAntecedentesPatologicos = async () => {
     try {
-      const response = await axios.get('http://172.30.190.112:5005/antecPatolog');
+      const response = await axios.get('http://172.30.189.104:5005/antecPatolog');
       setAntecedentesPatologicos(response.data);
     } catch (error) {
       console.error('Error al obtener antecedentes patológicos:', error);
@@ -48,7 +48,7 @@ const ExamenMedico = () => {
 
   const fetchUsuarioFolio = async () => {
     try {
-      const response = await axios.get(`http://172.30.190.112:5005/usuario/folio/${idFolio}`);
+      const response = await axios.get(`http://172.30.189.104:5005/usuario/folio/${idFolio}`);
       setUsuario(response.data);
       setEntrevistaInicial(response.data.entrevistaInicial);
       setExamMed(response.data.examenMedico)
@@ -111,11 +111,10 @@ const ExamenMedico = () => {
   const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.post('http://172.30.190.112:5005/examMedico', {
+            const response = await axios.post('http://172.30.189.104:5005/examMedico', {
                 examMedicoData: {
                     planta: formData.planta,
                     fecha: new Date(formData.fecha),
-                    fechaNac: new Date(formData.fechaNac),
                     alcoholismo: formData.alcoholismo === 'si' ? formData.frecuenciaAlcoholismo : null,
                     deporte: formData.deporte === 'si' ? formData.frecuenciaDeporte : null,
                     tabaquismo: formData.tabaquismo === 'si' ? formData.frecuenciaTabaquismo : null,
@@ -184,7 +183,7 @@ const ExamenMedico = () => {
       </div>
       <div className="mb-4">
         <label className="block text-sm font-medium text-gray-700">Fecha de Nacimiento:</label>
-        <input type="date" name="fechaNac" value={formData.fechaNac} onChange={handleChange} required className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-500" />
+        <input type="date" name="fechaNac" value={usuario.fechaNac.split('T')[0]} readOnly className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-500" />
       </div>
 
       {/* Alcoholismo */}

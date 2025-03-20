@@ -56,7 +56,8 @@ const EntrevIniForm = () => {
     calle: '',
     numero: '',
     colonia: '',
-    escolaridad: ''
+    escolaridad: '',
+    fechaNac: ''
   });
 
   const [numFolio, setNumFolio] = useState('');
@@ -64,7 +65,7 @@ const EntrevIniForm = () => {
 
   const fetchFolio = async () => {
     try {
-      const response = await axios.get(`http://172.30.190.112:5005/folio/${numFolio}`);
+      const response = await axios.get(`http://172.30.189.104:5005/folio/${numFolio}`);
       if (response.data.Usuario) {
         setFolioStatus('Folio ya está siendo usado');
       } else {
@@ -154,11 +155,12 @@ const EntrevIniForm = () => {
         calle: formData.calle,
         numero: formData.numero,
         colonia: formData.colonia,
-        escolaridad: formData.escolaridad
+        escolaridad: formData.escolaridad,
+        fechaNac: formData.fechaNac
       },
     };
     try {
-      const response = await axios.post('http://172.30.190.112:5005/entrevIni', dataToSubmit);
+      const response = await axios.post('http://172.30.189.104:5005/entrevIni', dataToSubmit);
       console.log('Response:', response.data);
       fetchFolio();
     } catch (error) {
@@ -168,7 +170,7 @@ const EntrevIniForm = () => {
 
   const renderInput = (key) => {
     const isNumberField = ['numIngresos', 'cant_hijos', 'renta', 'fonacot', 'infonavit', 'edad', 'bonoContr'].includes(key);
-    const isDateField = key === 'fecha';
+    const isDateField = key === 'fecha' || key === 'fechaNac'; // Incluyendo fechaNac como campo de fecha
     return (
       <input
         type={isDateField ? 'date' : isNumberField ? 'number' : 'text'}

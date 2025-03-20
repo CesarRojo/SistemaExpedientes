@@ -9,7 +9,7 @@ const TablaUsuarios = () => {
   useEffect(() => {
     const fetchDatos = async () => {
       try {
-        const response = await axios.get('http://172.30.190.112:5005/usuario');
+        const response = await axios.get('http://172.30.189.104:5005/usuario');
         console.log(response.data);
         setDatos(response.data);
       } catch (error) {
@@ -20,8 +20,8 @@ const TablaUsuarios = () => {
     fetchDatos();
   }, []);
 
-  const handleNuevaEntrada = () => {
-    navigate('/entrevIni');
+  const handleExpFisica = (idUsuario, nombre, apellidoPat) => {
+    navigate('/ExpFisica', { state: { idUsuario, nombre, apellidoPat }});
   };
 
   return (
@@ -33,29 +33,29 @@ const TablaUsuarios = () => {
             <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre</th>
             <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Apellido Pat</th>
             <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Apellido Mat</th>
-            <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Teléfono</th>
-            <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Correo</th>
+            <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha</th>
+            <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Entrevista Inicial</th>
+            <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Examen Medico</th>
+            <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Exploracion Fisica</th>
+            <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Solicitud Interna</th>
           </tr>
         </thead>
         <tbody className="bg-white divide-y divide-gray-200">
           {datos.map((dato, index) => (
-            <tr key={index}>
+            <tr key={index} onClick={() => handleExpFisica(dato.idUsuario, dato.nombre, dato.apellidoPat)} className="cursor-pointer hover:bg-gray-50">
               <td className="px-6 py-4 whitespace-nowrap">{dato.idUsuario}</td>
               <td className="px-6 py-4 whitespace-nowrap">{dato.nombre}</td>
               <td className="px-6 py-4 whitespace-nowrap">{dato.apellidoPat}</td>
               <td className="px-6 py-4 whitespace-nowrap">{dato.apellidoMat}</td>
-              <td className="px-6 py-4 whitespace-nowrap">{dato.telefono}</td>
-              <td className="px-6 py-4 whitespace-nowrap">{dato.correo}</td>
+              <td className="px-6 py-4 whitespace-nowrap">{dato.entrevistaInicial.fecha}</td>
+              <td className={`px-6 py-4 whitespace-nowrap font-bold ${dato.entrevistaInicial ? 'text-green-600' : 'text-red-600'}`}>{dato.entrevistaInicial ? "Hecha" : "No hecha"}</td>
+              <td className={`px-6 py-4 whitespace-nowrap font-bold ${dato.examenMedico ? 'text-green-600' : 'text-red-600'}`}>{dato.examenMedico ? "Hecho" : "No hecho"}</td>
+              <td className={`px-6 py-4 whitespace-nowrap font-bold ${dato.exploracionFisica ? 'text-green-600' : 'text-red-600'}`}>{dato.exploracionFisica ? "Hecha" : "No hecha"}</td>
+              <td className={`px-6 py-4 whitespace-nowrap font-bold ${dato.solicitudInterna ? 'text-green-600' : 'text-red-600'}`}>{dato.solicitudInterna ? "Hecha" : "No hecha"}</td>
             </tr>
           ))}
         </tbody>
       </table>
-      <button
-        onClick={handleNuevaEntrada}
-        className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-700"
-      >
-        Nueva Entrada
-      </button>
     </div>
   );
 };

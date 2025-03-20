@@ -31,7 +31,7 @@ const Navbar = () => {
         <li><Link to="/Videos" className="hover:text-gray-300">Videos</Link></li>
         <li><Link to="/SubirVideos" className="hover:text-gray-300">Subir Videos</Link></li>
         <li><Link to="/TablaEntrev" className="hover:text-gray-300">Tabla de Entrevistas</Link></li>
-        <li><Link to="/ExpFisica" className="hover:text-gray-300">Exploracion Fisica</Link></li>
+        <li><Link to="/TablaExFis" className="hover:text-gray-300">Exploracion Fisica</Link></li>
       </ul>
       <div className="relative">
         <button 

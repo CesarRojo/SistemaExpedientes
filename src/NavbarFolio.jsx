@@ -30,6 +30,7 @@ const NavbarFolio = () => {
         <li><Link to="/home" className="hover:text-gray-300">Inicio</Link></li>
         <li><Link to="/Videos" className="hover:text-gray-300">Videos</Link></li>
         <li><Link to="/ExamMedico" className="hover:text-gray-300">Examen Medico</Link></li>
+        <li><Link to="/SolicInt" className="hover:text-gray-300">Solicitud Interna</Link></li>
       </ul>
       <div className="relative">
         <button 
