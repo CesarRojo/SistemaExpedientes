@@ -45,7 +45,7 @@ const ExploracionFisica = () => {
 
   const fetchUsuarioFolio = async () => {
     try {
-      const response = await axios.get(`http://172.30.189.104:5005/usuario/${idUsuario}`);
+      const response = await axios.get(`http://172.30.189.93:5005/usuario/${idUsuario}`);
       console.log(response.data);
       setExamMed(response.data.examenMedico);
       setExpFisica(response.data.exploracionFisica);
@@ -71,7 +71,7 @@ const ExploracionFisica = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://172.30.189.104:5005/expFisica', {
+      const response = await axios.post('http://172.30.189.93:5005/expFisica', {
         ...formData,
         peso: parseInt(formData.peso),
         talla: parseInt(formData.talla),
@@ -104,7 +104,7 @@ const ExploracionFisica = () => {
   };
 
   if (!examMed) {
-    return <div className="text-center">El examen medico es un paso obligatorio. Por favor, completa la entrevista inicial antes de continuar con el examen médico.</div>;
+    return <div className="text-center">Por favor, completa el examen medico antes de continuar con este paso.</div>;
   }
 
   if (expFisica) {

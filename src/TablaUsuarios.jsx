@@ -1,23 +1,36 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { io } from 'socket.io-client';
 
 const TablaUsuarios = () => {
   const [datos, setDatos] = useState([]);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const fetchDatos = async () => {
-      try {
-        const response = await axios.get('http://172.30.189.104:5005/usuario');
-        console.log(response.data);
-        setDatos(response.data);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-      }
-    };
+  const fetchDatos = async () => {
+    try {
+      const response = await axios.get('http://172.30.189.93:5005/usuario');
+      console.log(response.data);
+      setDatos(response.data);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  };
 
+  useEffect(() => {
     fetchDatos();
+
+    const socket = io('http://172.30.189.93:5005');
+
+    // Escuchar el evento newEntrevIni
+    socket.on('newExamMed', (data) => {
+      console.log('Nuevo evento de examen medico:', data);
+    });
+
+    // Limpiar la conexión al desmontar el componente
+    return () => {
+      socket.disconnect();
+    };
   }, []);
 
   const handleExpFisica = (idUsuario, nombre, apellidoPat) => {

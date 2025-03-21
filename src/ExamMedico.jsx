@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import useAuthStore from './authStore';
+import { io } from 'socket.io-client';
 
 const ExamenMedico = () => {
   const [formData, setFormData] = useState({
@@ -37,9 +38,26 @@ const ExamenMedico = () => {
   const [usuario, setUsuario] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  // Configurar Socket.IO
+  useEffect(() => {
+    const socket = io('http://172.30.189.93:5005'); // Asegúrate de que la URL sea correcta
+
+    // Escuchar el evento newEntrevIni
+    socket.on('newEntrevIni', (data) => {
+      console.log('Nuevo evento de entrevista inicial:', data);
+      //No serviría de mucho usar un socket aqui, ya que la emisión del back se envia a todos los usuarios y por tanto si hay 2 o más
+      //personas haciendo el examen medico se les actualizaría el componente a todos. (Comprobado)
+    });
+
+    // Limpiar la conexión al desmontar el componente
+    return () => {
+      socket.disconnect();
+    };
+  }, []);
+
   const fetchAntecedentesPatologicos = async () => {
     try {
-      const response = await axios.get('http://172.30.189.104:5005/antecPatolog');
+      const response = await axios.get('http://172.30.189.93:5005/antecPatolog');
       setAntecedentesPatologicos(response.data);
     } catch (error) {
       console.error('Error al obtener antecedentes patológicos:', error);
@@ -48,7 +66,8 @@ const ExamenMedico = () => {
 
   const fetchUsuarioFolio = async () => {
     try {
-      const response = await axios.get(`http://172.30.189.104:5005/usuario/folio/${idFolio}`);
+      const response = await axios.get(`http://172.30.189.93:5005/usuario/folio/${idFolio}`);
+      console.log(response.data.entrevistaInicial);
       setUsuario(response.data);
       setEntrevistaInicial(response.data.entrevistaInicial);
       setExamMed(response.data.examenMedico)
@@ -111,7 +130,7 @@ const ExamenMedico = () => {
   const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.post('http://172.30.189.104:5005/examMedico', {
+            const response = await axios.post('http://172.30.189.93:5005/examMedico', {
                 examMedicoData: {
                     planta: formData.planta,
                     fecha: new Date(formData.fecha),
@@ -143,7 +162,7 @@ const ExamenMedico = () => {
   }
 
   if (!entrevistaInicial) {
-    return <div className="text-center">La entrevista inicial es un paso obligatorio. Por favor, completa la entrevista inicial antes de continuar con el examen médico.</div>;
+    return <div className="text-center">Por favor, completa la entrevista inicial antes de continuar con este paso.</div>;
   }
 
   if (examMed) {
