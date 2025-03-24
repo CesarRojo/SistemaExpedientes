@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import useAuthStore from './authStore';
-import { io } from 'socket.io-client';
+// import { io } from 'socket.io-client';
 
 const ExamenMedico = () => {
   const [formData, setFormData] = useState({
@@ -39,25 +39,25 @@ const ExamenMedico = () => {
   const [loading, setLoading] = useState(true);
 
   // Configurar Socket.IO
-  useEffect(() => {
-    const socket = io('http://172.30.189.93:5005'); // Asegúrate de que la URL sea correcta
+  // useEffect(() => {
+  //   const socket = io('http://172.30.189.86:5005'); // Asegúrate de que la URL sea correcta
 
-    // Escuchar el evento newEntrevIni
-    socket.on('newEntrevIni', (data) => {
-      console.log('Nuevo evento de entrevista inicial:', data);
-      //No serviría de mucho usar un socket aqui, ya que la emisión del back se envia a todos los usuarios y por tanto si hay 2 o más
-      //personas haciendo el examen medico se les actualizaría el componente a todos. (Comprobado)
-    });
+  //   // Escuchar el evento newEntrevIni
+  //   socket.on('newEntrevIni', (data) => {
+  //     console.log('Nuevo evento de entrevista inicial:', data);
+  //     //No serviría de mucho usar un socket aqui, ya que la emisión del back se envia a todos los usuarios y por tanto si hay 2 o más
+  //     //personas haciendo el examen medico se les actualizaría el componente a todos. (Comprobado)
+  //   });
 
-    // Limpiar la conexión al desmontar el componente
-    return () => {
-      socket.disconnect();
-    };
-  }, []);
+  //   // Limpiar la conexión al desmontar el componente
+  //   return () => {
+  //     socket.disconnect();
+  //   };
+  // }, []);
 
   const fetchAntecedentesPatologicos = async () => {
     try {
-      const response = await axios.get('http://172.30.189.93:5005/antecPatolog');
+      const response = await axios.get('http://172.30.189.86:5005/antecPatolog');
       setAntecedentesPatologicos(response.data);
     } catch (error) {
       console.error('Error al obtener antecedentes patológicos:', error);
@@ -66,11 +66,11 @@ const ExamenMedico = () => {
 
   const fetchUsuarioFolio = async () => {
     try {
-      const response = await axios.get(`http://172.30.189.93:5005/usuario/folio/${idFolio}`);
+      const response = await axios.get(`http://172.30.189.86:5005/usuario/folio/${idFolio}`);
       console.log(response.data.entrevistaInicial);
       setUsuario(response.data);
       setEntrevistaInicial(response.data.entrevistaInicial);
-      setExamMed(response.data.examenMedico)
+      setExamMed(response.data.examenMedico);
     } catch (error) {
       console.error('Error al obtener datos del usuario:', error);
     } finally {
@@ -130,7 +130,7 @@ const ExamenMedico = () => {
   const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.post('http://172.30.189.93:5005/examMedico', {
+            const response = await axios.post('http://172.30.189.86:5005/examMedico', {
                 examMedicoData: {
                     planta: formData.planta,
                     fecha: new Date(formData.fecha),
@@ -174,12 +174,12 @@ const ExamenMedico = () => {
       <h2 className="text-2xl font-bold mb-4">Examen Médico</h2>
       
       <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700">Planta:</label>
+        <label className="block text-sm font-medium text-gray-700">Planta: <span className="text-red-500">*</span></label>
         <input type="text" name="planta" placeholder="Planta" onChange={handleChange} className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-500" />
       </div>
       
       <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700">Fecha:</label>
+        <label className="block text-sm font-medium text-gray-700">Fecha: <span className="text-red-500">*</span></label>
         <input type="date" name="fecha" onChange={handleChange} className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-500" />
       </div>
       
@@ -357,7 +357,7 @@ const ExamenMedico = () => {
         <input type="text" name="otraEnferm" value={formData.otraEnferm} onChange={handleChange} className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-500" />
       </div>
 
-      <h3 className="text-lg font-semibold mb-2">Antecedentes Familiares</h3>
+      <h3 className="text-lg font-semibold mb-2">Antecedentes Familiares <span className="text-red-500">*</span></h3>
       {formData.antecFam.map((fam, index) => (
         <div key={index} className="mb-4 border p-2 rounded">
           <input

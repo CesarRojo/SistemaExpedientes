@@ -27,13 +27,13 @@ function App() {
         <Route path="/" element={isAuthenticated ? <Navigate to="/home" /> : <Login />} />
         <Route path="/home" element={isAuthenticated ? <Home /> : <Navigate to="/" />} />
         <Route path="/Videos" element={isAuthenticated ? <VideosList /> : <Navigate to="/" />} />
-        <Route path="/SubirVideos" element={isAuthenticated ? (loginType === 'folio' && !hasWatchedAllVideos ? <Navigate to="/Videos" /> : <SubirVideos />) : <Navigate to="/" />} />
+        <Route path="/SubirVideos" element={isAuthenticated && loginType === 'normal' ? <SubirVideos /> : <Navigate to="/" />} />
         <Route path="/LoginFolio" element={isAuthenticated ? <Navigate to="/home" /> : <LoginFolio />} />
-        <Route path="/EntrevIni" element={isAuthenticated ? (loginType === 'folio' && !hasWatchedAllVideos ? <Navigate to="/Videos" /> : <EntrevIniForm />) : <Navigate to="/" />} />
-        <Route path="/TablaEntrev" element={isAuthenticated ? (loginType === 'folio' && !hasWatchedAllVideos ? <Navigate to="/Videos" /> : <TablaEntrevistas />) : <Navigate to="/" />} />
-        <Route path="/TablaExFis" element={isAuthenticated ? (loginType === 'folio' && !hasWatchedAllVideos ? <Navigate to="/Videos" /> : <TablaUsuarios />) : <Navigate to="/" />} />
+        <Route path="/EntrevIni" element={isAuthenticated && loginType === 'normal' ? <EntrevIniForm /> : <Navigate to="/" />} />
+        <Route path="/TablaEntrev" element={isAuthenticated && loginType === 'normal' ? <TablaEntrevistas /> : <Navigate to="/" />} />
+        <Route path="/TablaExFis" element={isAuthenticated && loginType === 'normal' ?  <TablaUsuarios /> : <Navigate to="/" />} />
         <Route path="/ExamMedico" element={isAuthenticated ? (loginType === 'folio' && !hasWatchedAllVideos ? <Navigate to="/Videos" /> : <ExamenMedico />) : <Navigate to="/" />} />
-        <Route path="/ExpFisica" element={isAuthenticated ? (loginType === 'folio' && !hasWatchedAllVideos ? <Navigate to="/Videos" /> : <ExploracionFisica />) : <Navigate to="/" />} />
+        <Route path="/ExpFisica" element={isAuthenticated && loginType === 'normal' ? <ExploracionFisica /> : <Navigate to="/" />} />
         <Route path="/SolicInt" element={isAuthenticated ? (loginType === 'folio' && !hasWatchedAllVideos ? <Navigate to="/Videos" /> : <SolicitudInterna />) : <Navigate to="/" />} />
       </Routes>
     </Router>

@@ -26,7 +26,7 @@ const SolicitudInternaForm = () => {
 
   const fetchUsuarioFolio = async () => {
     try {
-      const response = await axios.get(`http://172.30.189.93:5005/usuario/folio/${idFolio}`);
+      const response = await axios.get(`http://172.30.189.86:5005/usuario/folio/${idFolio}`);
       console.log(response.data);
       setUsuario(response.data);
       setSolInt(response.data.solicitudInterna);
@@ -81,7 +81,7 @@ const SolicitudInternaForm = () => {
         // Eliminar fechaNac del usuario antes de enviar
         const { fechaNac, ...dataWithoutFechaNac } = dataToSend;
 
-        const response = await axios.post('http://172.30.189.93:5005/solicInt', dataWithoutFechaNac);
+        const response = await axios.post('http://172.30.189.86:5005/solicInt', dataWithoutFechaNac);
         console.log('Data submitted successfully:', response.data);
       } else {
         console.error('Usuario no cargado');
@@ -104,7 +104,7 @@ const SolicitudInternaForm = () => {
       <h2 className="text-2xl font-bold mb-4">Solicitud Interna</h2>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700">Fecha:</label>
+          <label className="block text-sm font-medium text-gray-700">Fecha: <span className="text-red-500">*</span></label>
           <input
             type="date"
             name="fecha"
@@ -115,7 +115,7 @@ const SolicitudInternaForm = () => {
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700">Lugar de Nacimiento:</label>
+          <label className="block text-sm font-medium text-gray-700">Lugar de Nacimiento: <span className="text-red-500">*</span></label>
           <input
             type="text"
             name="lugarNac"
@@ -126,7 +126,7 @@ const SolicitudInternaForm = () => {
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700">RFC:</label>
+          <label className="block text-sm font-medium text-gray-700">RFC: <span className="text-red-500">*</span></label>
           <input
             type="text"
             name="RFC"
@@ -137,7 +137,7 @@ const SolicitudInternaForm = () => {
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700">CURP:</label>
+          <label className="block text-sm font-medium text-gray-700">CURP: <span className="text-red-500">*</span></label>
           <input
             type="text"
             name="CURP"
@@ -148,7 +148,7 @@ const SolicitudInternaForm = () => {
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700">NSS:</label>
+          <label className="block text-sm font-medium text-gray-700">NSS: <span className="text-red-500">*</span></label>
           <input
             type="text"
             name="NSS"
@@ -159,7 +159,7 @@ const SolicitudInternaForm = () => {
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700">CP:</label>
+          <label className="block text-sm font-medium text-gray-700">CP: <span className="text-red-500">*</span></label>
           <input
             type="text"
             name="CP"
@@ -170,7 +170,7 @@ const SolicitudInternaForm = () => {
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700">Ciudad:</label>
+          <label className="block text-sm font-medium text-gray-700">Ciudad: <span className="text-red-500">*</span></label>
           <input
             type="text"
             name="ciudad"
@@ -181,7 +181,7 @@ const SolicitudInternaForm = () => {
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700">Estado:</label>
+          <label className="block text-sm font-medium text-gray-700">Estado: <span className="text-red-500">*</span></label>
           <input
             type="text"
             name="estado"
@@ -192,7 +192,7 @@ const SolicitudInternaForm = () => {
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700">Municipio:</label>
+          <label className="block text-sm font-medium text-gray-700">Municipio: <span className="text-red-500">*</span></label>
           <input
             type="text"
             name="municipio"
@@ -203,7 +203,7 @@ const SolicitudInternaForm = () => {
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700">Vive con:</label>
+          <label className="block text-sm font-medium text-gray-700">Vive con: <span className="text-red-500">*</span></label>
           <input
             type="text"
             name="viveCon"
@@ -214,7 +214,7 @@ const SolicitudInternaForm = () => {
           />
         </div>
 
-        <h3 className="text-xl font-semibold mt-6">Datos Familiares</h3>
+        <h3 className="text-xl font-semibold mt-6">Datos Familiares <span className="text-red-500">*</span></h3>
         {formData.datosFam.map((dataFam, index) => (
           <div key={index} className="border p-4 rounded-md mb-4">
             <label className="block text-sm font-medium text-gray-700">Nombre:</label>

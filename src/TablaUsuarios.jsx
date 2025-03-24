@@ -9,7 +9,7 @@ const TablaUsuarios = () => {
 
   const fetchDatos = async () => {
     try {
-      const response = await axios.get('http://172.30.189.93:5005/usuario');
+      const response = await axios.get('http://172.30.189.86:5005/usuario');
       console.log(response.data);
       setDatos(response.data);
     } catch (error) {
@@ -20,11 +20,25 @@ const TablaUsuarios = () => {
   useEffect(() => {
     fetchDatos();
 
-    const socket = io('http://172.30.189.93:5005');
+    const socket = io('http://172.30.189.86:5005');
 
-    // Escuchar el evento newEntrevIni
+    // Escuchar el evento newExamMed
     socket.on('newExamMed', (data) => {
-      console.log('Nuevo evento de examen medico:', data);
+      // Actualizar el estado con el nuevo examen médico
+      setDatos((prevDatos) => {
+        return prevDatos.map((usuario) => {
+          //Si algun idUsuario de la tabla coincide con el idUsuario que regresa el socket
+          if (usuario.idUsuario === data.idUsuario) {
+            // Actualizar el examen médico del usuario
+            return {
+              ...usuario,
+              examenMedico: true, // O cualquier otra propiedad que necesites actualizar
+              // Si necesitas más datos del examen médico, puedes agregarlos aquí
+            };
+          }
+          return usuario;
+        });
+      });
     });
 
     // Limpiar la conexión al desmontar el componente

@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import useAuthStore from './authStore';
 import { useLocation } from 'react-router-dom';
 
 const ExploracionFisica = () => {
@@ -37,7 +36,7 @@ const ExploracionFisica = () => {
     extremidades: '',
     capacEsp: '',
     calificacionFinal: '',
-    idUsuario: idUsuario, // Se asigna el usuario seleccionado de la tabla anterior
+    idUsuario: idUsuario,
   });
 
   const [expFisica, setExpFisica] = useState(null);
@@ -45,7 +44,7 @@ const ExploracionFisica = () => {
 
   const fetchUsuarioFolio = async () => {
     try {
-      const response = await axios.get(`http://172.30.189.93:5005/usuario/${idUsuario}`);
+      const response = await axios.get(`http://172.30.189.86:5005/usuario/${idUsuario}`);
       console.log(response.data);
       setExamMed(response.data.examenMedico);
       setExpFisica(response.data.exploracionFisica);
@@ -71,14 +70,14 @@ const ExploracionFisica = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://172.30.189.93:5005/expFisica', {
+      const response = await axios.post('http://172.30.189.86:5005/expFisica', {
         ...formData,
         peso: parseInt(formData.peso),
         talla: parseInt(formData.talla),
         temperatura: parseInt(formData.temperatura),
         FR: parseInt(formData.FR),
         FC: parseInt(formData.FC),
-        TA: parseInt(formData.TA),
+        TA: formData.TA, // Assuming TA is a string
         finkelstein: parseInt(formData.finkelstein),
         tinel: parseInt(formData.tinel),
         phalen: parseInt(formData.phalen),
@@ -116,47 +115,47 @@ const ExploracionFisica = () => {
       <h2 className="text-2xl font-bold mb-4">Exploración Física - <em>{nombre + ' ' + apellidoPat}</em></h2>
 
       <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700">Peso:</label>
+        <label className="block text-sm font-medium text-gray-700">Peso: <span className="text-red-500">*</span></label>
         <input type="number" name="peso" value={formData.peso} onChange={handleChange} className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-500" />
       </div>
 
       <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700">Talla:</label>
+        <label className="block text-sm font-medium text-gray-700">Talla: <span className="text-red-500">*</span></label>
         <input type="number" name="talla" value={formData.talla} onChange={handleChange} className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-500" />
       </div>
 
       <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700">Temperatura:</label>
+        <label className="block text-sm font-medium text-gray-700">Temperatura: <span className="text-red-500">*</span></label>
         <input type="number" name="temperatura" value={formData.temperatura} onChange={handleChange} className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-500" />
       </div>
 
       <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700">Frecuencia Respiratoria (FR):</label>
+        <label className="block text-sm font-medium text-gray-700">Frecuencia Respiratoria (FR): <span className="text-red-500">*</span></label>
         <input type="number" name="FR" value={formData.FR} onChange={handleChange} className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-500" />
       </div>
 
       <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700">Frecuencia Cardíaca (FC):</label>
+        <label className="block text-sm font-medium text-gray-700">Frecuencia Cardíaca (FC): <span className="text-red-500">*</span></label>
         <input type="number" name="FC" value={formData.FC} onChange={handleChange} className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-500" />
       </div>
 
       <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700">Tensión Arterial (TA):</label>
-        <input type="text" name="TA" value={formData.TA} onChange={handleChange} className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-500" />
+        <label className="block text-sm font-medium text-gray-700">Tensión Arterial (TA): <span className="text-red-500">*</span></label>
+        <input type="number" name="TA" value={formData.TA} onChange={handleChange} className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue- 500" />
       </div>
 
       <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700">Finkelstein:</label>
+        <label className="block text-sm font-medium text-gray-700">Finkelstein: <span className="text-red-500">*</span></label>
         <input type="number" name="finkelstein" value={formData.finkelstein} onChange={handleChange} className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-500" />
       </div>
 
       <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700">Tinel:</label>
+        <label className="block text-sm font-medium text-gray-700">Tinel: <span className="text-red-500">*</span></label>
         <input type="number" name="tinel" value={formData.tinel} onChange={handleChange} className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-500" />
       </div>
 
       <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700">Phalen:</label>
+        <label className="block text-sm font-medium text-gray-700">Phalen: <span className="text-red-500">*</span></label>
         <input type="number" name="phalen" value={formData.phalen} onChange={handleChange} className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-500" />
       </div>
 
@@ -180,92 +179,92 @@ const ExploracionFisica = () => {
       </div>
 
       <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700">Comprensión:</label>
-        <input type="text" name="comprension" value={formData.comprension} onChange={handleChange} className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-500" />
+        <label className="block text-sm font-medium text-gray-700">Comprensión: <span className="text-red-500">*</span></label>
+        <input type="number" name="comprension" value={formData.comprension} onChange={handleChange} className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-500" />
       </div>
 
       <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700">Visión Lejos:</label>
-        <input type="text" name="visionLejos" value={formData.visionLejos} onChange={handleChange} className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-500" />
+        <label className="block text-sm font-medium text-gray-700">Visión Lejos: <span className="text-red-500">*</span></label>
+        <input type="number" name="visionLejos" value={formData.visionLejos} onChange={handleChange} className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-500" />
       </div>
 
       <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700">Visión Cerca:</label>
-        <input type="text" name="visionCerca" value={formData.visionCerca} onChange={handleChange} className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-500" />
+        <label className="block text-sm font-medium text-gray-700">Visión Cerca: <span className="text-red-500">*</span></label>
+        <input type="number" name="visionCerca" value={formData.visionCerca} onChange={handleChange} className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-500" />
       </div>
 
       <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700">Daltonismo:</label>
-        <input type="text" name="daltonismo" value={formData.daltonismo} onChange={handleChange} className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-500" />
+        <label className="block text-sm font-medium text-gray-700">Daltonismo: <span className="text-red-500">*</span></label>
+        <input type="number" name="daltonismo" value={formData.daltonismo} onChange={handleChange} className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-500" />
       </div>
 
       <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700">Ojo Izquierdo (OI):</label>
-        <input type="text" name="OI" value={formData.OI} onChange={handleChange} className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-500" />
+        <label className="block text-sm font-medium text-gray-700">Ojo Izquierdo (OI): <span className="text-red-500">*</span></label>
+        <input type="number" name="OI" value={formData.OI} onChange={handleChange} className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-500" />
       </div>
 
       <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700">Ojo Derecho (OD):</label>
-        <input type="text" name="OD" value={ formData.OD} onChange={handleChange} className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-500" />
+        <label className="block text-sm font-medium text-gray-700">Ojo Derecho (OD): <span className="text-red-500">*</span></label>
+        <input type="number" name="OD" value={formData.OD} onChange={handleChange} className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-500" />
       </div>
 
       <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700">Calificación:</label>
-        <input type="text" name="calificacion" value={formData.calificacion} onChange={handleChange} className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-500" />
+        <label className="block text-sm font-medium text-gray-700">Calificación: <span className="text-red-500">*</span></label>
+        <input type="number" name="calificacion" value={formData.calificacion} onChange={handleChange} className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-500" />
       </div>
 
       <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700">Piel:</label>
+        <label className="block text-sm font-medium text-gray-700">Piel: <span className="text-red-500">*</span></label>
         <input type="text" name="piel" value={formData.piel} onChange={handleChange} className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-500" />
       </div>
 
       <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700">Higiene:</label>
+        <label className="block text-sm font-medium text-gray-700">Higiene: <span className="text-red-500">*</span></label>
         <input type="text" name="higiene" value={formData.higiene} onChange={handleChange} className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-500" />
       </div>
 
       <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700">Tipo de Peso:</label>
+        <label className="block text-sm font-medium text-gray-700">Tipo de Peso: <span className="text-red-500">*</span></label>
         <input type="text" name="tipoPeso" value={formData.tipoPeso} onChange={handleChange} className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-500" />
       </div>
 
       <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700">Lesión Ocular:</label>
-        <input type="text" name="lesionOcular" value={formData.lesionOcular} onChange={handleChange} className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-500" />
+        <label className="block text-sm font-medium text-gray-700">Lesión Ocular: <span className="text-red-500">*</span></label>
+        <input type="number" name="lesionOcular" value={formData.lesionOcular} onChange={handleChange} className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-500" />
       </div>
 
       <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700">Lesión de Oído:</label>
-        <input type="text" name="lesionOido" value={formData.lesionOido} onChange={handleChange} className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-500" />
+        <label className="block text-sm font-medium text-gray-700">Lesión de Oído: <span className="text-red-500">*</span></label>
+        <input type="number" name="lesionOido" value={formData.lesionOido} onChange={handleChange} className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-500" />
       </div>
 
       <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700">Boca/Dientes/Encías:</label>
-        <input type="text" name="bocaDienEnc" value={formData.bocaDienEnc} onChange={handleChange} className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-500" />
+        <label className="block text-sm font-medium text-gray-700">Boca/Dientes/Encías: <span className="text-red-500">*</span></label>
+        <input type="number" name="bocaDienEnc" value={formData.bocaDienEnc} onChange={handleChange} className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-500" />
       </div>
 
       <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700">Tórax:</label>
-        <input type="text" name="torax" value={formData.torax} onChange={handleChange} className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-500" />
+        <label className="block text-sm font-medium text-gray-700">Tórax: <span className="text-red-500">*</span></label>
+        <input type="number" name="torax" value={formData.torax} onChange={handleChange} className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-500" />
       </div>
 
       <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700">Columna Vertebral:</label>
-        <input type="text" name="columVert" value={formData.columVert} onChange={handleChange} className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-500" />
+        <label className="block text-sm font-medium text-gray-700">Columna Vertebral: <span className="text-red-500">*</span></label>
+        <input type="number" name="columVert" value={formData.columVert} onChange={handleChange} className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-500" />
       </div>
 
       <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700">Extremidades:</label>
-        <input type="text" name="extremidades" value={formData.extremidades} onChange={handleChange} className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-500" />
+        <label className="block text-sm font-medium text-gray-700">Extremidades: <span className="text-red-500">*</span></label>
+        <input type="number" name="extremidades" value={formData.extremidades} onChange={handleChange} className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-500" />
       </div>
 
       <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700">Capacidad Especial:</label>
+        <label className="block text-sm font-medium text-gray-700">Capacidad Especial: <span className="text-red-500">*</span></label>
         <input type="text" name="capacEsp" value={formData.capacEsp} onChange={handleChange} className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-500" />
-      </ div>
+      </div>
 
       <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700">Calificación Final:</label>
+        <label className="block text-sm font-medium text-gray-700">Calificación Final: <span className="text-red-500">*</span></label>
         <input type="text" name="calificacionFinal" value={formData.calificacionFinal} onChange={handleChange} className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-500" />
       </div>
 
