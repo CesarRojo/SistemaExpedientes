@@ -26,7 +26,7 @@ const SolicitudInternaForm = () => {
 
   const fetchUsuarioFolio = async () => {
     try {
-      const response = await axios.get(`http://172.30.189.107:5005/usuario/folio/${idFolio}`);
+      const response = await axios.get(`http://172.30.189.87:5005/usuario/folio/${idFolio}`);
       console.log(response.data);
       setUsuario(response.data);
       setSolInt(response.data.solicitudInterna);
@@ -81,7 +81,7 @@ const SolicitudInternaForm = () => {
         // Eliminar fechaNac del usuario antes de enviar
         const { fechaNac, ...dataWithoutFechaNac } = dataToSend;
 
-        const response = await axios.post('http://172.30.189.107:5005/solicInt', dataWithoutFechaNac);
+        const response = await axios.post('http://172.30.189.87:5005/solicInt', dataWithoutFechaNac);
         console.log('Data submitted successfully:', response.data);
       } else {
         console.error('Usuario no cargado');

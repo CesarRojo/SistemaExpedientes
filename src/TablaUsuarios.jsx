@@ -9,7 +9,7 @@ const TablaUsuarios = () => {
 
   const fetchDatos = async () => {
     try {
-      const response = await axios.get('http://172.30.189.107:5005/usuario');
+      const response = await axios.get('http://172.30.189.87:5005/usuario');
       console.log(response.data);
       setDatos(response.data);
     } catch (error) {
@@ -20,7 +20,7 @@ const TablaUsuarios = () => {
   useEffect(() => {
     fetchDatos();
 
-    const socket = io('http://172.30.189.107:5005');
+    const socket = io('http://172.30.189.87:5005');
 
     // Escuchar el evento newExamMed
     socket.on('newExamMed', (data) => {

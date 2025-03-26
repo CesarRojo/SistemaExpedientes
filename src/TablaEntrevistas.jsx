@@ -9,7 +9,7 @@ const TablaEntrevistas = () => {
   useEffect(() => {
     const fetchDatos = async () => {
       try {
-        const response = await axios.get('http://172.30.189.107:5005/entrevIni');
+        const response = await axios.get('http://172.30.189.87:5005/entrevIni');
         setDatos(response.data);
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -21,6 +21,10 @@ const TablaEntrevistas = () => {
 
   const handleNuevaEntrada = () => {
     navigate('/entrevIni');
+  };
+
+  const handleEntrevPdf = (idUsuario) => {
+    navigate('/EntrevDiseño', { state: { idUsuario }});
   };
 
   return (
@@ -40,7 +44,7 @@ const TablaEntrevistas = () => {
         </thead>
         <tbody className="bg-white divide-y divide-gray-200">
           {datos.map((dato, index) => (
-            <tr key={index}>
+            <tr key={index} onClick={() => handleEntrevPdf(dato.idUsuario)} className="cursor-pointer hover:bg-gray-50">
               <td className="px-6 py-4 whitespace-nowrap">{dato.idEntrevIni}</td>
               <td className="px-6 py-4 whitespace-nowrap">{dato.usuario.nombre}</td>
               <td className="px-6 py-4 whitespace-nowrap">{dato.usuario.apellidoPat}</td>

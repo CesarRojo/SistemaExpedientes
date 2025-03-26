@@ -40,7 +40,7 @@ const ExamenMedico = () => {
 
   // Configurar Socket.IO
   // useEffect(() => {
-  //   const socket = io('http://172.30.189.107:5005'); // Asegúrate de que la URL sea correcta
+  //   const socket = io('http://172.30.189.87:5005'); // Asegúrate de que la URL sea correcta
 
   //   // Escuchar el evento newEntrevIni
   //   socket.on('newEntrevIni', (data) => {
@@ -57,7 +57,7 @@ const ExamenMedico = () => {
 
   const fetchAntecedentesPatologicos = async () => {
     try {
-      const response = await axios.get('http://172.30.189.107:5005/antecPatolog');
+      const response = await axios.get('http://172.30.189.87:5005/antecPatolog');
       setAntecedentesPatologicos(response.data);
     } catch (error) {
       console.error('Error al obtener antecedentes patológicos:', error);
@@ -66,7 +66,7 @@ const ExamenMedico = () => {
 
   const fetchUsuarioFolio = async () => {
     try {
-      const response = await axios.get(`http://172.30.189.107:5005/usuario/folio/${idFolio}`);
+      const response = await axios.get(`http://172.30.189.87:5005/usuario/folio/${idFolio}`);
       console.log(response.data.entrevistaInicial);
       setUsuario(response.data);
       setEntrevistaInicial(response.data.entrevistaInicial);
@@ -130,7 +130,7 @@ const ExamenMedico = () => {
   const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.post('http://172.30.189.107:5005/examMedico', {
+            const response = await axios.post('http://172.30.189.87:5005/examMedico', {
                 examMedicoData: {
                     planta: formData.planta,
                     fecha: new Date(formData.fecha),
