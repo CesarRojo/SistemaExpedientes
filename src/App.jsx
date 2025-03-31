@@ -5,6 +5,7 @@ import SubirVideos from './SubirVideos';
 import LoginFolio from './LoginFolio';
 import EntrevIniForm from './EntrevIni';
 import TablaEntrevistas from './TablaEntrevistas';
+import TablaExamMed from './TablaExamMed';
 import TablaUsuarios from './TablaUsuarios';
 import Home from './Home';
 import Navbar from './Navbar';
@@ -33,6 +34,7 @@ function App() {
         <Route path="/EntrevIni" element={isAuthenticated && loginType === 'normal' ? <EntrevIniForm /> : <Navigate to="/" />} />
         <Route path="/EntrevDiseño" element={isAuthenticated && loginType === 'normal' ? <EntrevistaDiseño /> : <Navigate to="/" />} />
         <Route path="/TablaEntrev" element={isAuthenticated && loginType === 'normal' ? <TablaEntrevistas /> : <Navigate to="/" />} />
+        <Route path="/TablaExamMed" element={isAuthenticated && loginType === 'normal' ? <TablaExamMed /> : <Navigate to="/" />} />
         <Route path="/TablaExFis" element={isAuthenticated && loginType === 'normal' ?  <TablaUsuarios /> : <Navigate to="/" />} />
         <Route path="/ExamMedico" element={isAuthenticated ? (loginType === 'folio' && !hasWatchedAllVideos ? <Navigate to="/Videos" /> : <ExamenMedico />) : <Navigate to="/" />} />
         <Route path="/ExpFisica" element={isAuthenticated && loginType === 'normal' ? <ExploracionFisica /> : <Navigate to="/" />} />

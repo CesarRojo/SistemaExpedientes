@@ -44,7 +44,7 @@ const ExploracionFisica = () => {
 
   const fetchUsuarioFolio = async () => {
     try {
-      const response = await axios.get(`http://172.30.189.87:5005/usuario/${idUsuario}`);
+      const response = await axios.get(`http://172.30.189.99:5005/usuario/${idUsuario}`);
       console.log(response.data);
       setExamMed(response.data.examenMedico);
       setExpFisica(response.data.exploracionFisica);
@@ -70,14 +70,14 @@ const ExploracionFisica = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://172.30.189.87:5005/expFisica', {
+      const response = await axios.post('http://172.30.189.99:5005/expFisica', {
         ...formData,
         peso: parseInt(formData.peso),
         talla: parseInt(formData.talla),
         temperatura: parseInt(formData.temperatura),
         FR: parseInt(formData.FR),
         FC: parseInt(formData.FC),
-        TA: formData.TA, // Assuming TA is a string
+        TA: parseInt(formData.TA),
         finkelstein: parseInt(formData.finkelstein),
         tinel: parseInt(formData.tinel),
         phalen: parseInt(formData.phalen),

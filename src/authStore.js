@@ -10,7 +10,7 @@ const useAuthStore = create(persist(
     hasWatchedAllVideos: false, // Estado para controlar si ha visto todos los videos
     login: async (username, password) => {
       try {
-        const response = await axios.post('http://172.30.189.87:5005/auth/login', { username, password });
+        const response = await axios.post('http://172.30.189.99:5005/auth/login', { username, password });
 
         // Extraer solo la información necesaria
         const { user } = response.data;
@@ -32,14 +32,14 @@ const useAuthStore = create(persist(
     },
     loginWithFolio: async (folio) => {
       try {
-        const response = await axios.post('http://172.30.189.87:5005/auth/loginFolio', { folio });
+        const response = await axios.post('http://172.30.189.99:5005/auth/loginFolio', { folio });
 
         // Extraer solo la información necesaria
         const { user } = response.data;
         const { idFolio, numFolio, Usuario, Extras } = user;
 
         // Estructura el usuario de manera más clara
-        const structuredUser  = {
+        const structuredUser = {
           idFolio,
           numFolio,
           fullName: `${Usuario?.nombre || ''} ${Usuario?.apellidoPat || ''}`.trim(),
@@ -55,7 +55,7 @@ const useAuthStore = create(persist(
     logout: () => set({ isAuthenticated: false, user: null, loginType: null, hasWatchedAllVideos: false }), // Resetea el tipo de inicio de sesión al cerrar sesión
     markVideosAsWatched: async (idFolio) => {
       try {
-        await axios.put(`http://172.30.189.87:5005/folio/extras/${idFolio}`);
+        await axios.put(`http://172.30.189.99:5005/folio/extras/${idFolio}`);
         set({ hasWatchedAllVideos: true });
         console.log("Estado de vioVideos actualizado a true");
       } catch (error) {

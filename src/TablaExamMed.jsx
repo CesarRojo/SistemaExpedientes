@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import * as XLSX from 'xlsx'; // Importar la biblioteca xlsx
 
-const TablaEntrevistas = () => {
+const TablaExamMed = () => {
   const [datos, setDatos] = useState([]);
   const [fecha, setFecha] = useState(new Date().toISOString().split('T')[0]);
   const [filtros, setFiltros] = useState({
@@ -17,9 +17,10 @@ const TablaEntrevistas = () => {
   useEffect(() => {
     const fetchDatos = async () => {
       try {
-        const response = await axios.get('http://172.30.189.99:5005/entrevIni/fecha', {
+        const response = await axios.get('http://172.30.189.99:5005/examMedico/fecha', {
           params: { fecha },
         });
+        console.log(response.data);
         setDatos(response.data);
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -29,9 +30,6 @@ const TablaEntrevistas = () => {
     fetchDatos();
   }, [fecha]);
 
-  const handleNuevaEntrada = () => {
-    navigate('/entrevIni');
-  };
 
   const handleEntrevPdf = (idUsuario) => {
     navigate('/EntrevDiseño', { state: { idUsuario } });
@@ -39,21 +37,21 @@ const TablaEntrevistas = () => {
 
   const handleExportarExcel = () => {
     const datosParaExportar = datos.map((dato) => ({
-      ID: dato.idEntrevIni,
+      ID: dato.idExamMed,
       Nombre: dato.usuario.nombre,
       ApellidoPaterno: dato.usuario.apellidoPat,
       ApellidoMaterno: dato.usuario.apellidoMat,
-      Puesto: dato.puesto,
-      Turno: dato.turno,
+      drogas: dato.drogas ? dato.drogas : "Ninguna",
+      observaciones: dato.observaciones ? dato.observaciones : "Ninguna",
       Fecha: dato.fecha.split('T')[0],
-      Folio: dato.usuario.folio.numFolio,
+    //   Folio: dato.usuario.folio.numFolio,
     }));
 
     const hojaDeTrabajo = XLSX.utils.json_to_sheet(datosParaExportar);
     const libroDeTrabajo = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(libroDeTrabajo, hojaDeTrabajo, 'Entrevistas');
 
-    XLSX.writeFile(libroDeTrabajo, `Entrevistas-${fecha}.xlsx`);
+    XLSX.writeFile(libroDeTrabajo, `ExamenMedico-${fecha}.xlsx`);
   };
 
   const handleFiltroChange = (e) => {
@@ -62,16 +60,16 @@ const TablaEntrevistas = () => {
   };
 
   const datosFiltrados = datos.filter((dato) => {
-    const { nombre, puesto, turno, folio } = filtros;
+    const { nombre, drogas, observaciones } = filtros;
 
     // Concatenar nombre completo para el filtro
     const nombreCompleto = `${dato.usuario.nombre} ${dato.usuario.apellidoPat} ${dato.usuario.apellidoMat}`.toLowerCase();
 
     return (
       (!nombre || nombreCompleto.includes(nombre.toLowerCase())) && // Filtrar por nombre completo
-      (!puesto || dato.puesto.toLowerCase().includes(puesto.toLowerCase())) &&
-      (!turno || dato.turno.toLowerCase().includes(turno.toLowerCase())) &&
-      (!folio || dato.usuario.folio.numFolio.toString().includes(folio)) // Filtrar folio como número
+      (!drogas || dato.puesto.toLowerCase().includes(drogas.toLowerCase())) &&
+      (!observaciones || dato.turno.toLowerCase().includes(observaciones.toLowerCase()))
+    //   (!folio || dato.usuario.folio.numFolio.toString().includes(folio)) // Filtrar folio como número
     );
   });
 
@@ -147,12 +145,6 @@ const TablaEntrevistas = () => {
 
       <div className="flex space-x-4">
         <button
-          onClick={handleNuevaEntrada}
-          className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-700"
-        >
-          Nueva Entrevista
-        </button>
-        <button
           onClick={handleExportarExcel}
           className="mt-4 px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-700"
         >
@@ -167,23 +159,23 @@ const TablaEntrevistas = () => {
             <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre</th>
             <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Apellido Pat</th>
             <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Apellido Mat</th>
-            <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Puesto</th>
-            <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Turno</th>
+            <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Drogas</th>
+            <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Observaciones</th>
             <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha</th>
-            <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Folio</th>
+            {/* <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Folio</th> */}
           </tr>
         </thead>
         <tbody className="bg-white divide-y divide-gray-200">
           {datosFiltrados.map((dato, index) => (
-            <tr key={index} onClick={() => handleEntrevPdf(dato.idUsuario)} className="cursor-pointer hover:bg-gray-50">
-              <td className="px-6 py-4 whitespace-nowrap">{dato.idEntrevIni}</td>
+            <tr key={index} onClick={() => handleEntrevPdf(dato.usuario.idUsuario)} className="cursor-pointer hover:bg-gray-50">
+              <td className="px-6 py-4 whitespace-nowrap">{dato.idExamMed}</td>
               <td className="px-6 py-4 whitespace-nowrap">{dato.usuario.nombre}</td>
               <td className="px-6 py-4 whitespace-nowrap">{dato.usuario.apellidoPat}</td>
               <td className="px-6 py-4 whitespace-nowrap">{dato.usuario.apellidoMat}</td>
-              <td className="px-6 py-4 whitespace-nowrap">{dato.puesto}</td>
-              <td className="px-6 py-4 whitespace-nowrap">{dato.turno}</td>
+              <td className="px-6 py-4 whitespace-nowrap">{dato.drogas ? dato.drogas : "Ninguna"}</td>
+              <td className="px-6 py-4 whitespace-nowrap">{dato.observaciones ? dato.observaciones : "Ninguna"}</td>
               <td className="px-6 py-4 whitespace-nowrap">{dato.fecha.split('T')[0]}</td>
-              <td className="px-6 py-4 whitespace-nowrap">{dato.usuario.folio.numFolio}</td>
+              {/* <td className="px-6 py-4 whitespace-nowrap">{dato.usuario.folio.numFolio}</td> */}
             </tr>
           ))}
         </tbody>
@@ -192,4 +184,4 @@ const TablaEntrevistas = () => {
   );
 };
 
-export default TablaEntrevistas;
+export default TablaExamMed;
