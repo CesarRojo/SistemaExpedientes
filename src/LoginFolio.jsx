@@ -47,6 +47,12 @@ const LoginFolio = () => {
           >
             Tengo cuenta
           </button>
+          <button
+            onClick={() => navigate('/GenFolio')}
+            className="px-4 py-2 font-bold text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring focus:ring-blue-200"
+          >
+            No tengo folio
+          </button>
         </div>
       </div>
     </div>
