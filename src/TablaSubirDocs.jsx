@@ -13,7 +13,7 @@ const TablaSubirDocs = () => {
 
   const fetchDatos = async () => {
     try {
-      const response = await axios.get('http://172.30.189.99:5005/usuario');
+      const response = await axios.get('http://192.168.1.68:5005/usuario');
       console.log(response.data);
       setDatos(response.data);
     } catch (error) {
@@ -23,7 +23,7 @@ const TablaSubirDocs = () => {
 
   const fetchDocs = async () => {
     try {
-      const response = await axios.get('http://172.30.189.99:5005/docs');
+      const response = await axios.get('http://192.168.1.68:5005/docs');
       setDocs(response.data);
     } catch (error) {
       console.error('Error fetching docs data:', error);
@@ -91,8 +91,8 @@ const TablaSubirDocs = () => {
           <tr>
             <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
             <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre</th>
-            <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Apellido Pat</th>
-            <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Apellido Mat</th>
+            {/* <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Apellido Pat</th>
+            <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Apellido Mat</th> */}
             <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha</th>
             <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Folio</th>
             <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">INE</th>
@@ -102,6 +102,7 @@ const TablaSubirDocs = () => {
             <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Constancia Sit Fiscal</th>
             <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Comprob Domicilio</th>
             <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Comprob Estudios</th>
+            <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Combinado</th>
           </tr>
         </thead>
         <tbody className="bg-white divide-y divide-gray-200">
@@ -115,19 +116,19 @@ const TablaSubirDocs = () => {
               >
                 <td className="px-6 py-4 whitespace-nowrap">{dato.idUsuario}</td>
                 <td className="px-6 py-4 whitespace-nowrap">{dato.nombre}</td>
-                <td className="px-6 py-4 whitespace-nowrap">{dato.apellidoPat}</td>
-                <td className="px-6 py-4 whitespace-nowrap">{dato.apellidoMat}</td>
+                {/* <td className="px-6 py-4 whitespace-nowrap">{dato.apellidoPat}</td>
+                <td className="px-6 py-4 whitespace-nowrap">{dato.apellidoMat}</td> */}
                 <td className="px-6 py-4 whitespace-nowrap">{dato.entrevistaInicial.fecha.split('T')[0]}</td>
                 <td className="px-6 py-4 whitespace-nowrap">{dato.folio.numFolio}</td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   {documentos.ine ? (
                     <a
-                      href={`http://172.30.189.99:5005${documentos.ine.path}`}
+                      href={`http://192.168.1.68:5005${documentos.ine.path}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-blue-500 hover:underline"
                     >
-                      Ver INE
+                      Ver
                     </a>
                   ) : (
                     <span className="text-gray-500">No subido</span>
@@ -136,12 +137,12 @@ const TablaSubirDocs = () => {
                 <td className="px-6 py-4 whitespace-nowrap">
                   {documentos.nss ? (
                     <a
-                      href={`http://172.30.189.99:5005${documentos.nss.path}`}
+                      href={`http://192.168.1.68:5005${documentos.nss.path}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-blue-500 hover:underline"
                     >
-                      Ver NSS
+                      Ver
                     </a>
                   ) : (
                     <span className="text-gray-500">No subido</span>
@@ -150,12 +151,12 @@ const TablaSubirDocs = () => {
                 <td className="px-6 py-4 whitespace-nowrap">
                   {documentos.curp ? (
                     <a
-                      href={`http://172.30.189.99:5005${documentos.curp.path}`}
+                      href={`http://192.168.1.68:5005${documentos.curp.path}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-blue-500 hover:underline"
                     >
-                      Ver CURP
+                      Ver
                     </a>
                   ) : (
                     <span className="text-gray-500">No subido</span>
@@ -164,12 +165,12 @@ const TablaSubirDocs = () => {
                 <td className="px-6 py-4 whitespace-nowrap">
                   {documentos.nacimiento ? (
                     <a
-                      href={`http://172.30.189.99:5005${documentos.nacimiento.path}`}
+                      href={`http://192.168.1.68:5005${documentos.nacimiento.path}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-blue-500 hover:underline"
                     >
-                      Ver Acta Nacimiento
+                      Ver
                     </a>
                   ) : (
                     <span className="text-gray- 500">No subido</span>
@@ -178,12 +179,12 @@ const TablaSubirDocs = () => {
                 <td className="px-6 py-4 whitespace-nowrap">
                   {documentos.fiscal ? (
                     <a
-                      href={`http://172.30.189.99:5005${documentos.fiscal.path}`}
+                      href={`http://192.168.1.68:5005${documentos.fiscal.path}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-blue-500 hover:underline"
                     >
-                      Ver Constancia Sit Fiscal
+                      Ver
                     </a>
                   ) : (
                     <span className="text-gray-500">No subido</span>
@@ -192,12 +193,12 @@ const TablaSubirDocs = () => {
                 <td className="px-6 py-4 whitespace-nowrap">
                   {documentos.domicilio ? (
                     <a
-                      href={`http://172.30.189.99:5005${documentos.domicilio.path}`}
+                      href={`http://192.168.1.68:5005${documentos.domicilio.path}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-blue-500 hover:underline"
                     >
-                      Ver Comprob Domicilio
+                      Ver
                     </a>
                   ) : (
                     <span className="text-gray-500">No subido</span>
@@ -206,12 +207,26 @@ const TablaSubirDocs = () => {
                 <td className="px-6 py-4 whitespace-nowrap">
                   {documentos.estudios ? (
                     <a
-                      href={`http://172.30.189.99:5005${documentos.estudios.path}`}
+                      href={`http://192.168.1.68:5005${documentos.estudios.path}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-blue-500 hover:underline"
                     >
-                      Ver Comprob Estudios
+                      Ver
+                    </a>
+                  ) : (
+                    <span className="text-gray-500">No subido</span>
+                  )}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  {documentos.merged ? (
+                    <a
+                      href={`http://192.168.1.68:5005${documentos.merged.path}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-500 hover:underline"
+                    >
+                      Ver
                     </a>
                   ) : (
                     <span className="text-gray-500">No subido</span>

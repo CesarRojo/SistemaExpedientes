@@ -65,7 +65,7 @@ const EntrevIniForm = () => {
 
   const fetchFolio = async () => {
     try {
-      const response = await axios.get(`http://172.30.189.99:5005/folio/${numFolio}`);
+      const response = await axios.get(`http://192.168.1.68:5005/folio/${numFolio}`);
       if (response.data.Usuario) {
         setFolioStatus('Folio ya está siendo usado');
       } else {
@@ -160,7 +160,7 @@ const EntrevIniForm = () => {
       },
     };
     try {
-      const response = await axios.post('http://172.30.189.99:5005/entrevIni', dataToSubmit);
+      const response = await axios.post('http://192.168.1.68:5005/entrevIni', dataToSubmit);
       console.log('Response:', response.data);
       fetchFolio();
     } catch (error) {

@@ -33,6 +33,7 @@ const Navbar = () => {
         <li><Link to="/TablaEntrev" className="hover:text-gray-300">Tabla de Entrevistas</Link></li>
         <li><Link to="/TablaExamMed" className="hover:text-gray-300">Tabla de Examen Medico</Link></li>
         <li><Link to="/TablaExFis" className="hover:text-gray-300">Exploracion Fisica</Link></li>
+        <li><Link to="/TablaSolInt" className="hover:text-gray-300">Solicitud Interna</Link></li>
         <li><Link to="/TablaSubirDocs" className="hover:text-gray-300">Subir Documentos</Link></li>
       </ul>
       <div className="relative">

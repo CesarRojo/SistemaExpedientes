@@ -14,10 +14,12 @@ const TablaEntrevistas = () => {
   });
   const navigate = useNavigate();
 
+  console.log(new Date().toISOString().split('T')[0]);
+
   useEffect(() => {
     const fetchDatos = async () => {
       try {
-        const response = await axios.get('http://172.30.189.99:5005/entrevIni/fecha', {
+        const response = await axios.get('http://192.168.1.68:5005/entrevIni/fecha', {
           params: { fecha },
         });
         setDatos(response.data);

@@ -17,6 +17,7 @@ import EntrevistaDiseño from './entrevistaDiseño';
 import SubirDocumentos from './SubirDocs';
 import TablaSubirDocs from './TablaSubirDocs';
 import GenerateFolio from './GenerateFolio';
+import TablaSolicInterna from './TablaSolicInterna';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import useAuthStore from './authStore';
 
@@ -40,6 +41,7 @@ function App() {
         <Route path="/TablaEntrev" element={isAuthenticated && loginType === 'normal' ? <TablaEntrevistas /> : <Navigate to="/" />} />
         <Route path="/TablaExamMed" element={isAuthenticated && loginType === 'normal' ? <TablaExamMed /> : <Navigate to="/" />} />
         <Route path="/TablaExFis" element={isAuthenticated && loginType === 'normal' ?  <TablaUsuarios /> : <Navigate to="/" />} />
+        <Route path="/TablaSolInt" element={isAuthenticated && loginType === 'normal' ?  <TablaSolicInterna /> : <Navigate to="/" />} />
         <Route path="/TablaSubirDocs" element={isAuthenticated && loginType === 'normal' ?  <TablaSubirDocs /> : <Navigate to="/" />} />
         <Route path="/SubirDocs" element={isAuthenticated && loginType === 'normal' ?  <SubirDocumentos /> : <Navigate to="/" />} />
         <Route path="/ExamMedico" element={isAuthenticated ? (loginType === 'folio' && !hasWatchedAllVideos ? <Navigate to="/Videos" /> : <ExamenMedico />) : <Navigate to="/" />} />

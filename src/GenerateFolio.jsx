@@ -11,14 +11,14 @@ const GenerateFolio = () => {
     setLoading(true);
     try {
       // Obtener el último folio desde el endpoint
-      const response = await axios.get('http://172.30.189.99:5005/folio/last');
+      const response = await axios.get('http://192.168.1.68:5005/folio/last');
       const lastFolio = response.data.numFolio;
 
       // Generar el nuevo folio
       const generatedFolio = lastFolio + 2;
 
       // Insertar el nuevo folio en la base de datos
-      await axios.post('http://172.30.189.99:5005/folio', { numFolio: generatedFolio });
+      await axios.post('http://192.168.1.68:5005/folio', { numFolio: generatedFolio });
 
       setNewFolio(generatedFolio);
     } catch (error) {
