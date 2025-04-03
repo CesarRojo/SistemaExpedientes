@@ -13,7 +13,7 @@ const TablaUsuarios = () => {
 
   const fetchDatos = async () => {
     try {
-      const response = await axios.get('http://192.168.1.68:5005/expFisica/fecha', {
+      const response = await axios.get('http://172.30.189.99:5005/expFisica/fecha', {
         params: { fecha },
       });
       console.log(response.data);
@@ -26,7 +26,7 @@ const TablaUsuarios = () => {
   useEffect(() => {
     fetchDatos();
 
-    const socket = io('http://192.168.1.68:5005');
+    const socket = io('http://172.30.189.99:5005');
 
     // Escuchar el evento newExamMed
     socket.on('newExamMed', (data) => {
@@ -55,6 +55,10 @@ const TablaUsuarios = () => {
 
   const handleExpFisica = (idUsuario, nombre, apellidoPat) => {
     navigate('/ExpFisica', { state: { idUsuario, nombre, apellidoPat }});
+  };
+
+  const handleExpFisicaDiseño = (idUsuario) => {
+    navigate('/ExpFisicaDiseño', { state: { idUsuario }});
   };
 
   const handleFiltroChange = (e) => {
@@ -108,16 +112,31 @@ const TablaUsuarios = () => {
             <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Apellido Pat</th>
             <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Apellido Mat</th>
             <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha</th>
+            <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
           </tr>
         </thead>
         <tbody className="bg-white divide-y divide-gray-200">
           {datosFiltrados.map((dato, index) => (
-            <tr key={index} onClick={() => handleExpFisica(dato.usuario.idUsuario, dato.usuario.nombre, dato.usuario.apellidoPat)} className="cursor-pointer hover:bg-gray-50">
+            <tr key={index} >
               <td className="px-6 py-4 whitespace-nowrap">{dato.idExpFis}</td>
               <td className="px-6 py-4 whitespace-nowrap">{dato.usuario.nombre}</td>
               <td className="px-6 py-4 whitespace-nowrap">{dato.usuario.apellidoPat}</td>
               <td className="px-6 py-4 whitespace-nowrap">{dato.usuario.apellidoMat}</td>
               <td className="px-6 py-4 whitespace-nowrap">{dato.createdAt.split('T')[0]}</td>
+              <td className="px-6 py-4 whitespace-nowrap">
+                <button 
+                  onClick={() => handleExpFisica(dato.usuario.idUsuario, dato.usuario.nombre, dato.usuario.apellidoPat)} 
+                  className="cursor-pointer px-4 py-2 font-bold text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring focus:ring-blue-200"
+                >
+                  Exp Fisica
+                </button>
+                <button 
+                  onClick={() => handleExpFisicaDiseño(dato.usuario.idUsuario)} 
+                  className="cursor-pointer px-4 py-2 font-bold text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring focus:ring-blue-200"
+                >
+                  Diseño
+                </button>
+              </td>
             </tr>
           ))}
         </tbody>

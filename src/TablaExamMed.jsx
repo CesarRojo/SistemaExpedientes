@@ -17,7 +17,7 @@ const TablaExamMed = () => {
   useEffect(() => {
     const fetchDatos = async () => {
       try {
-        const response = await axios.get('http://192.168.1.68:5005/examMedico/fecha', {
+        const response = await axios.get('http://172.30.189.99:5005/examMedico/fecha', {
           params: { fecha },
         });
         console.log(response.data);
@@ -32,7 +32,7 @@ const TablaExamMed = () => {
 
 
   const handleEntrevPdf = (idUsuario) => {
-    navigate('/EntrevDiseño', { state: { idUsuario } });
+    navigate('/ExamMedDiseño', { state: { idUsuario } });
   };
 
   const handleExportarExcel = () => {

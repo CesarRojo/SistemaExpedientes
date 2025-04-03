@@ -15,7 +15,7 @@ const TablaSolicInterna = () => {
   useEffect(() => {
     const fetchDatos = async () => {
       try {
-        const response = await axios.get('http://192.168.1.68:5005/solicInt/fecha', {
+        const response = await axios.get('http://172.30.189.99:5005/solicInt/fecha', {
           params: { fecha },
         });
         setDatos(response.data);
@@ -57,6 +57,10 @@ const TablaSolicInterna = () => {
       (!NSS || dato.NSS.toString().includes(NSS))
     );
   });
+
+  const handleSolicIntPdf = (idUsuario) => {
+    navigate('/SolicIntDiseño', { state: { idUsuario } });
+  };
 
   return (
     <div>
@@ -137,7 +141,7 @@ const TablaSolicInterna = () => {
         </thead>
         <tbody className="bg-white divide-y divide-gray-200">
           {datosFiltrados.map((dato, index) => (
-            <tr key={index} className="hover:bg-gray-50">
+            <tr key={index} onClick={() => handleSolicIntPdf(dato.usuario.idUsuario)} className="hover:bg-gray-50 cursor-pointer">
               <td className="px-6 py-4 whitespace-nowrap">{dato.idSolInt}</td>
               <td className="px-6 py-4 whitespace-nowrap">{dato.fecha.split('T')[0]}</td>
               <td className="px-6 py-4 whitespace-nowrap">{dato.RFC}</td>

@@ -13,11 +13,14 @@ import NavbarFolio from './NavbarFolio';
 import ExamenMedico from './ExamMedico';
 import ExploracionFisica from './ExpFisica';
 import SolicitudInterna from './solicIntern';
-import EntrevistaDiseño from './entrevistaDiseño';
+import EntrevistaDiseño from './EntrevistaDiseño';
 import SubirDocumentos from './SubirDocs';
 import TablaSubirDocs from './TablaSubirDocs';
 import GenerateFolio from './GenerateFolio';
 import TablaSolicInterna from './TablaSolicInterna';
+import ExamMedDiseño from './ExamMedDiseño';
+import ExpFisicaDiseño from './ExpFisicaDiseño';
+import SolicIntDiseño from './SolicIntDiseño';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import useAuthStore from './authStore';
 
@@ -38,6 +41,9 @@ function App() {
         <Route path="/GenFolio" element={isAuthenticated ? <Navigate to="/home" /> : <GenerateFolio />} />
         <Route path="/EntrevIni" element={isAuthenticated && loginType === 'normal' ? <EntrevIniForm /> : <Navigate to="/" />} />
         <Route path="/EntrevDiseño" element={isAuthenticated && loginType === 'normal' ? <EntrevistaDiseño /> : <Navigate to="/" />} />
+        <Route path="/ExamMedDiseño" element={isAuthenticated && loginType === 'normal' ? <ExamMedDiseño /> : <Navigate to="/" />} />
+        <Route path="/ExpFisicaDiseño" element={isAuthenticated && loginType === 'normal' ? <ExpFisicaDiseño /> : <Navigate to="/" />} />
+        <Route path="/SolicIntDiseño" element={isAuthenticated && loginType === 'normal' ? <SolicIntDiseño /> : <Navigate to="/" />} />
         <Route path="/TablaEntrev" element={isAuthenticated && loginType === 'normal' ? <TablaEntrevistas /> : <Navigate to="/" />} />
         <Route path="/TablaExamMed" element={isAuthenticated && loginType === 'normal' ? <TablaExamMed /> : <Navigate to="/" />} />
         <Route path="/TablaExFis" element={isAuthenticated && loginType === 'normal' ?  <TablaUsuarios /> : <Navigate to="/" />} />

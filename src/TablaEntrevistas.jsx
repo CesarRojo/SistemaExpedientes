@@ -14,12 +14,10 @@ const TablaEntrevistas = () => {
   });
   const navigate = useNavigate();
 
-  console.log(new Date().toISOString().split('T')[0]);
-
   useEffect(() => {
     const fetchDatos = async () => {
       try {
-        const response = await axios.get('http://192.168.1.68:5005/entrevIni/fecha', {
+        const response = await axios.get('http://172.30.189.99:5005/entrevIni/fecha', {
           params: { fecha },
         });
         setDatos(response.data);
@@ -45,6 +43,7 @@ const TablaEntrevistas = () => {
       Nombre: dato.usuario.nombre,
       ApellidoPaterno: dato.usuario.apellidoPat,
       ApellidoMaterno: dato.usuario.apellidoMat,
+      Reingreso: dato.numIngreso && dato.numIngreso > 0 ? "Si" : "No",
       Puesto: dato.puesto,
       Turno: dato.turno,
       Fecha: dato.fecha.split('T')[0],
@@ -169,6 +168,7 @@ const TablaEntrevistas = () => {
             <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre</th>
             <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Apellido Pat</th>
             <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Apellido Mat</th>
+            <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Reingreso</th>
             <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Puesto</th>
             <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Turno</th>
             <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha</th>
@@ -182,6 +182,7 @@ const TablaEntrevistas = () => {
               <td className="px-6 py-4 whitespace-nowrap">{dato.usuario.nombre}</td>
               <td className="px-6 py-4 whitespace-nowrap">{dato.usuario.apellidoPat}</td>
               <td className="px-6 py-4 whitespace-nowrap">{dato.usuario.apellidoMat}</td>
+              <td className="px-6 py-4 whitespace-nowrap">{dato.numIngreso && dato.numIngreso > 0 ? "Si" : "No"}</td>
               <td className="px-6 py-4 whitespace-nowrap">{dato.puesto}</td>
               <td className="px-6 py-4 whitespace-nowrap">{dato.turno}</td>
               <td className="px-6 py-4 whitespace-nowrap">{dato.fecha.split('T')[0]}</td>
