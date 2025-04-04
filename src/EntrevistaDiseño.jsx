@@ -11,7 +11,7 @@ function EntrevistaDiseño() {
 
     const fetchEntrevIniData = async () => {
         try {
-            const response = await axios.get(`http://172.30.189.99:5005/usuario/${idUsuario}`);
+            const response = await axios.get(`http://172.30.189.106:5005/usuario/${idUsuario}`);
             setEntrevIni(response.data);
             console.log(response.data);
         } catch (error) {
@@ -48,7 +48,7 @@ function EntrevistaDiseño() {
 
     return (
         <>
-            <div ref={pdfRef} className="max-w-4xl mx-auto bg-white p-6 shadow-md">
+            <div ref={pdfRef} className="max-w-4xl mx-auto bg-white p-6 shadow-md pdf-container">
                 {/* Header */}
                 <div className="flex items-center justify-between mb-4">
                     <img alt="ATR Nayarit Logo" className="h-31" src="logo.png" />
@@ -74,7 +74,7 @@ function EntrevistaDiseño() {
                     <div className="grid grid-cols-5 gap-4">
                         <div>
                             <label>NOMBRE (S)</label>
-                            <input className="w-full border border-gray-300 p-2" type="text" defaultValue={entrevIni?.nombre} />
+                            <input className="w-full border border-gray-300 p-2 leading-[4] h-10" type="text" defaultValue={entrevIni?.nombre} />
                         </div>
                         <div>
                             <label>APELLIDO PATERNO</label>

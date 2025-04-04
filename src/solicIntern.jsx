@@ -19,18 +19,18 @@ const SolicitudInternaForm = () => {
   
   const [usuario, setUsuario] = useState(null);
   const [solInt, setSolInt] = useState(null);
-  const [expFisica, setExpFisica] = useState(null);
+  const [consent, setConsent] = useState(null);
 
   const user = useAuthStore((state) => state.user);
   const idFolio = user?.idFolio;
 
   const fetchUsuarioFolio = async () => {
     try {
-      const response = await axios.get(`http://172.30.189.99:5005/usuario/folio/${idFolio}`);
+      const response = await axios.get(`http://172.30.189.106:5005/usuario/folio/${idFolio}`);
       console.log(response.data);
       setUsuario(response.data);
       setSolInt(response.data.solicitudInterna);
-      setExpFisica(response.data.exploracionFisica);
+      setConsent(response.data.consentimiento);
     } catch (error) {
       console.error('Error al obtener datos del usuario:', error);
     }
@@ -81,7 +81,7 @@ const SolicitudInternaForm = () => {
         // Eliminar fechaNac del usuario antes de enviar
         const { fechaNac, ...dataWithoutFechaNac } = dataToSend;
 
-        const response = await axios.post('http://172.30.189.99:5005/solicInt', dataWithoutFechaNac);
+        const response = await axios.post('http://172.30.189.106:5005/solicInt', dataWithoutFechaNac);
         console.log('Data submitted successfully:', response.data);
       } else {
         console.error('Usuario no cargado');
@@ -91,8 +91,8 @@ const SolicitudInternaForm = () => {
     }
   };
 
-  if (!expFisica) {
-    return <div className="text-center">Por favor, completa la exploracion fisica antes de continuar con este paso.</div>;
+  if (!consent) {
+    return <div className="text-center">Por favor, firma tu consentimiento antes de continuar con este paso.</div>;
   }
 
   if (solInt) {

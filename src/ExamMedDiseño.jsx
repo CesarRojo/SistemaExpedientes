@@ -11,7 +11,7 @@ function ExamMedDiseño() {
 
     const fetchEntrevIniData = async () => {
         try {
-            const response = await axios.get(`http://172.30.189.99:5005/usuario/${idUsuario}`);
+            const response = await axios.get(`http://172.30.189.106:5005/usuario/${idUsuario}`);
             setEntrevIni(response.data);
             console.log(response.data);
         } catch (error) {
@@ -48,7 +48,7 @@ function ExamMedDiseño() {
 
     return (
         <>
-            <div ref={pdfRef} className="max-w-4xl mx-auto bg-white p-6 shadow-md">
+            <div ref={pdfRef} className="max-w-4xl mx-auto bg-white p-6 shadow-md pdf-container">
                 {/* Header */}
                 <div className="flex items-center justify-between mb-4">
                     <img alt="ATR Nayarit Logo" className="h-31" src="logo.png" />
@@ -233,16 +233,16 @@ function ExamMedDiseño() {
                     </div>
                 </div>
 
-                <div class="pt-2 mb-4">
-                    <h2 class="text-lg mb-2">
+                <div className="pt-2 mb-4">
+                    <h2 className="text-lg mb-2">
                     OBSERVACIONES:
                     </h2>
-                    <textarea class="w-full border border-gray-300 p-2 h-24"></textarea>
+                    <textarea className="w-full border border-gray-300 p-2 h-24"></textarea>
                 </div>
 
-                <div class="pt-2 mb-4">
-                    <h2 class="text-lg mb-2">ANTECEDENTES PATOLÓGICOS</h2>
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
+                <div className="pt-2 mb-4">
+                    <h2 className="text-lg mb-2">ANTECEDENTES PATOLÓGICOS</h2>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
                         {[
                             "Alergias",
                             "Tuberculosis",
@@ -275,20 +275,20 @@ function ExamMedDiseño() {
                             "Actualmente en tratamiento medico/psicologico",
                         ].map((item, index) => (
                             <div key={index}>
-                                <label class="block text-sm">{item.toUpperCase()}</label>
-                                <div class="flex items-center">
-                                    <input class="mr-4" type="checkbox" />
+                                <label className="block text-sm">{item.toUpperCase()}</label>
+                                <div className="flex items-center">
+                                    <input className="mr-4" type="checkbox" />
                                 </div>
                             </div>
                         ))}
                     </div>
                 </div>
 
-                <div class="pt-2 mb-4">
-                    <h2 class="text-lg mb-2">
+                <div className="pt-2 mb-4">
+                    <h2 className="text-lg mb-2">
                     PADECIMIENTO ACTUAL:
                     </h2>
-                    <textarea class="w-full border border-gray-300 p-2 h-24"></textarea>
+                    <textarea className="w-full border border-gray-300 p-2 h-24"></textarea>
                 </div>
             </div>
             <button onClick={exportToPDF} className="mt-4 p-2 bg-blue-500 text-white">

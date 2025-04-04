@@ -3,9 +3,18 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 const TablaSubirDocs = () => {
+  const getFechaHoy = () => {
+    const hoy = new Date();
+    const dia = String(hoy.getDate()).padStart(2, '0'); // Asegura que el día tenga dos dígitos
+    const mes = String(hoy.getMonth() + 1).padStart(2, '0'); // Los meses son 0-indexados, así que sumamos 1
+    const año = hoy.getFullYear();
+    const fechaHoy = `${año}-${mes}-${dia}`; // Formato "YYYY-MM-DD"
+    return fechaHoy;
+  }
+
   const [datos, setDatos] = useState([]);
   const [docs, setDocs] = useState([]);
-  const [fecha, setFecha] = useState(new Date().toISOString().split('T')[0]);
+  const [fecha, setFecha] = useState(getFechaHoy());
   const [filtros, setFiltros] = useState({
     nombre: '',
   });
@@ -13,8 +22,9 @@ const TablaSubirDocs = () => {
 
   const fetchDatos = async () => {
     try {
-      const response = await axios.get('http://172.30.189.99:5005/usuario');
-      console.log(response.data);
+      const response = await axios.get('http://172.30.189.106:5005/usuario/fecha', {
+        params: { fecha },
+      });
       setDatos(response.data);
     } catch (error) {
       console.error('Error fetching user data:', error);
@@ -23,7 +33,7 @@ const TablaSubirDocs = () => {
 
   const fetchDocs = async () => {
     try {
-      const response = await axios.get('http://172.30.189.99:5005/docs');
+      const response = await axios.get('http://172.30.189.106:5005/docs');
       setDocs(response.data);
     } catch (error) {
       console.error('Error fetching docs data:', error);
@@ -91,8 +101,6 @@ const TablaSubirDocs = () => {
           <tr>
             <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
             <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre</th>
-            {/* <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Apellido Pat</th>
-            <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Apellido Mat</th> */}
             <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha</th>
             <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Folio</th>
             <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">INE</th>
@@ -116,14 +124,12 @@ const TablaSubirDocs = () => {
               >
                 <td className="px-6 py-4 whitespace-nowrap">{dato.idUsuario}</td>
                 <td className="px-6 py-4 whitespace-nowrap">{dato.nombre}</td>
-                {/* <td className="px-6 py-4 whitespace-nowrap">{dato.apellidoPat}</td>
-                <td className="px-6 py-4 whitespace-nowrap">{dato.apellidoMat}</td> */}
-                <td className="px-6 py-4 whitespace-nowrap">{dato.entrevistaInicial.fecha.split('T')[0]}</td>
+                <td className="px-6 py-4 whitespace-nowrap">{dato.createdAt.split('T')[0]}</td>
                 <td className="px-6 py-4 whitespace-nowrap">{dato.folio.numFolio}</td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   {documentos.ine ? (
                     <a
-                      href={`http://172.30.189.99:5005${documentos.ine.path}`}
+                      href={`http://172.30.189.106:5005${documentos.ine.path}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-blue-500 hover:underline"
@@ -137,7 +143,7 @@ const TablaSubirDocs = () => {
                 <td className="px-6 py-4 whitespace-nowrap">
                   {documentos.nss ? (
                     <a
-                      href={`http://172.30.189.99:5005${documentos.nss.path}`}
+                      href={`http://172.30.189.106:5005${documentos.nss.path}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-blue-500 hover:underline"
@@ -151,7 +157,7 @@ const TablaSubirDocs = () => {
                 <td className="px-6 py-4 whitespace-nowrap">
                   {documentos.curp ? (
                     <a
-                      href={`http://172.30.189.99:5005${documentos.curp.path}`}
+                      href={`http://172.30.189.106:5005${documentos.curp.path}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-blue-500 hover:underline"
@@ -165,7 +171,7 @@ const TablaSubirDocs = () => {
                 <td className="px-6 py-4 whitespace-nowrap">
                   {documentos.nacimiento ? (
                     <a
-                      href={`http://172.30.189.99:5005${documentos.nacimiento.path}`}
+                      href={`http://172.30.189.106:5005${documentos.nacimiento.path}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-blue-500 hover:underline"
@@ -179,7 +185,7 @@ const TablaSubirDocs = () => {
                 <td className="px-6 py-4 whitespace-nowrap">
                   {documentos.fiscal ? (
                     <a
-                      href={`http://172.30.189.99:5005${documentos.fiscal.path}`}
+                      href={`http://172.30.189.106:5005${documentos.fiscal.path}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-blue-500 hover:underline"
@@ -193,7 +199,7 @@ const TablaSubirDocs = () => {
                 <td className="px-6 py-4 whitespace-nowrap">
                   {documentos.domicilio ? (
                     <a
-                      href={`http://172.30.189.99:5005${documentos.domicilio.path}`}
+                      href={`http://172.30.189.106:5005${documentos.domicilio.path}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-blue-500 hover:underline"
@@ -207,7 +213,7 @@ const TablaSubirDocs = () => {
                 <td className="px-6 py-4 whitespace-nowrap">
                   {documentos.estudios ? (
                     <a
-                      href={`http://172.30.189.99:5005${documentos.estudios.path}`}
+                      href={`http://172.30.189.106:5005${documentos.estudios.path}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-blue-500 hover:underline"
@@ -221,7 +227,7 @@ const TablaSubirDocs = () => {
                 <td className="px-6 py-4 whitespace-nowrap">
                   {documentos.merged ? (
                     <a
-                      href={`http://172.30.189.99:5005${documentos.merged.path}`}
+                      href={`http://172.30.189.106:5005${documentos.merged.path}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-blue-500 hover:underline"

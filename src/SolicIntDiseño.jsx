@@ -11,7 +11,7 @@ function SolicIntDiseño() {
 
     const fetchEntrevIniData = async () => {
         try {
-            const response = await axios.get(`http://172.30.189.99:5005/usuario/${idUsuario}`);
+            const response = await axios.get(`http://172.30.189.106:5005/usuario/${idUsuario}`);
             setEntrevIni(response.data);
             console.log(response.data);
         } catch (error) {
@@ -48,7 +48,7 @@ function SolicIntDiseño() {
 
     return (
         <>
-            <div ref={pdfRef} className="max-w-4xl mx-auto bg-white p-6 shadow-md">
+            <div ref={pdfRef} className="max-w-4xl mx-auto bg-white p-6 shadow-md pdf-container">
                 {/* Header */}
                 <div className="flex items-center mb-4">
                     <img alt="ATR Nayarit Logo" className="h-31" src="logo.png" />

@@ -4,8 +4,17 @@ import axios from 'axios';
 import * as XLSX from 'xlsx'; // Importar la biblioteca xlsx
 
 const TablaExamMed = () => {
+  const getFechaHoy = () => {
+    const hoy = new Date();
+    const dia = String(hoy.getDate()).padStart(2, '0'); // Asegura que el día tenga dos dígitos
+    const mes = String(hoy.getMonth() + 1).padStart(2, '0'); // Los meses son 0-indexados, así que sumamos 1
+    const año = hoy.getFullYear();
+    const fechaHoy = `${año}-${mes}-${dia}`; // Formato "YYYY-MM-DD"
+    return fechaHoy;
+  }
+
   const [datos, setDatos] = useState([]);
-  const [fecha, setFecha] = useState(new Date().toISOString().split('T')[0]);
+  const [fecha, setFecha] = useState(getFechaHoy());
   const [filtros, setFiltros] = useState({
     nombre: '',
     puesto: '',
@@ -17,7 +26,7 @@ const TablaExamMed = () => {
   useEffect(() => {
     const fetchDatos = async () => {
       try {
-        const response = await axios.get('http://172.30.189.99:5005/examMedico/fecha', {
+        const response = await axios.get('http://172.30.189.106:5005/usuario/fecha', {
           params: { fecha },
         });
         console.log(response.data);
@@ -36,22 +45,24 @@ const TablaExamMed = () => {
   };
 
   const handleExportarExcel = () => {
-    const datosParaExportar = datos.map((dato) => ({
-      ID: dato.idExamMed,
-      Nombre: dato.usuario.nombre,
-      ApellidoPaterno: dato.usuario.apellidoPat,
-      ApellidoMaterno: dato.usuario.apellidoMat,
-      drogas: dato.drogas ? dato.drogas : "Ninguna",
-      observaciones: dato.observaciones ? dato.observaciones : "Ninguna",
-      Fecha: dato.fecha.split('T')[0],
-    //   Folio: dato.usuario.folio.numFolio,
-    }));
-
-    const hojaDeTrabajo = XLSX.utils.json_to_sheet(datosParaExportar);
-    const libroDeTrabajo = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(libroDeTrabajo, hojaDeTrabajo, 'Entrevistas');
-
-    XLSX.writeFile(libroDeTrabajo, `ExamenMedico-${fecha}.xlsx`);
+      const datosParaExportar = datos.map((dato) => ({
+        ID: dato.entrevistaInicial.idEntrevIni,
+        Nombre: dato.nombre,
+        ApellidoPaterno: dato.apellidoPat,
+        ApellidoMaterno: dato.apellidoMat,
+        Reingreso: dato.entrevistaInicial.numIngreso && dato.entrevistaInicial.numIngreso > 0 ? "Si" : "No",
+        Puesto: dato.entrevistaInicial.puesto,
+        Turno: dato.entrevistaInicial.turno,
+        Fecha: dato.createdAt.split('T')[0],
+        Folio: dato.folio.numFolio,
+        ExamenMedico: dato.examenMedico ? "Hecho" : "No hecho",
+      }));
+  
+      const hojaDeTrabajo = XLSX.utils.json_to_sheet(datosParaExportar);
+      const libroDeTrabajo = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(libroDeTrabajo, hojaDeTrabajo, 'ExamenMedico');
+  
+      XLSX.writeFile(libroDeTrabajo, `ExamenesMedicos-${fecha}.xlsx`);
   };
 
   const handleFiltroChange = (e) => {
@@ -60,16 +71,16 @@ const TablaExamMed = () => {
   };
 
   const datosFiltrados = datos.filter((dato) => {
-    const { nombre, drogas, observaciones } = filtros;
+    const { nombre, puesto, turno, folio } = filtros;
 
     // Concatenar nombre completo para el filtro
-    const nombreCompleto = `${dato.usuario.nombre} ${dato.usuario.apellidoPat} ${dato.usuario.apellidoMat}`.toLowerCase();
+    const nombreCompleto = `${dato.nombre} ${dato.apellidoPat} ${dato.apellidoMat}`.toLowerCase();
 
     return (
       (!nombre || nombreCompleto.includes(nombre.toLowerCase())) && // Filtrar por nombre completo
-      (!drogas || dato.puesto.toLowerCase().includes(drogas.toLowerCase())) &&
-      (!observaciones || dato.turno.toLowerCase().includes(observaciones.toLowerCase()))
-    //   (!folio || dato.usuario.folio.numFolio.toString().includes(folio)) // Filtrar folio como número
+      (!puesto || dato.entrevistaInicial.puesto.toLowerCase().includes(puesto.toLowerCase())) &&
+      (!turno || dato.entrevistaInicial.turno.toLowerCase().includes(turno.toLowerCase())) &&
+      (!folio || dato.folio.numFolio.toString().includes(folio)) // Filtrar folio como número
     );
   });
 
@@ -152,6 +163,8 @@ const TablaExamMed = () => {
         </button>
       </div>
 
+      <p className='text-sm text-center font-bold'>Selecciona un usuario para VER su examen medico (Recuerda que el entrevistado es quien lo realiza)</p>
+
       <table className="min-w-full divide-y divide-gray-200 mt-4">
         <thead>
           <tr>
@@ -159,23 +172,27 @@ const TablaExamMed = () => {
             <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre</th>
             <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Apellido Pat</th>
             <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Apellido Mat</th>
-            <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Drogas</th>
-            <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Observaciones</th>
+            <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Reingreso</th>
+            <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Puesto</th>
+            <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Turno</th>
             <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha</th>
-            {/* <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Folio</th> */}
+            <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Folio</th>
+            <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Examen Med.</th>
           </tr>
         </thead>
         <tbody className="bg-white divide-y divide-gray-200">
           {datosFiltrados.map((dato, index) => (
-            <tr key={index} onClick={() => handleEntrevPdf(dato.usuario.idUsuario)} className="cursor-pointer hover:bg-gray-50">
-              <td className="px-6 py-4 whitespace-nowrap">{dato.idExamMed}</td>
-              <td className="px-6 py-4 whitespace-nowrap">{dato.usuario.nombre}</td>
-              <td className="px-6 py-4 whitespace-nowrap">{dato.usuario.apellidoPat}</td>
-              <td className="px-6 py-4 whitespace-nowrap">{dato.usuario.apellidoMat}</td>
-              <td className="px-6 py-4 whitespace-nowrap">{dato.drogas ? dato.drogas : "Ninguna"}</td>
-              <td className="px-6 py-4 whitespace-nowrap">{dato.observaciones ? dato.observaciones : "Ninguna"}</td>
-              <td className="px-6 py-4 whitespace-nowrap">{dato.fecha.split('T')[0]}</td>
-              {/* <td className="px-6 py-4 whitespace-nowrap">{dato.usuario.folio.numFolio}</td> */}
+            <tr key={index} onClick={() => handleEntrevPdf(dato.idUsuario)} className="cursor-pointer hover:bg-gray-50">
+              <td className="px-6 py-4 whitespace-nowrap">{dato.idUsuario}</td>
+              <td className="px-6 py-4 whitespace-nowrap">{dato.nombre}</td>
+              <td className="px-6 py-4 whitespace-nowrap">{dato.apellidoPat}</td>
+              <td className="px-6 py-4 whitespace-nowrap">{dato.apellidoMat}</td>
+              <td className="px-6 py-4 whitespace-nowrap">{dato.entrevistaInicial.numIngreso && dato.entrevistaInicial.numIngreso > 0 ? "Si" : "No"}</td>
+              <td className="px-6 py-4 whitespace-nowrap">{dato.entrevistaInicial.puesto}</td>
+              <td className="px-6 py-4 whitespace-nowrap">{dato.entrevistaInicial.turno}</td>
+              <td className="px-6 py-4 whitespace-nowrap">{dato.createdAt.split('T')[0]}</td>
+              <td className="px-6 py-4 whitespace-nowrap">{dato.folio.numFolio}</td>
+              <td className={`px-6 py-4 whitespace-nowrap font-bold ${dato.examenMedico ? 'text-green-600' : 'text-red-600'}`}>{dato.examenMedico ? "Hecho" : "No hecho"}</td>
             </tr>
           ))}
         </tbody>

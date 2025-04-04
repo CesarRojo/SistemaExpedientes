@@ -7,3 +7,13 @@ button {
 .title-log {
     font-family: 'Protest Revolution', 'Noto Sans JP', sans-serif;
 }
+
+.pdf-container input[type="text"],
+.pdf-container input[type="date"],
+.pdf-container input[type="number"] {
+    border: 0 !important;
+    border-bottom: 1px solid #000 !important;
+    line-height: 4 !important; 
+    height: 2.5rem !important;
+    padding: 0 !important;
+}

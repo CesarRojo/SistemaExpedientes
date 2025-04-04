@@ -21,6 +21,7 @@ import TablaSolicInterna from './TablaSolicInterna';
 import ExamMedDiseño from './ExamMedDiseño';
 import ExpFisicaDiseño from './ExpFisicaDiseño';
 import SolicIntDiseño from './SolicIntDiseño';
+import Consentimiento from './Consentimiento';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import useAuthStore from './authStore';
 
@@ -53,6 +54,7 @@ function App() {
         <Route path="/ExamMedico" element={isAuthenticated ? (loginType === 'folio' && !hasWatchedAllVideos ? <Navigate to="/Videos" /> : <ExamenMedico />) : <Navigate to="/" />} />
         <Route path="/ExpFisica" element={isAuthenticated && loginType === 'normal' ? <ExploracionFisica /> : <Navigate to="/" />} />
         <Route path="/SolicInt" element={isAuthenticated ? (loginType === 'folio' && !hasWatchedAllVideos ? <Navigate to="/Videos" /> : <SolicitudInterna />) : <Navigate to="/" />} />
+        <Route path="/Consent" element={isAuthenticated ? (loginType === 'folio' && !hasWatchedAllVideos ? <Navigate to="/Videos" /> : <Consentimiento />) : <Navigate to="/" />} />
       </Routes>
     </Router>
   );
