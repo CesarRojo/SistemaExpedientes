@@ -5,25 +5,23 @@ import axios from 'axios';
 const TablaSubirDocs = () => {
   const getFechaHoy = () => {
     const hoy = new Date();
-    const dia = String(hoy.getDate()).padStart(2, '0'); // Asegura que el día tenga dos dígitos
-    const mes = String(hoy.getMonth() + 1).padStart(2, '0'); // Los meses son 0-indexados, así que sumamos 1
+    const dia = String(hoy.getDate()).padStart(2, '0');
+    const mes = String(hoy.getMonth() + 1).padStart(2, '0');
     const año = hoy.getFullYear();
-    const fechaHoy = `${año}-${mes}-${dia}`; // Formato "YYYY-MM-DD"
-    return fechaHoy;
-  }
+    return `${año}-${mes}-${dia}`;
+  };
 
   const [datos, setDatos] = useState([]);
   const [docs, setDocs] = useState([]);
-  const [fecha, setFecha] = useState(getFechaHoy());
-  const [filtros, setFiltros] = useState({
-    nombre: '',
-  });
+  const [fechaInicio, setFechaInicio] = useState(getFechaHoy());
+  const [fechaFin, setFechaFin] = useState(getFechaHoy());
+  const [filtros, setFiltros] = useState({ nombre: '' });
   const navigate = useNavigate();
 
   const fetchDatos = async () => {
     try {
       const response = await axios.get('http://172.30.189.106:5005/usuario/fecha', {
-        params: { fecha },
+        params: { fechaInicio, fechaFin },
       });
       setDatos(response.data);
     } catch (error) {
@@ -31,19 +29,26 @@ const TablaSubirDocs = () => {
     }
   };
 
-  const fetchDocs = async () => {
+  const fetchDocs = async (idUsuarios) => {
     try {
-      const response = await axios.get('http://172.30.189.106:5005/docs');
+      const response = await axios.get('http://172.30.189.106:5005/docs/por-usuarios', {
+        params: { idUsuarios: idUsuarios.join(',') }, // Pasar los idUsuarios como un string separado por comas
+      });
       setDocs(response.data);
+      console.log("docs", response.data);
     } catch (error) {
       console.error('Error fetching docs data:', error);
     }
   };
 
   useEffect(() => {
-    fetchDatos();
-    fetchDocs();
-  }, []);
+    const fetchData = async () => {
+      await fetchDatos();
+      const idUsuarios = datos.map(dato => dato.idUsuario); // Obtener todos los idUsuario
+      await fetchDocs(idUsuarios); // Llamar a fetchDocs con todos los idUsuario
+    };
+    fetchData();
+  }, [fechaInicio, fechaFin]);
 
   const handleSubirDocs = (idUsuario, numFolio) => {
     navigate('/SubirDocs', { state: { idUsuario, numFolio } });
@@ -75,26 +80,28 @@ const TablaSubirDocs = () => {
         <label htmlFor="fecha" className="block text-sm font-medium text-gray-700">
           Filtrar por fecha:
         </label>
-        <input
-          type="date"
-          id="fecha"
-          value={fecha}
-          onChange={(e) => setFecha(e.target.value)}
-          className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-        />
-      </div>
-      <div className="mb-4">
-        <label htmlFor="nombre" className="block text-sm font-medium text-gray-700">
-          Filtrar por nombre completo:
-        </label>
-        <input
-          type="text"
-          id="nombre"
-          name="nombre"
-          value={filtros.nombre}
-          onChange={handleFiltroChange}
-          className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-        />
+        <div className='grid grid-cols-2 gap-4'>
+          <div>
+            <label className='text-sm'>Fecha inicio</label>
+            <input
+              type="date"
+              id="fechaInicio"
+              value={fechaInicio}
+              onChange={(e) => setFechaInicio(e.target.value)}
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+            />
+          </div>
+          <div>
+            <label className='text-sm'>Fecha fin</label>
+            <input
+              type="date"
+              id="fechaFin"
+              value={fechaFin}
+              onChange={(e) => setFechaFin(e.target.value)}
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+            />
+          </div>
+        </div>
       </div>
       <table className="min-w-full divide-y divide-gray-200">
         <thead>
@@ -116,128 +123,37 @@ const TablaSubirDocs = () => {
         <tbody className="bg-white divide-y divide-gray-200">
           {datosFiltrados.map((dato, index) => {
             const documentos = documentosPorUsuario[dato.idUsuario] || {};
+            const documentosValidos = ['ine', 'nss', 'curp', 'nacimiento', 'fiscal', 'domicilio', 'estudios', 'merged'];
+
+            // Contar solo los documentos válidos
+            const documentosSubidos = Object.keys(documentos).filter((key) => documentosValidos.includes(key)).length;
+
             return (
               <tr
                 key={index}
-                onClick={() => Object.keys(documentos).length === 0 && handleSubirDocs(dato.idUsuario, dato.folio.numFolio)}
-                className={`cursor-pointer hover:bg-gray-50 ${Object.keys(documentos).length > 0 ? 'bg-green-100 cursor-not-allowed' : ''}`}
+                onClick={() => documentosSubidos === 0 && handleSubirDocs(dato.idUsuario, dato.folio.numFolio)}
+                className={`cursor-pointer hover:bg-gray-50 ${documentosSubidos > 0 ? 'bg-green-100 cursor-not-allowed' : ''}`}
               >
                 <td className="px-6 py-4 whitespace-nowrap">{dato.idUsuario}</td>
                 <td className="px-6 py-4 whitespace-nowrap">{dato.nombre}</td>
                 <td className="px-6 py-4 whitespace-nowrap">{dato.createdAt.split('T')[0]}</td>
                 <td className="px-6 py-4 whitespace-nowrap">{dato.folio.numFolio}</td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  {documentos.ine ? (
-                    <a
-                      href={`http://172.30.189.106:5005${documentos.ine.path}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-500 hover:underline"
-                    >
-                      Ver
-                    </a>
-                  ) : (
-                    <span className="text-gray-500">No subido</span>
-                  )}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  {documentos.nss ? (
-                    <a
-                      href={`http://172.30.189.106:5005${documentos.nss.path}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-500 hover:underline"
-                    >
-                      Ver
-                    </a>
-                  ) : (
-                    <span className="text-gray-500">No subido</span>
-                  )}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  {documentos.curp ? (
-                    <a
-                      href={`http://172.30.189.106:5005${documentos.curp.path}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-500 hover:underline"
-                    >
-                      Ver
-                    </a>
-                  ) : (
-                    <span className="text-gray-500">No subido</span>
-                  )}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  {documentos.nacimiento ? (
-                    <a
-                      href={`http://172.30.189.106:5005${documentos.nacimiento.path}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-500 hover:underline"
-                    >
-                      Ver
-                    </a>
-                  ) : (
-                    <span className="text-gray- 500">No subido</span>
-                  )}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  {documentos.fiscal ? (
-                    <a
-                      href={`http://172.30.189.106:5005${documentos.fiscal.path}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-500 hover:underline"
-                    >
-                      Ver
-                    </a>
-                  ) : (
-                    <span className="text-gray-500">No subido</span>
-                  )}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  {documentos.domicilio ? (
-                    <a
-                      href={`http://172.30.189.106:5005${documentos.domicilio.path}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-500 hover:underline"
-                    >
-                      Ver
-                    </a>
-                  ) : (
-                    <span className="text-gray-500">No subido</span>
-                  )}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  {documentos.estudios ? (
-                    <a
-                      href={`http://172.30.189.106:5005${documentos.estudios.path}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-500 hover:underline"
-                    >
-                      Ver
-                    </a>
-                  ) : (
-                    <span className="text-gray-500">No subido</span>
-                  )}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  {documentos.merged ? (
-                    <a
-                      href={`http://172.30.189.106:5005${documentos.merged.path}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-500 hover:underline"
-                    >
-                      Ver
-                    </a>
-                  ) : (
-                    <span className="text-gray-500">No subido</span>
-                  )}
-                </td>
+                {['ine', 'nss', 'curp', 'nacimiento', 'fiscal', 'domicilio', 'estudios', 'merged'].map((docType) => (
+                  <td key={docType} className="px-6 py-4 whitespace-nowrap">
+                    {documentos[docType] ? (
+                      <a
+                        href={`http://172.30.189.106:5005${documentos[docType].path}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-500 hover:underline"
+                      >
+                        Ver
+                      </a>
+                    ) : (
+                      <span className="text-gray-500">No subido</span>
+                    )}
+                  </td>
+                ))}
               </tr>
             );
           })}

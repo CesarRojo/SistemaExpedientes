@@ -41,13 +41,14 @@ const ExploracionFisica = () => {
 
   const [expFisica, setExpFisica] = useState(null);
   const [examMed, setExamMed] = useState(null);
-
+  const [usuario, setUsuario] = useState(null);
 
 
   const fetchUsuarioFolio = async () => {
     try {
       const response = await axios.get(`http://172.30.189.106:5005/usuario/${idUsuario}`);
-      console.log(response.data);
+      console.log(response.data.createdAt);
+      setUsuario(response.data);
       setExamMed(response.data.examenMedico);
       setExpFisica(response.data.exploracionFisica);
     } catch (error) {
@@ -97,6 +98,7 @@ const ExploracionFisica = () => {
         columVert: parseInt(formData.columVert),
         extremidades: parseInt(formData.extremidades),
         observaciones: formData.observaciones ? formData.observaciones : null,
+        createdAt: usuario.createdAt,
       });
       console.log('Exploración Física creada:', response.data);
     } catch (error) {

@@ -14,7 +14,8 @@ const TablaEntrevistas = () => {
   }
 
   const [datos, setDatos] = useState([]);
-  const [fecha, setFecha] = useState(getFechaHoy());
+  const [fechaInicio, setFechaInicio] = useState(getFechaHoy());
+  const [fechaFin, setFechaFin] = useState(getFechaHoy());
   const [filtros, setFiltros] = useState({
     nombre: '',
     puesto: '',
@@ -23,14 +24,15 @@ const TablaEntrevistas = () => {
   });
   const navigate = useNavigate();
 
-  
+  console.log('Fecha de inicio:', fechaInicio);
+  console.log('Fecha de fin:', fechaFin);
 
   useEffect(() => {
     getFechaHoy();
     const fetchDatos = async () => {
       try {
         const response = await axios.get('http://172.30.189.106:5005/usuario/fecha', {
-          params: { fecha },
+          params: { fechaInicio, fechaFin },
         });
         setDatos(response.data);
       } catch (error) {
@@ -39,7 +41,7 @@ const TablaEntrevistas = () => {
     };
 
     fetchDatos();
-  }, [fecha]);
+  }, [fechaInicio, fechaFin]);
 
   const handleNuevaEntrada = () => {
     navigate('/entrevIni');
@@ -67,7 +69,7 @@ const TablaEntrevistas = () => {
     const libroDeTrabajo = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(libroDeTrabajo, hojaDeTrabajo, 'Entrevistas');
 
-    XLSX.writeFile(libroDeTrabajo, `Entrevistas-${fecha}.xlsx`);
+    XLSX.writeFile(libroDeTrabajo, `Entrevistas-${fechaInicio}.xlsx`);
   };
 
   const handleFiltroChange = (e) => {
@@ -95,13 +97,28 @@ const TablaEntrevistas = () => {
         <label htmlFor="fecha" className="block text-sm font-medium text-gray-700">
           Filtrar por fecha:
         </label>
-        <input
-          type="date"
-          id="fecha"
-          value={fecha}
-          onChange={(e) => setFecha(e.target.value)}
-          className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-        />
+        <div className='grid grid-cols-2 gap-4'>
+          <div>
+            <label className='text-sm'>Fecha inicio</label>
+            <input
+              type="date"
+              id="fechaInicio"
+              value={fechaInicio}
+              onChange={(e) => setFechaInicio(e.target.value)}
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+            />
+          </div>
+          <div>
+            <label className='text-sm'>Fecha fin</label>
+            <input
+              type="date"
+              id="fechaFin"
+              value={fechaFin}
+              onChange={(e) => setFechaFin(e.target.value)}
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+            />
+          </div>
+        </div>
       </div>
 
       <div className="grid grid-cols-2 gap-4 mb-4">

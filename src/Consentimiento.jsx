@@ -12,28 +12,29 @@ function Consentimiento() {
     const [usuario, setUsuario] = useState(null);
     const [explorFis, setExplorFis] = useState(null);
     const [consent, setConsent] = useState(null);
+    const [fecha, setFecha] = useState(''); // Estado para la fecha seleccionada
 
     const fetchUsuarioFolio = async () => {
         try {
-          const response = await axios.get(`http://172.30.189.106:5005/usuario/folio/${idFolio}`);
-          console.log("fetchUsuario for consentimiento",response.data);
-          setUsuario(response.data);
-          setExplorFis(response.data.exploracionFisica);
-          setConsent(response.data.consentimiento);
+            const response = await axios.get(`http://172.30.189.106:5005/usuario/folio/${idFolio}`);
+            console.log("fetchUsuario for consentimiento", response.data);
+            setUsuario(response.data);
+            setExplorFis(response.data.exploracionFisica);
+            setConsent(response.data.consentimiento);
         } catch (error) {
-          console.error('Error al obtener datos del usuario:', error);
+            console.error('Error al obtener datos del usuario:', error);
         }
     };
 
     const nombreUsuario = () => {
-        return usuario.nombre + ' ' + usuario.apellidoPat + ' ' + usuario.apellidoMat;
-    }
+        return usuario?.nombre + ' ' + usuario?.apellidoPat + ' ' + usuario?.apellidoMat;
+    };
 
     useEffect(() => {
         if (idFolio) {
-          fetchUsuarioFolio();
+            fetchUsuarioFolio();
         }
-      }, [idFolio]);
+    }, [idFolio]);
 
     const pdfRef = useRef();
 
@@ -58,10 +59,27 @@ function Consentimiento() {
         });
     };
 
+    const enviarConsentimiento = async () => {
+        if (!fecha || !usuario?.idUsuario) {
+            alert('Por favor, selecciona una fecha y asegúrate de que el usuario esté cargado.');
+            return;
+        }
+
+        try {
+            const response = await axios.post('http://172.30.189.106:5005/consent', {
+                fecha,
+                idUsuario: usuario.idUsuario,
+            });
+            console.log('Consentimiento enviado:', response.data);
+        } catch (error) {
+            console.error('Error al enviar el consentimiento:', error);
+        }
+    };
+
     if (!explorFis) {
-        return <div className="text-center">Por favor, completa la exploracion fisica antes de continuar con este paso.</div>;
+        return <div className="text-center">Por favor, completa la exploración física antes de continuar con este paso.</div>;
     }
-    
+
     if (consent) {
         return <div className="text-center">Ya realizaste el consentimiento.</div>;
     }
@@ -71,85 +89,86 @@ function Consentimiento() {
             <div ref={pdfRef} className="max-w-4xl mx-auto bg-white p-6 shadow-md pdf-container">
                 {/* Header */}
                 <div className="flex items-center mb-4">
-                    {/* <img alt="ATR Nayarit Logo" className="h-31" src="logo.png" /> */}
                     <div className="w-full text-center bg-gray-200">
                         <h1 className="text-6xl">CONSENTIMIENTO INFORMADO</h1>
-                        <h3 className='text-2xl'>EXAMENES MEDICOS</h3>
+                        <h3 className="text-2xl">EXÁMENES MÉDICOS</h3>
                     </div>
                 </div>
 
-                {/* fecha */}
+                {/* Fecha */}
                 <div className="ml-80 flex space-x-2 mt-10 text-xl">
                     <div>FECHA</div>
-                    <input 
-                        className="w-full border-b h-10 border-gray-300 text-center align-middle leading-[4]" 
+                    <input
+                        className="w-full border-b h-10 border-gray-300 text-center align-middle leading-[4]"
                         type="date"
+                        value={fecha}
+                        onChange={(e) => setFecha(e.target.value)} // Actualizar el estado de la fecha
                     />
                 </div>
 
-                {/* info */}
-                <div className='grid grid-rows-2 gap-2 mt-10'>
+                {/* Información */}
+                <div className="grid grid-rows-2 gap-2 mt-10">
                     <div>
-                        <p className='text-2xl'>
+                        <p className="text-2xl">
                             El colaborador y/o aspirante al cargo, cuyos datos y firmas constan en este documento, da su consentimiento para que le
-                            realicen las pruebas medicas y complementarias necesarias para valorar su aptitud laboral, conforme a los riesgos identificados
-                            en el puesto de trabajo, y que el contenido y el resultdo de la misma este a disposicion del encargado del Area de 
-                            Servicios Medicos de la empresa. Se le informa que el examen medico ocupacional incluye una valoracion medica y pruebas
+                            realicen las pruebas médicas y complementarias necesarias para valorar su aptitud laboral, conforme a los riesgos identificados
+                            en el puesto de trabajo, y que el contenido y el resultado de la misma esté a disposición del encargado del Área de 
+                            Servicios Médicos de la empresa. Se le informa que el examen médico ocupacional incluye una valoración médica y pruebas
                             complementarias, las cuales para el cargo son:
                         </p>
                     </div>
-                    <div className='grid grid-cols-2 gap-4 text-2xl items-center'>
+                    <div className="grid grid-cols-2 gap-4 text-2xl items-center">
                         <div>
-                            <ul className='text-center flex flex-col gap-6'>
-                                <li>Exploracion fisica</li>
-                                <li>Toma de tension arterial</li>
+                            <ul className="text-center flex flex-col gap-6">
+                                <li>Exploración física</li>
+                                <li>Toma de tensión arterial</li>
                                 <li>Toma de glucosa en sangre</li>
                             </ul>
                         </div>
                         <div>
-                            <ul className='text-center flex flex-col gap-6'>
-                                <li>Examen de vision</li>
-                                <li>Examen de percepcion de colores</li>
-                                <li>Examen de concentracion</li>
+                            <ul className="text-center flex flex-col gap-6">
+                                <li>Examen de visión</li>
+                                <li>Examen de percepción de colores</li>
+                                <li>Examen de concentración</li>
                             </ul>
                         </div>
                     </div>
                 </div>
 
-                {/* protesta */}
+                {/* Protesta */}
                 <div>
-                    <p className='text-2xl mt-10'>
-                       {
-                        `Yo ${nombreUsuario()}, declaro bajo protesta decir la verdad sobre mi estado de salud actual y que la informacion vertida por
-                        mi es real, estoy consciente de que mi periodo de prueba es de 28 dias y es causa de recesion laboral sin responsabilidad
-                        para el patron, el engañarlo en cuanto a enfermedades cronico-degenerativas (diabetes, hipertension, cancer), embarazo,
-                        enfermedades neuronales, ortopedicas y pulmonares; lo anterior con fundamento en el articulo 47, fraccion I de la Ley
-                        Federal del Trabajo.`
-                       } 
+                    <p className="text-2xl mt-10">
+                        {`Yo ${nombreUsuario()}, declaro bajo protesta decir la verdad sobre mi estado de salud actual y que la información vertida por
+                        mí es real, estoy consciente de que mi periodo de prueba es de 28 días y es causa de recesión laboral sin responsabilidad
+                        para el patrón, el engañarlo en cuanto a enfermedades crónico-degenerativas (diabetes, hipertensión, cáncer), embarazo,
+                        enfermedades neuronales, ortopédicas y pulmonares; lo anterior con fundamento en el artículo 47, fracción I de la Ley
+                        Federal del Trabajo.`}
                     </p>
                 </div>
 
-                {/* firmas */}
-                <div className='grid grid-rows-2 gap-4 mt-10 text-center text-xl'>
-                    <div className='flex flex-col mb-15'>
+                {/* Firmas */}
+                <div className="grid grid-rows-2 gap-4 mt-10 text-center text-xl">
+                    <div className="flex flex-col mb-15">
                         <input className="border border-gray-300 p-2" type="text" />
                         <label>Firma del interesado</label>
                     </div>
-                    <div className='grid grid-cols-2 gap-4'>
-                        <div className='flex flex-col'>
+                    <div className="grid grid-cols-2 gap-4">
+                        <div className="flex flex-col">
                             <input className="border border-gray-300 p-2" type="text" />
-                            <label>Firma del dpto. medico</label>
+                            <label>Firma del dpto. médico</label>
                         </div>
-                        <div className='flex flex-col'>
+                        <div className="flex flex-col">
                             <input className="border border-gray-300 p-2" type="text" />
                             <label>Firma del dpto. reclutamiento</label>
                         </div>
                     </div>
                 </div>
-
             </div>
             <button onClick={exportToPDF} className="mt-4 p-2 bg-blue-500 text-white">
                 Exportar a PDF
+            </button>
+            <button onClick={enviarConsentimiento} className="mt-4 p-2 bg-green-500 text-white">
+                Enviar Consentimiento
             </button>
         </>
     );

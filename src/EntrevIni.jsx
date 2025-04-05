@@ -39,6 +39,8 @@ const EntrevIniForm = () => {
     encinte: '',
     tricky: '',
     artesanal: '',
+    enProceso: '', // Nuevo campo
+    preparado: '',  // Nuevo campo
     comprension: '',
     vista: '',
     calificacion: '',
@@ -135,6 +137,8 @@ const EntrevIniForm = () => {
         encinte: formData.encinte,
         tricky: formData.tricky,
         artesanal: formData.artesanal,
+        enProceso: formData.enProceso, // Nuevo campo
+        preparado: formData.preparado,   // Nuevo campo
         comprension: formData.comprension,
         vista: formData.vista,
         calificacion: formData.calificacion,
@@ -156,7 +160,8 @@ const EntrevIniForm = () => {
         numero: formData.numero,
         colonia: formData.colonia,
         escolaridad: formData.escolaridad,
-        fechaNac: formData.fechaNac
+        fechaNac: formData.fechaNac,
+        createdAt: formData.fecha,
       },
     };
     try {
