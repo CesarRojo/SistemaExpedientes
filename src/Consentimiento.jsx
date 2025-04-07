@@ -16,7 +16,7 @@ function Consentimiento() {
 
     const fetchUsuarioFolio = async () => {
         try {
-            const response = await axios.get(`http://172.30.189.106:5005/usuario/folio/${idFolio}`);
+            const response = await axios.get(`http://192.168.1.68:5005/usuario/folio/${idFolio}`);
             console.log("fetchUsuario for consentimiento", response.data);
             setUsuario(response.data);
             setExplorFis(response.data.exploracionFisica);
@@ -38,26 +38,26 @@ function Consentimiento() {
 
     const pdfRef = useRef();
 
-    const exportToPDF = () => {
-        const input = pdfRef.current;
+    // const exportToPDF = () => {
+    //     const input = pdfRef.current;
 
-        html2canvas(input, { scale: 3 }).then((canvas) => {
-            const imgData = canvas.toDataURL('image/png');
-            const pdf = new jsPDF('p', 'mm', 'legal');
-            const imgWidth = 216;
-            const pageHeight = 330;
-            const imgHeight = (canvas.height * imgWidth) / canvas.width;
+    //     html2canvas(input, { scale: 3 }).then((canvas) => {
+    //         const imgData = canvas.toDataURL('image/png');
+    //         const pdf = new jsPDF('p', 'mm', 'legal');
+    //         const imgWidth = 216;
+    //         const pageHeight = 330;
+    //         const imgHeight = (canvas.height * imgWidth) / canvas.width;
 
-            if (imgHeight > pageHeight) {
-                const scaleFactor = pageHeight / imgHeight;
-                pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, (imgHeight * scaleFactor) + 30);
-            } else {
-                pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
-            }
+    //         if (imgHeight > pageHeight) {
+    //             const scaleFactor = pageHeight / imgHeight;
+    //             pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, (imgHeight * scaleFactor) + 30);
+    //         } else {
+    //             pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+    //         }
 
-            pdf.save(`consentimiento-${numFol}.pdf`);
-        });
-    };
+    //         pdf.save(`consentimiento-${numFol}.pdf`);
+    //     });
+    // };
 
     const enviarConsentimiento = async () => {
         if (!fecha || !usuario?.idUsuario) {
@@ -66,11 +66,58 @@ function Consentimiento() {
         }
 
         try {
-            const response = await axios.post('http://172.30.189.106:5005/consent', {
+            const response = await axios.post('http://192.168.1.68:5005/consent', {
                 fecha,
                 idUsuario: usuario.idUsuario,
             });
+
             console.log('Consentimiento enviado:', response.data);
+
+            // Generar el PDF
+        const pdfBlob = await new Promise((resolve) => {
+            const input = pdfRef.current;
+            html2canvas(input, { scale: 0.8 }).then((canvas) => { //A mas 'scale' más calidad tiene el pdf, pero tambien es más pesado
+              const imgData = canvas.toDataURL('image/png');
+              const pdf = new jsPDF('p', 'mm', 'legal');
+              const imgWidth = 216;
+              const pageHeight = 330;
+              const imgHeight = (canvas.height * imgWidth) / canvas.width;
+  
+              if (imgHeight > pageHeight) {
+                  const scaleFactor = pageHeight / imgHeight;
+                  pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, (imgHeight * scaleFactor) + 30);
+              } else {
+                  pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+              }
+
+                // Convertir el PDF a un Blob
+                const pdfOutput = pdf.output('blob');
+                resolve(pdfOutput);
+            });
+        });
+
+        // console.log('Tipo de archivo:', pdfBlob.type); // Esto debería ser 'application/pdf'
+
+        // Verificar el tamaño del Blob
+        if (pdfBlob.size > 20 * 1024 * 1024) { // 20MB
+          console.log("Tamaño del pdf",pdfBlob.size);
+          console.error('El archivo PDF es demasiado grande.');
+          return; // Detener el proceso si el archivo es demasiado grande
+        }
+
+        // Crear FormData para subir el PDF
+        const formDataToSend = new FormData();
+        formDataToSend.append('document', pdfBlob, `consentimiento-${numFol}.pdf`); // Agregar el PDF
+        formDataToSend.append('idUsuario', usuario.idUsuario); // Agregar idUsuario
+
+        // Enviar el PDF al backend
+        const pdfUploadResponse = await axios.post('http://192.168.1.68:5005/pdf/upload-single-doc', formDataToSend, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+        });
+
+        console.log('PDF subido con éxito:', pdfUploadResponse.data);
         } catch (error) {
             console.error('Error al enviar el consentimiento:', error);
         }
@@ -164,9 +211,6 @@ function Consentimiento() {
                     </div>
                 </div>
             </div>
-            <button onClick={exportToPDF} className="mt-4 p-2 bg-blue-500 text-white">
-                Exportar a PDF
-            </button>
             <button onClick={enviarConsentimiento} className="mt-4 p-2 bg-green-500 text-white">
                 Enviar Consentimiento
             </button>

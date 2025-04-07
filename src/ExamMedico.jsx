@@ -40,7 +40,7 @@ function ExamenMedico() {
 
     const fetchEntrevIniData = async () => {
         try {
-            const response = await axios.get(`http://172.30.189.106:5005/usuario/folio/${idFolio}`);
+            const response = await axios.get(`http://192.168.1.68:5005/usuario/folio/${idFolio}`);
             setUsuario(response.data);
             setEntrevistaInicial(response.data.entrevistaInicial);
             setExamMed(response.data.examenMedico);
@@ -52,7 +52,7 @@ function ExamenMedico() {
 
     const fetchAntecedentesPatologicos = async () => {
       try {
-        const response = await axios.get('http://172.30.189.106:5005/antecPatolog');
+        const response = await axios.get('http://192.168.1.68:5005/antecPatolog');
         setAntecedentesPatologicos(response.data);
       } catch (error) {
         console.error('Error al obtener antecedentes patológicos:', error);
@@ -64,29 +64,105 @@ function ExamenMedico() {
         fetchAntecedentesPatologicos();
     }, [])
 
-    const exportToPDF = () => {
-        const input = pdfRef.current;
+    // const exportToPDF = () => {
+    //     const input = pdfRef.current;
 
-        html2canvas(input, { scale: 0.8 }).then((canvas) => {
-            const imgData = canvas.toDataURL('image/png');
-            const pdf = new jsPDF('p', 'mm', 'legal');
-            const imgWidth = 216;
-            const pageHeight = 330;
-            const imgHeight = (canvas.height * imgWidth) / canvas.width;
+    //     html2canvas(input, { scale: 0.8 }).then((canvas) => {
+    //         const imgData = canvas.toDataURL('image/png');
+    //         const pdf = new jsPDF('p', 'mm', 'legal');
+    //         const imgWidth = 216;
+    //         const pageHeight = 330;
+    //         const imgHeight = (canvas.height * imgWidth) / canvas.width;
 
-            if (imgHeight > pageHeight) {
-                const scaleFactor = pageHeight / imgHeight;
-                pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, (imgHeight * scaleFactor) + 30);
-            } else {
-                pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
-            }
+    //         if (imgHeight > pageHeight) {
+    //             const scaleFactor = pageHeight / imgHeight;
+    //             pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, (imgHeight * scaleFactor) + 30);
+    //         } else {
+    //             pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+    //         }
 
-            pdf.save('examenmedicoNormal.pdf');
-        });
-    };
+    //         pdf.save('examenmedicoNormal.pdf');
+    //     });
+    // };
 
     const handleChange = (e) => {
         const { name, value } = e.target;
+    
+        // Manejo de alcoholismo
+        if (name === 'alcoholismo') {
+            if (value === 'no') {
+                setFormData((prev) => ({
+                    ...prev,
+                    alcoholismo: value,
+                    frecuenciaAlcoholismo: '', // limpiar
+                }));
+            } else {
+                setFormData((prev) => ({
+                    ...prev,
+                    alcoholismo: value,
+                    frecuenciaAlcoholismo: '', // limpiar también aquí por si acaso
+                }));
+            }
+            return;
+        }
+    
+        // Manejo de deporte
+        if (name === 'deporte') {
+            if (value === 'no') {
+                setFormData((prev) => ({
+                    ...prev,
+                    deporte: value,
+                    frecuenciaDeporte: '', // limpiar
+                }));
+            } else {
+                setFormData((prev) => ({
+                    ...prev,
+                    deporte: value,
+                    frecuenciaDeporte: '', // limpiar también aquí por si acaso
+                }));
+            }
+            return;
+        }
+    
+        // Manejo de tabaquismo
+        if (name === 'tabaquismo') {
+            if (value === 'no') {
+                setFormData((prev) => ({
+                    ...prev,
+                    tabaquismo: value,
+                    frecuenciaTabaquismo: '', // limpiar
+                }));
+            } else {
+                setFormData((prev) => ({
+                    ...prev,
+                    tabaquismo: value,
+                    frecuenciaTabaquismo: '', // limpiar también aquí por si acaso
+                }));
+            }
+            return;
+        }
+    
+        // Manejo de drogas
+        if (name === 'drogas') {
+            if (value === 'no') {
+                setFormData((prev) => ({
+                    ...prev,
+                    drogas: value,
+                    frecuenciaDrogas: '', // limpiar
+                    cualDroga: '', // limpiar
+                }));
+            } else {
+                setFormData((prev) => ({
+                    ...prev,
+                    drogas: value,
+                    frecuenciaDrogas: '', // limpiar también aquí por si acaso
+                    cualDroga: '', // limpiar también aquí por si acaso
+                }));
+            }
+            return;
+        }
+    
+        // Actualiza el resto de los campos
         setFormData((prevData) => ({
             ...prevData,
             [name]: value,
@@ -122,7 +198,7 @@ function ExamenMedico() {
             }));
 
         // Enviar datos del examen médico al backend
-        const examMedicoResponse = await axios.post('http://172.30.189.106:5005/examMedico', {
+        const examMedicoResponse = await axios.post('http://192.168.1.68:5005/examMedico', {
             examMedicoData: {
                 planta: formData.planta,
                 fecha: new Date(formData.fecha),
@@ -184,7 +260,7 @@ function ExamenMedico() {
         formDataToSend.append('idUsuario', usuario.idUsuario); // Agregar idUsuario
 
         // Enviar el PDF al backend
-        const pdfUploadResponse = await axios.post('http://172.30.189.106:5005/pdf/upload-single-doc', formDataToSend, {
+        const pdfUploadResponse = await axios.post('http://192.168.1.68:5005/pdf/upload-single-doc', formDataToSend, {
             headers: {
                 'Content-Type': 'multipart/form-data',
             },
@@ -251,19 +327,19 @@ function ExamenMedico() {
                     <div className="grid grid-cols-3 gap-4">
                         <div>
                             <label>APELLIDO PATERNO</label>
-                            <input name="apellidoPaterno" className="w-full border border-gray-300 p-2" type="text" onChange={handleChange} />
+                            <input name="apellidoPaterno" className="w-full border border-gray-300 p-2" type="text" value={usuario.apellidoPat} readOnly />
                         </div>
                         <div>
                             <label>APELLIDO MATERNO</label>
-                            <input name="apellidoMaterno" className="w-full border border-gray-300 p-2" type="text" onChange={handleChange} />
+                            <input name="apellidoMaterno" className="w-full border border-gray-300 p-2" type="text" value={usuario.apellidoMat} readOnly />
                         </div>
                         <div>
                             <label>NOMBRE (S)</label>
-                            <input name="nombre" className="w-full border border-gray-300 p-2" type="text" onChange={handleChange} />
+                            <input name="nombre" className="w-full border border-gray-300 p-2" type="text" value={usuario.nombre} readOnly />
                         </div>
                         <div>
                             <label>FECHA NACIMIENTO</label>
-                            <input name="fechaNacimiento" className="w-full border border-gray-300 p-2" type="date" onChange={handleChange} />
+                            <input name="fechaNacimiento" className="w-full border border-gray-300 p-2" type="date" value={usuario.fechaNac.split('T')[0]} readOnly />
                         </div>
                         <div className="mb-4">
                             <div className="flex flex-row gap-4">
@@ -283,44 +359,44 @@ function ExamenMedico() {
                         <div className='flex flex-col'>
                             <label>ALCOHOLISMO</label>
                             <div className='flex flex-row gap-4'>
-                                <label><input type="radio" name="alcoholismo" value="si" onChange={handleChange} />Si</label>
-                                <label><input type="radio" name="alcoholismo" value="no" onChange={handleChange} />No</label>
+                                <label><input type="radio" name="alcoholismo" value="si" checked={formData.alcoholismo === 'si'} onChange={handleChange} />Si</label>
+                                <label><input type="radio" name="alcoholismo" value="no" checked={formData.alcoholismo === 'no'} onChange={handleChange} />No</label>
                             </div>
                             <label>FRECUENCIA</label>
-                            <input name="frecuenciaAlcoholismo" className="border border-gray-300 p-2" type="text" onChange={handleChange} />
+                            <input name="frecuenciaAlcoholismo" className="border border-gray-300 p-2" value={formData.frecuenciaAlcoholismo} type="text" onChange={handleChange} disabled={formData.alcoholismo !== 'si'} />
                         </div>
                         <div className='flex flex-col'>
                             <label>DEPORTE</label>
                             <div className='flex flex-row gap-4'>
-                                <label><input type="radio" name="deporte" value="si" onChange={handleChange} />Si</label>
-                                <label><input type="radio" name="deporte" value="no" onChange={handleChange} />No</label>
+                                <label><input type="radio" name="deporte" value="si" checked={formData.deporte === 'si'} onChange={handleChange} />Si</label>
+                                <label><input type="radio" name="deporte" value="no" checked={formData.deporte === 'no'} onChange={handleChange} />No</label>
                             </div>
                             <label>FRECUENCIA</label>
-                            <input name="frecuenciaDeporte" className="border border-gray-300 p-2" type="text" onChange={handleChange} />
+                            <input name="frecuenciaDeporte" className="border border-gray-300 p-2" value={formData.frecuenciaDeporte} type="text" onChange={handleChange} disabled={formData.deporte !== 'si'} />
                         </div>
                         <div className='flex flex-col'>
                             <label>TABAQUISMO</label>
                             <div className='flex flex-row gap-4'>
-                                <label><input type="radio" name="tabaquismo" value="si" onChange={handleChange} />Si</label>
-                                <label><input type="radio" name="tabaquismo" value="no" onChange={handleChange} />No</label>
+                                <label><input type="radio" name="tabaquismo" value="si" checked={formData.tabaquismo === 'si'} onChange={handleChange} />Si</label>
+                                <label><input type="radio" name="tabaquismo" value="no" checked={formData.tabaquismo === 'no'} onChange={handleChange} />No</label>
                             </div>
                             <label>FRECUENCIA</label>
-                            <input name="frecuenciaTabaquismo" className="border border-gray-300 p-2" type="text" onChange={handleChange} />
+                            <input name="frecuenciaTabaquismo" className="border border-gray-300 p-2" value={formData.frecuenciaTabaquismo} type="text" onChange={handleChange} disabled={formData.tabaquismo !== 'si'} />
                         </div>
                         <div className='flex flex-col'>
                             <label>DROGAS</label>
                             <div className='flex flex-row gap-4'>
-                                <label><input type="radio" name="drogas" value="si" onChange={handleChange} />Si</label>
-                                <label><input type="radio" name="drogas" value="no" onChange={handleChange} />No</label>
+                                <label><input type="radio" name="drogas" value="si" checked={formData.drogas === 'si'} onChange={handleChange} />Si</label>
+                                <label><input type="radio" name="drogas" value="no" checked={formData.drogas === 'no'} onChange={handleChange} />No</label>
                             </div>
                             <div className='grid grid-cols-2 gap-2'>
                                 <div>
                                     <label>FRECUENCIA</label>
-                                    <input name="frecuenciaDrogas" className="border border-gray-300 p-2" type="text" onChange={handleChange} />
+                                    <input name="frecuenciaDrogas" className="border border-gray-300 p-2" type="text" value={formData.frecuenciaDrogas} onChange={handleChange} disabled={formData.drogas !== 'si'} />
                                 </div>
                                 <div>
                                     <label>¿CUAL?</label>
-                                    <input name="cualDroga" className="border border-gray-300 p-2" type="text" onChange={handleChange} />
+                                    <input name="cualDroga" className="border border-gray-300 p-2" type="text" value={formData.cualDroga} onChange={handleChange} disabled={formData.drogas !== 'si'} />
                                 </div>
                             </div>
                         </div>
@@ -444,10 +520,14 @@ function ExamenMedico() {
                     </h2>
                     <textarea name="otraEnferm" className="w-full border border-gray-300 p-2 h-24" onChange={handleChange}></textarea>
                 </div>
-                <button type="submit" className="mt-4 p-2 bg-blue-500 text-white">
+            </form>
+                <button 
+                    type="submit" 
+                    className="mt-4 p-2 bg-blue-500 text-white"
+                    onClick={() => pdfRef.current.dispatchEvent(new Event('submit', { bubbles: true }))} // Llama a submit del formulario
+                >
                     Enviar Examen Médico
                 </button>
-            </form>
         </>
     );
 }

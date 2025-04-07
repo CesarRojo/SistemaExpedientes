@@ -31,7 +31,7 @@ const TablaEntrevistas = () => {
     getFechaHoy();
     const fetchDatos = async () => {
       try {
-        const response = await axios.get('http://172.30.189.106:5005/usuario/fecha', {
+        const response = await axios.get('http://192.168.1.68:5005/usuario/fecha', {
           params: { fechaInicio, fechaFin },
         });
         setDatos(response.data);
