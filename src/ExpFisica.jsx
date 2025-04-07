@@ -51,7 +51,7 @@ const ExploracionFisica = () => {
 
   const fetchUsuarioFolio = async () => {
     try {
-      const response = await axios.get(`http://192.168.1.68:5005/usuario/${idUsuario}`);
+      const response = await axios.get(`http://172.30.189.106:5005/usuario/${idUsuario}`);
       setUsuario(response.data);
       setExamMed(response.data.examenMedico);
       setExpFisica(response.data.exploracionFisica);
@@ -78,7 +78,7 @@ const ExploracionFisica = () => {
     e.preventDefault();
     try {
       const { nombreCompleto, realizadoPor, ...dataToSend } = formData; // Omitir los campos
-      const response = await axios.post('http://192.168.1.68:5005/expFisica', {
+      const response = await axios.post('http://172.30.189.106:5005/expFisica', {
         ...dataToSend,
         peso: parseInt(formData.peso),
         talla: parseInt(formData.talla),
@@ -146,7 +146,7 @@ const ExploracionFisica = () => {
         formDataToSend.append('idUsuario', usuario.idUsuario); // Agregar idUsuario
 
         // Enviar el PDF al backend
-        const pdfUploadResponse = await axios.post('http://192.168.1.68:5005/pdf/upload-single-doc', formDataToSend, {
+        const pdfUploadResponse = await axios.post('http://172.30.189.106:5005/pdf/upload-single-doc', formDataToSend, {
             headers: {
                 'Content-Type': 'multipart/form-data',
             },
@@ -154,7 +154,17 @@ const ExploracionFisica = () => {
 
         console.log('PDF subido con éxito:', pdfUploadResponse.data);
     } catch (error) {
-      console.error('Error al crear Exploración Física:', error);
+      if (error.response) {
+    // La solicitud se realizó y el servidor respondió con un código de estado
+    // que está fuera del rango de 2xx
+    console.error('Error en la respuesta del servidor:', error.response.data);
+  } else if (error.request) {
+    // La solicitud se realizó pero no se recibió respuesta
+    console.error('No se recibió respuesta del servidor:', error.request);
+  } else {
+    // Algo sucedió al configurar la solicitud que provocó un error
+    console.error('Error al configurar la solicitud:', error.message);
+  }
     }
   };
 

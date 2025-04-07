@@ -3,6 +3,82 @@ import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas-pro';
 import axios from 'axios';
 import useAuthStore from './authStore';
+import RfcFacil from 'rfc-facil'; // Importar la librería
+
+const estados = [
+  { clave: "AS", nombre: "Aguascalientes" },
+  { clave: "BC", nombre: "Baja California" },
+  { clave: "BS", nombre: "Baja California Sur" },
+  { clave: "CC", nombre: "Campeche" },
+  { clave: "CS", nombre: "Chiapas" },
+  { clave: "CH", nombre: "Chihuahua" },
+  { clave: "CO", nombre: "Coahuila" },
+  { clave: "CL", nombre: "Colima" },
+  { clave: "CM", nombre: "Ciudad de México" },
+  { clave: "DG", nombre: "Durango" },
+  { clave: "GT", nombre: "Guanajuato" },
+  { clave: "GR", nombre: "Guerrero" },
+  { clave: "HG", nombre: "Hidalgo" },
+  { clave: "JC", nombre: "Jalisco" },
+  { clave: "MC", nombre: "México" },
+  { clave: "MN", nombre: "Michoacán" },
+  { clave: "MS", nombre: "Morelos" },
+  { clave: "NT", nombre: "Nayarit" },
+  { clave: "NL", nombre: "Nuevo León" },
+  { clave: "OC", nombre: "Oaxaca" },
+  { clave: "PL", nombre: "Puebla" },
+  { clave: "QT", nombre: "Querétaro" },
+  { clave: "QR", nombre: "Quintana Roo" },
+  { clave: "SP", nombre: "San Luis Potosí" },
+  { clave: "SL", nombre: "Sinaloa" },
+  { clave: "SR", nombre: "Sonora" },
+  { clave: "TC", nombre: "Tabasco" },
+  { clave: "TS", nombre: "Tamaulipas" },
+  { clave: "TL", nombre: "Tlaxcala" },
+  { clave: "VZ", nombre: "Veracruz" },
+  { clave: "YN", nombre: "Yucatán" },
+  { clave: "ZS", nombre: "Zacatecas" }
+];
+
+// Listado de palabras altisonantes para la CURP en base al instructivo normativo de la SEGOB Marzo 2006
+const palabrasInconvenientes = {
+  "BACA": "BXCA", "BAKA": "BXKA", "BUEI": "BXEI", "BUEY": "BXEY",
+  "CACA": "CXCA", "CACO": "CXCO", "CAGA": "CXGA", "CAGO": "CXGO",
+  "CAKA": "CXKA", "CAKO": "CXKO", "COGE": "CXGE", "COGI": "CXGI",
+  "COJA": "CXJA", "COJE": "CXJE", "COJI": "CXJI", "COJO": "CXJO",
+  "COLA": "CXLA", "CULO": "CXLO", "FALO": "FXLO", "FETO": "FXTO",
+  "GETA": "GXTA", "GUEI": "GXEI", "GUEY": "GXEY", "JETA": "JXTA",
+  "JOTO": "JXTO", "KACA": "KXCA", "KACO": "KXCO", "KAGA": "KXGA",
+  "KAGO": "KXGO", "KAKA": "KXKA", "KAKO": "KXKO", "KOGE": "KXGE",
+  "KOGI": "KXGI", "KOJA": "KXJA", "KOJE": "KXJE", "KOJI": "KXJI",
+  "KOJO": "KXJO", "KOLA": "KXLA", "KULO": "KXLO", "LILO": "LXLO",
+  "LOCA": "LXCA", // Agregar más palabras según sea necesario
+};
+
+const palabrasIgnoradas = ["DE", "DEL", "LA", "LOS", "LAS", "Y", "E", "O", "UN", "UNA"];
+
+const obtenerPrimeraLetra = (nombre) => {
+  if (!nombre || nombre.trim() === "") return "X";
+  const partes = nombre.split(" ").filter(part => !palabrasIgnoradas.includes(part.toUpperCase()));
+  const primeraPalabra = partes[0] ? partes[0].toUpperCase() : "X";
+
+  // Manejo de nombres compuestos
+  if (primeraPalabra === "MARIA" || primeraPalabra === "MA." || primeraPalabra === "MA" || primeraPalabra === "JOSE" || primeraPalabra === "J" || primeraPalabra === "J.") {
+    return partes.length > 1 ? partes[1].charAt(0) : "X";
+  }
+
+  return primeraPalabra.charAt(0);
+};
+
+const obtenerPrimeraVocalInterna = (palabra) => {
+  let vocales = palabra.slice(1).match(/[AEIOU]/);
+  return vocales ? vocales[0] : "X";
+};
+
+const obtenerPrimeraConsonanteInterna = (palabra) => {
+  let consonantes = palabra.slice(1).match(/[^AEIOU]/);
+  return consonantes ? consonantes[0] : "X";
+};
 
 const SolicitudInternaForm = () => {
   const [formData, setFormData] = useState({
@@ -13,7 +89,7 @@ const SolicitudInternaForm = () => {
     NSS: '',
     CP: '',
     ciudad: '',
-    estado: '',
+    estado: '', // Este campo se llenará desde el select
     municipio: '',
     viveCon: '',
     datosFam: [
@@ -39,7 +115,7 @@ const SolicitudInternaForm = () => {
 
   const fetchUsuarioFolio = async () => {
     try {
-      const response = await axios.get(`http://192.168.1.68:5005/usuario/folio/${idFolio}`);
+      const response = await axios.get(`http://172.30.189.106:5005/usuario/folio/${idFolio}`);
       console.log(response.data);
       setUsuario(response.data);
       setSolInt(response.data.solicitudInterna);
@@ -66,12 +142,10 @@ const SolicitudInternaForm = () => {
   const handleDataFamChange = (index, field, value) => {
     const newDatosFam = [...formData.datosFam];
     
-    // Asegúrate de que el objeto exista
     if (!newDatosFam[index]) {
       newDatosFam[index] = { nombre: '', apellidos: '', fechaNac: '', parentesco: '' };
     }
 
-    // Actualiza el campo correspondiente
     newDatosFam[index][field] = value;
 
     setFormData((prevData) => ({
@@ -80,25 +154,124 @@ const SolicitudInternaForm = () => {
     }));
   };
 
+  const generarDiferenciadorHomonimia = (fechaNac) => {
+    const year = parseInt(fechaNac.split('-')[0]);
+    // Si el año es menor a 2000, devuelve '0', si es 2000 o mayor, devuelve 'A'
+    return year < 2000 ? '0' : 'A'; 
+  };
+  
+  const calcularDigitoVerificador = (curp) => {
+    const valores = "0123456789ABCDEFGHIJKLMNÑOPQRSTUVWXYZ";
+    let suma = 0;
+  
+    for (let i = 0; i < curp.length; i++) {
+      suma += valores.indexOf(curp.charAt(i)) * (18 - i);
+    }
+  
+    const digitoVerificador = 10 - (suma % 10);
+    return digitoVerificador === 10 ? '0' : digitoVerificador.toString();
+  };
+
+  const generateCURP = () => {
+    if (!usuario) return '';
+  
+    const { nombre, apellidoPat, apellidoMat, fechaNac, sexo } = usuario;
+    if (!nombre || !apellidoPat || !apellidoMat || !fechaNac || !sexo || !formData.estado) return '';
+  
+    const apellidoP = apellidoPat.toUpperCase().split(" ").filter(part => !palabrasIgnoradas.includes(part))[0]; // Solo la primera palabra que no es ignorada
+    const apellidoM = apellidoMat.toUpperCase().split(" ").filter(part => !palabrasIgnoradas.includes(part))[0]; // Solo la primera palabra que no es ignorada
+    const nombreU = nombre.toUpperCase().split(" ").filter(part => !palabrasIgnoradas.includes(part))[0]; // Solo la primera palabra que no es ignorada
+  
+    // Aplicar reglas de palabras inconvenientes
+    const primeraLetraApellidoP = palabrasInconvenientes[apellidoP] || obtenerPrimeraLetra(apellidoP);
+    const primeraVocalInternaP = obtenerPrimeraVocalInterna(apellidoP);
+    const primeraLetraApellidoM = palabrasInconvenientes[apellidoM] || obtenerPrimeraLetra(apellidoM);
+    const primeraLetraNombreU = palabrasInconvenientes[nombreU] || obtenerPrimeraLetra(nombreU);
+  
+    let curp = '';
+    curp += primeraLetraApellidoP; // Primera letra del primer apellido
+    curp += primeraVocalInternaP; // Primera vocal interna del primer apellido
+    curp += primeraLetraApellidoM; // Primera letra del segundo apellido
+    curp += primeraLetraNombreU; // Primera letra del nombre
+  
+    // Fecha de nacimiento (YYMMDD)
+    const [year, month, day] = fechaNac.split('T')[0].split('-');
+    curp += year.slice(-2) + month + day;
+  
+    curp += (sexo === 'H' ? 'H' : 'M'); // Género H o M
+    curp += formData.estado; // Clave del estado de nacimiento
+  
+    curp += obtenerPrimeraConsonanteInterna(apellidoP);
+    curp += obtenerPrimeraConsonanteInterna(apellidoM);
+    curp += obtenerPrimeraConsonanteInterna(nombreU);
+  
+    // Generar el diferenciador de homonimia
+    const diferenciador = generarDiferenciadorHomonimia(fechaNac);
+    curp += diferenciador;
+  
+    // Calcular el dígito verificador
+    const digitoVerificador = calcularDigitoVerificador(curp);
+    curp += digitoVerificador;
+  
+    return curp;
+  };
+
+  const generateRFC = (usuario) => {
+    if (!usuario) return '';
+    
+    const { nombre, apellidoPat, apellidoMat, fechaNac } = usuario;
+    if (!nombre || !apellidoPat || !apellidoMat || !fechaNac) return '';
+
+    const [year, month, day] = fechaNac.split('T')[0].split('-').map(Number);
+    
+    // Generar el RFC usando la librería
+    const rfc = RfcFacil.forNaturalPerson({
+      name: nombre,
+      firstLastName: apellidoPat,
+      secondLastName: apellidoMat,
+      day: day,
+      month: month,
+      year: year
+    });
+
+    return rfc;
+  };
+
+  useEffect(() => {
+    if (usuario) {
+      const curp = generateCURP();
+      const rfc = generateRFC(usuario); // Generar el RFC aquí
+      setFormData((prevData) => ({
+        ...prevData,
+        CURP: curp,
+        RFC: rfc, // Actualizar el RFC en el estado
+      }));
+    }
+  }, [usuario, formData.estado]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       if (usuario) {
+        const filteredDatosFam = formData.datosFam.filter(fam => 
+          fam.nombre || fam.apellidos
+        );
+
         const dataToSend = {
           ...formData,
+          datosFam: filteredDatosFam,
           idUsuario: usuario.idUsuario,
         };
 
         const { fechaNac, ...dataWithoutFechaNac } = dataToSend;
 
-        const response = await axios.post('http://192.168.1.68:5005/solicInt', dataWithoutFechaNac);
+        const response = await axios.post('http://172.30.189.106:5005/solicInt', dataWithoutFechaNac);
 
         console.log('Data submitted successfully:', response.data);
 
-        // Generar el PDF
         const pdfBlob = await new Promise((resolve) => {
           const input = pdfRef.current;
-          html2canvas(input, { scale: 0.8 }).then((canvas) => { //A mas 'scale' más calidad tiene el pdf, pero tambien es más pesado
+          html2canvas(input, { scale: 0.8 }).then((canvas) => {
             const imgData = canvas.toDataURL('image/png');
             const pdf = new jsPDF('p', 'mm', 'legal');
             const imgWidth = 216;
@@ -112,34 +285,28 @@ const SolicitudInternaForm = () => {
                 pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
             }
 
-              // Convertir el PDF a un Blob
-              const pdfOutput = pdf.output('blob');
-              resolve(pdfOutput);
+            const pdfOutput = pdf.output('blob');
+            resolve(pdfOutput);
           });
-      });
+        });
 
-      // console.log('Tipo de archivo:', pdfBlob.type); // Esto debería ser 'application/pdf'
+        if (pdfBlob.size > 20 * 1024 * 1024) {
+          console.log("Tamaño del pdf", pdfBlob.size);
+          console.error('El archivo PDF es demasiado grande.');
+          return;
+        }
 
-      // Verificar el tamaño del Blob
-      if (pdfBlob.size > 20 * 1024 * 1024) { // 20MB
-        console.log("Tamaño del pdf",pdfBlob.size);
-        console.error('El archivo PDF es demasiado grande.');
-        return; // Detener el proceso si el archivo es demasiado grande
-      }
+        const formDataToSend = new FormData();
+        formDataToSend.append('document', pdfBlob, `solicitudinterna-${numFolio}.pdf`);
+        formDataToSend.append('idUsuario', usuario.idUsuario);
 
-      // Crear FormData para subir el PDF
-      const formDataToSend = new FormData();
-      formDataToSend.append('document', pdfBlob, `solicitudinterna-${numFolio}.pdf`); // Agregar el PDF
-      formDataToSend.append('idUsuario', usuario.idUsuario); // Agregar idUsuario
+        const pdfUploadResponse = await axios.post('http://172.30.189.106:5005/pdf/upload-single-doc', formDataToSend, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+        });
 
-      // Enviar el PDF al backend
-      const pdfUploadResponse = await axios.post('http://192.168.1.68:5005/pdf/upload-single-doc', formDataToSend, {
-          headers: {
-              'Content-Type': 'multipart/form-data',
-          },
-      });
-
-      console.log('PDF subido con éxito:', pdfUploadResponse.data);
+        console.log('PDF subido con éxito:', pdfUploadResponse.data);
       } else {
         console.error('Usuario no cargado');
       }
@@ -246,8 +413,8 @@ const SolicitudInternaForm = () => {
                 className="w-full border border-gray-300 p-2"
                 type="text"
                 name="RFC"
-                value={formData.RFC}
-                onChange={handleChange}
+                value={formData.RFC} // Mostrar el RFC generado
+                readOnly // Hacerlo de solo lectura
               />
             </div>
             <div>
@@ -257,7 +424,7 @@ const SolicitudInternaForm = () => {
                 type="text"
                 name="CURP"
                 value={formData.CURP}
-                onChange={handleChange}
+                readOnly
               />
             </div>
           </div>
@@ -457,13 +624,17 @@ const SolicitudInternaForm = () => {
             </div>
             <div>
               <label>ESTADO</label>
-              <input
+              <select
                 className="w-full border border-gray-300 p-2"
-                type="text"
                 name="estado"
                 value={formData.estado}
                 onChange={handleChange}
-              />
+              >
+                <option value="">Selecciona un estado</option>
+                {estados.map((estado) => (
+                  <option key={estado.clave} value={estado.clave}>{estado.nombre}</option>
+                ))}
+              </select>
             </div>
           </div>
           <div className='grid grid-cols-2 gap-2'>

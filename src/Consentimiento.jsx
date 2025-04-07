@@ -16,7 +16,7 @@ function Consentimiento() {
 
     const fetchUsuarioFolio = async () => {
         try {
-            const response = await axios.get(`http://192.168.1.68:5005/usuario/folio/${idFolio}`);
+            const response = await axios.get(`http://172.30.189.106:5005/usuario/folio/${idFolio}`);
             console.log("fetchUsuario for consentimiento", response.data);
             setUsuario(response.data);
             setExplorFis(response.data.exploracionFisica);
@@ -66,7 +66,7 @@ function Consentimiento() {
         }
 
         try {
-            const response = await axios.post('http://192.168.1.68:5005/consent', {
+            const response = await axios.post('http://172.30.189.106:5005/consent', {
                 fecha,
                 idUsuario: usuario.idUsuario,
             });
@@ -111,7 +111,7 @@ function Consentimiento() {
         formDataToSend.append('idUsuario', usuario.idUsuario); // Agregar idUsuario
 
         // Enviar el PDF al backend
-        const pdfUploadResponse = await axios.post('http://192.168.1.68:5005/pdf/upload-single-doc', formDataToSend, {
+        const pdfUploadResponse = await axios.post('http://172.30.189.106:5005/pdf/upload-single-doc', formDataToSend, {
             headers: {
                 'Content-Type': 'multipart/form-data',
             },

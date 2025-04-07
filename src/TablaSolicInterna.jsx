@@ -14,6 +14,7 @@ const TablaSolicInterna = () => {
   }
 
   const [datos, setDatos] = useState([]);
+  const [docs, setDocs] = useState({});
   const [fechaInicio, setFechaInicio] = useState(getFechaHoy());
   const [fechaFin, setFechaFin] = useState(getFechaHoy());
   const [filtros, setFiltros] = useState({
@@ -27,7 +28,7 @@ const TablaSolicInterna = () => {
   useEffect(() => {
     const fetchDatos = async () => {
       try {
-        const response = await axios.get('http://192.168.1.68:5005/usuario/fecha', {
+        const response = await axios.get('http://172.30.189.106:5005/usuario/fecha', {
           params: { fechaInicio, fechaFin },
         });
         setDatos(response.data);
@@ -38,6 +39,32 @@ const TablaSolicInterna = () => {
 
     fetchDatos();
   }, [fechaInicio, fechaFin]);
+
+  useEffect(() => {
+    const fetchDocs = async () => {
+      const idUsuarios = datos.map(dato => dato.idUsuario); // Obtener todos los idUsuario
+      if (idUsuarios.length > 0) {
+        try {
+          const response = await axios.get('http://172.30.189.106:5005/docs/byUser', {
+            params: { idUsuarios: idUsuarios.join(',') }, // Pasar los idUsuarios como un string separado por comas
+          });
+          const docsData = response.data.reduce((acc, doc) => {
+            if (!acc[doc.idUsuario]) {
+              acc[doc.idUsuario] = {};
+            }
+            acc[doc.idUsuario][doc.filename.split('-')[0]] = doc; // Usar el prefijo del filename como clave
+            return acc;
+          }, {});
+          console.log("docs", docsData);
+          setDocs(docsData);
+        } catch (error) {
+          console.error('Error fetching docs data:', error);
+        }
+      }
+    };
+
+    fetchDocs();
+  }, [datos]);
 
   const handleExportarExcel = () => {
         const datosParaExportar = datos.map((dato) => ({
@@ -192,6 +219,7 @@ const TablaSolicInterna = () => {
             <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha</th>
             <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Folio</th>
             <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Solic. Interna</th>
+            <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">PDF</th>
           </tr>
         </thead>
         <tbody className="bg-white divide-y divide-gray-200">
@@ -207,6 +235,20 @@ const TablaSolicInterna = () => {
               <td className="px-6 py-4 whitespace-nowrap">{dato.createdAt.split('T')[0]}</td>
               <td className="px-6 py-4 whitespace-nowrap">{dato.folio.numFolio}</td>
               <td className={`px-6 py-4 whitespace-nowrap font-bold ${dato.solicitudInterna ? 'text-green-600' : 'text-red-600'}`}>{dato.solicitudInterna ? "Hecho" : "No hecho"}</td>
+              <td className="px-6 py-4 whitespace-nowrap">
+                {docs[dato.idUsuario] && docs[dato.idUsuario]['solicitudinterna'] ? (
+                  <a
+                    href={`http://172.30.189.106:5005${docs[dato.idUsuario]['solicitudinterna'].path}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-500 hover:underline"
+                  >
+                    Ver PDF
+                  </a>
+                ) : (
+                  <span className="text-gray-500">No disponible</span>
+                )}
+              </td>
             </tr>
           ))}
         </tbody>
