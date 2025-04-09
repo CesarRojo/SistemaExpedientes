@@ -68,10 +68,26 @@ const ExploracionFisica = () => {
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value,
-    }));
+  
+    // Si el radio seleccionado es "Otro", actualiza el campo comprension
+    if (name === 'comprension' && value === 'Otro') {
+      setFormData((prev) => ({
+        ...prev,
+        comprension: '', // Limpiar el valor de comprension para que el input de texto pueda ser usado
+      }));
+    } else if (name === 'comprensionOtro') {
+      // Si se está escribiendo en el input de texto, actualiza comprension
+      setFormData((prev) => ({
+        ...prev,
+        comprension: value, // Guardar el valor del input de texto en comprension
+      }));
+    } else {
+      // Para otros campos, actualiza normalmente
+      setFormData((prev) => ({
+        ...prev,
+        [name]: type === 'checkbox' ? checked : value,
+      }));
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -314,7 +330,7 @@ const ExploracionFisica = () => {
               <label><input type="radio" name="comprension" value="90/80" onChange={handleChange} />90/80</label>
               <label><input type="radio" name="comprension" value="80/70" onChange={handleChange} />80/70</label>
               <label><input type="radio" name="comprension" value="Otro" onChange={handleChange} />Otro</label>
-              <input className="border border-gray-300 p-1 w-full" name="comprensionOtro" type="text" onChange={handleChange} />
+              <input className="border border-gray-300 p-1 w-full" name="comprensionOtro" type="text" value={formData.comprension === '' ? '' : formData.comprension} onChange={handleChange} />
             </div>
             <div>
               <div className='grid grid-cols-2 gap-2'>

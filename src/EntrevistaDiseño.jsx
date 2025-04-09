@@ -46,6 +46,35 @@ function EntrevistaDiseño() {
         });
     };
 
+    // State to manage the selected option for radio buttons
+    const [selectedSexo, setSelectedSexo] = useState(entrevIni?.sexo);
+    const [selectedEstadoCivil, setSelectedEstadoCivil] = useState(entrevIni?.estado_civil);
+    const [selectedEscolaridad, setSelectedEscolaridad] = useState(entrevIni?.escolaridad);
+    const [selectedActualDedica, setSelectedActualDedica] = useState(entrevIni?.entrevistaInicial?.actualDedica);
+    const [selectedEntroEmpleo, setSelectedEntroEmpleo] = useState(entrevIni?.entrevistaInicial?.enteroEmpleo);
+    const [enQueArea, setEnQueArea] = useState(entrevIni?.entrevistaInicial?.enteroEmpleo);
+    const [selectedPendiente, setSelectedPendiente] = useState(entrevIni?.entrevistaInicial?.pendientes);
+    const [selectedCuidador, setSelectedCuidador] = useState(entrevIni?.entrevistaInicial?.cuidador);
+    const [selectedAreaOPlanta, setSelectedAreaOPlanta] = useState(entrevIni?.entrevistaInicial?.areaOPlanta);
+    const [workedBefore, setWorkedBefore] = useState(false);
+    const [children, setChildren] = useState(false);
+    const [renta, setRenta] = useState(false);
+    const [fonacot, setFonacot] = useState(false);
+    const [infonavit, setInfonavit] = useState(false);
+    const [antecedentes, setAntecedentes] = useState(false);
+    const [bono, setBono] = useState(false);
+    const [otherEscolaridad, setOtherEscolaridad] = useState('');
+
+    useEffect(() => {
+        if (selectedEscolaridad !== 'Otro') {
+            setOtherEscolaridad('');
+        }
+    }, [selectedEscolaridad]);
+
+    const handleRadioChange = (setter) => (e) => {
+        setter(e.target.value);
+    };
+
     return (
         <>
             <div ref={pdfRef} className="max-w-4xl mx-auto bg-white p-6 shadow-md pdf-container">
@@ -91,8 +120,12 @@ function EntrevistaDiseño() {
                         <div>
                             <label>SEXO</label>
                             <div className="flex space-x-2">
-                                <label><input type="radio" name="sexo" defaultChecked={entrevIni?.sexo === 'H'} />H</label>
-                                <label><input type="radio" name="sexo" defaultChecked={entrevIni?.sexo === 'M'} />M</label>
+                                <label>
+                                    <input type="radio" name="sexo" value="H" checked={selectedSexo === 'H'} onChange={handleRadioChange(setSelectedSexo)} />H
+                                </label>
+                                <label>
+                                    <input type="radio" name="sexo" value="M" checked={selectedSexo === 'M'} onChange={handleRadioChange(setSelectedSexo)} />M
+                                </label>
                             </div>
                         </div>
                     </div>
@@ -130,11 +163,21 @@ function EntrevistaDiseño() {
                 <div className="mb-4">
                     <div className="flex space-x-4">
                         <div>ESTADO CIVIL:</div>
-                        <label><input type="checkbox" defaultChecked={entrevIni?.estado_civil === 'Soltero (a)'} />Soltero (a)</label>
-                        <label><input type="checkbox" defaultChecked={entrevIni?.estado_civil === 'Casado'} />Casado (a)</label>
-                        <label><input type="checkbox" defaultChecked={entrevIni?.estado_civil === 'Unión Libre'} />Unión Libre</label>
-                        <label><input type="checkbox" defaultChecked={entrevIni?.estado_civil === 'Separado (a)'} />Separado (a)</label>
-                        <label><input type="checkbox" defaultChecked={entrevIni?.estado_civil === 'Viudo (a)'} />Viudo (a)</label>
+                        <label>
+                            <input type="radio" name="estadoCivil" value="Soltero (a)" checked={selectedEstadoCivil === 'Soltero (a)'} onChange={handleRadioChange(setSelectedEstadoCivil)} />Soltero (a)
+                        </label>
+                        <label>
+                            <input type="radio" name="estadoCivil" value="Casado" checked={selectedEstadoCivil === 'Casado'} onChange={handleRadioChange(setSelectedEstadoCivil)} />Casado (a)
+                        </label>
+                        <label>
+                            <input type="radio" name="estadoCivil" value="Unión Libre" checked={selectedEstadoCivil === 'Unión Libre'} onChange={handleRadioChange(setSelectedEstadoCivil)} />Unión Libre
+                        </label>
+                        <label>
+                            <input type="radio" name="estadoCivil" value="Separado (a)" checked={selectedEstadoCivil === 'Separado (a)'} onChange={handleRadioChange(setSelectedEstadoCivil)} />Separado (a)
+                        </label>
+                        <label>
+                            <input type="radio" name="estadoCivil" value="Viudo (a)" checked={selectedEstadoCivil === 'Viudo (a)'} onChange={handleRadioChange(setSelectedEstadoCivil)} />Viudo (a)
+                        </label>
                     </div>
                 </div>
 
@@ -142,11 +185,19 @@ function EntrevistaDiseño() {
                 <div className="mb-4">
                     <div className="flex space-x-4">
                         <div>ESCOLARIDAD:</div>
-                        <label><input type="checkbox" defaultChecked={entrevIni?.escolaridad === 'Primaria'} />PRIMARIA</label>
-                        <label><input type="checkbox" defaultChecked={entrevIni?.escolaridad === 'Secundaria'} />SECUNDARIA</label>
-                        <label><input type="checkbox" defaultChecked={entrevIni?.escolaridad === 'Bachillerato'} />PREPARATORIA</label>
-                        <label><input type="checkbox" defaultChecked={entrevIni?.escolaridad === 'Otro'} />OTRO</label>
-                        <input className="border border-gray-300 p-2" type="text" defaultValue={entrevIni?.escolaridad === 'Otro' ? '' : ''} />
+                        <label>
+                            <input type="radio" name="escolaridad" value="Primaria" checked={selectedEscolaridad === 'Primaria'} onChange={handleRadioChange(setSelectedEscolaridad)} />PRIMARIA
+                        </label>
+                        <label>
+                            <input type="radio" name="escolaridad" value="Secundaria" checked={selectedEscolaridad === 'Secundaria'} onChange={handleRadioChange(setSelectedEscolaridad)} />SECUNDARIA
+                        </label>
+                        <label>
+                            <input type="radio" name="escolaridad" value="Bachillerato" checked={selectedEscolaridad === 'Bachillerato'} onChange={handleRadioChange(setSelectedEscolaridad)} />PREPARATORIA
+                        </label>
+                        <label>
+                            <input type="radio" name="escolaridad" value="Otro" checked={selectedEscolaridad === 'Otro'} onChange={handleRadioChange(setSelectedEscolaridad)} />OTRO
+                        </label>
+                        <input className="border border-gray-300 p-2" type="text" value={otherEscolaridad} onChange={(e) => setOtherEscolaridad(e.target.value)} readOnly={selectedEscolaridad !== 'Otro'} />
                     </div>
                 </div>
 
@@ -154,10 +205,16 @@ function EntrevistaDiseño() {
                 <div className="mb-4">
                     <div>Actualmente, ¿A qué se dedica?</div>
                     <div className="flex space-x-4">
-                        <label><input type="checkbox" defaultChecked={entrevIni?.entrevistaInicial?.actualDedica === 'Estudiante'} />ESTUDIANTE</label>
-                        <label><input type="checkbox" defaultChecked={entrevIni?.entrevistaInicial?.actualDedica === 'Desempleado'} />DESEMPLEADO</label>
-                        <label><input type="checkbox" defaultChecked={entrevIni?.entrevistaInicial?.actualDedica === 'Otro'} />OTRO:</label>
-                        <input className="border border-gray-300 p-2" type="text" defaultValue={entrevIni?.entrevistaInicial?.actualDedica === 'Otro' ? '' : ''} />
+                        <label>
+                            <input type="radio" name="actualDedica" value="Estudiante" checked={selectedActualDedica === 'Estudiante'} onChange={handleRadioChange(setSelectedActualDedica)} />ESTUDIANTE
+                        </label>
+                        <label>
+                            <input type="radio" name="actualDedica" value="Desempleado" checked={selectedActualDedica === 'Desempleado'} onChange={handleRadioChange(setSelectedActualDedica)} />DESEMPLEADO
+                        </label>
+                        <label>
+                            <input type="radio" name="actualDedica" value="Otro" checked={selectedActualDedica === 'Otro'} onChange={handleRadioChange(setSelectedActualDedica)} />OTRO:
+                        </label>
+                        <input className="border border-gray-300 p-2" type="text" defaultValue={selectedActualDedica === 'Otro' ? '' : ''} readOnly={selectedActualDedica !== 'Otro'} />
                     </div>
                 </div>
 
@@ -165,17 +222,33 @@ function EntrevistaDiseño() {
                 <div className="mb-4">
                     <div>¿Cómo se enteró del Empleo?</div>
                     <div className="flex space-x-4">
-                        <label><input type="checkbox" defaultChecked={entrevIni?.entrevistaInicial?.enteroEmpleo === 'Reingreso'} />REINGRESO</label>
-                        <label><input type="checkbox" defaultChecked={entrevIni?.entrevistaInicial?.enteroEmpleo === 'Volante'} />VOLANTE</label>
-                        <label><input type="checkbox" defaultChecked={entrevIni?.entrevistaInicial?.enteroEmpleo === 'Publicidad en Poste'} />PUBLICIDAD EN POSTE</label>
-                        <label><input type="checkbox" defaultChecked={entrevIni?.entrevistaInicial?.enteroEmpleo === 'Espectacular'} />ESPECTACULAR</label>
+                        <label>
+                            <input type="radio" name="enteroEmpleo" value="Reingreso" checked={selectedEntroEmpleo === 'Reingreso'} onChange={handleRadioChange(setSelectedEntroEmpleo)} />REINGRESO
+                        </label>
+                        <label>
+                            <input type="radio" name="enteroEmpleo" value="Volante" checked={selectedEntroEmpleo === 'Volante'} onChange={handleRadioChange(setSelectedEntroEmpleo)} />VOLANTE
+                        </label>
+                        <label>
+                            <input type="radio" name="enteroEmpleo" value="Publicidad en Poste" checked={selectedEntroEmpleo === 'Publicidad en Poste'} onChange={handleRadioChange(setSelectedEntroEmpleo)} />PUBLICIDAD EN POSTE
+                        </label>
+                        <label>
+                            <input type="radio" name="enteroEmpleo" value="Espectacular" checked={selectedEntroEmpleo === 'Espectacular'} onChange={handleRadioChange(setSelectedEntroEmpleo)} />ESPECTACULAR
+                        </label>
                     </div>
                     <div className="flex space-x-4">
-                        <label><input type="checkbox" defaultChecked={entrevIni?.entrevistaInicial?.enteroEmpleo === 'Facebook'} />FACEBOOK</label>
-                        <label><input type="checkbox" defaultChecked={entrevIni?.entrevistaInicial?.enteroEmpleo === 'Bono Padrino'} />BONO PADRINO</label>
-                        <label><input type="checkbox" defaultChecked={entrevIni?.entrevistaInicial?.enteroEmpleo === 'Anuncio Parlante'} />ANUNCIO PARLANTE</label>
-                        <label><input type="checkbox" defaultChecked={entrevIni?.entrevistaInicial?.enteroEmpleo === 'Otro'} />OTRO:</label>
-                        <input className="border border-gray-300 p-2" type="text" defaultValue={entrevIni?.entrevistaInicial?.enteroEmpleo === 'Otro' ? '' : ''} />
+                        <label>
+                            <input type="radio" name="enteroEmpleo" value="Facebook" checked={selectedEntroEmpleo === 'Facebook'} onChange={handleRadioChange(setSelectedEntroEmpleo)} />FACEBOOK
+                        </label>
+                        <label>
+                            <input type="radio" name="enteroEmpleo" value="Bono Padrino" checked={selectedEntroEmpleo === 'Bono Padrino'} onChange={handleRadioChange(setSelectedEntroEmpleo)} />BONO PADRINO
+                        </label>
+                        <label>
+                            <input type="radio" name="enteroEmpleo" value="Anuncio Parlante" checked={selectedEntroEmpleo === 'Anuncio Parlante'} onChange={handleRadioChange(setSelectedEntroEmpleo)} />ANUNCIO PARLANTE
+                        </label>
+                        <label>
+                            <input type="radio" name="enteroEmpleo" value="Otro" checked={selectedEntroEmpleo === 'Otro'} onChange={handleRadioChange(setSelectedEntroEmpleo)} />OTRO:
+                        </label>
+                        <input className="border border-gray-300 p-2" type="text" defaultValue={selectedEntroEmpleo === 'Otro' ? '' : ''} readOnly={selectedEntroEmpleo !== 'Otro'} />
                     </div>
                 </div>
 
@@ -183,26 +256,74 @@ function EntrevistaDiseño() {
                 <div className="mb-4">
                     <div>Anteriormente, ¿ha trabajado con nosotros?</div>
                     <div className="flex space-x-4">
-                        <label><input type="checkbox" defaultChecked={entrevIni?.entrevistaInicial?.numIngresos !== null} />Sí</label>
-                        <label><input type="checkbox" defaultChecked={entrevIni?.entrevistaInicial?.numIngresos === null} />No</label>
+                        <label>
+                            <input 
+                                type="radio" 
+                                name="numIngresos" 
+                                value="Sí" 
+                                checked={workedBefore} 
+                                onChange={() => setWorkedBefore(true)} 
+                            />Sí
+                        </label>
+                        <label>
+                            <input 
+                                type="radio" 
+                                name="numIngresos" 
+                                value="No" 
+                                checked={!workedBefore} 
+                                onChange={() => setWorkedBefore(false)} 
+                            />No
+                        </label>
+                    </div>
+                    <div>
                         <label>Número de Ingresos:</label>
-                        <input className="border border-gray-300 p-2" type="text" defaultValue={entrevIni?.entrevistaInicial?.numIngresos} />
-                    </div>
-                    <div className="mt-4">
-                        <div>¿En qué área?</div>
-                        <div className="flex space-x-4">
-                            <label><input type="checkbox" defaultChecked={entrevIni?.entrevistaInicial?.enQueArea === 'Medios'} />MEDIOS</label>
-                            <label><input type="checkbox" defaultChecked={entrevIni?.entrevistaInicial?.enQueArea === 'Corte'} />CORTE</label>
-                            <label><input type="checkbox" defaultChecked={entrevIni?.entrevistaInicial?.enQueArea === 'Ensamble'} />ENSAMBLE</label>
-                            <label>PROCESO DE LÍNEA:</label>
-                            <input className="border border-gray-300 p-2" type="text" defaultValue={entrevIni?.entrevistaInicial?.procesoLinea} />
-                            <label>OTRA ÁREA:</label>
-                            <input className="border border-gray-300 p-2" type="text" defaultValue={entrevIni?.entrevistaInicial?.otraArea} />
+                        <input 
+                            className="border border-gray-300 p-2" 
+                            type="number" 
+                            defaultValue={entrevIni?.entrevistaInicial?.numIngresos} 
+                            readOnly={!workedBefore} 
+                        />
+                        <div className="mt-4">
+                            <div>¿En qué área?</div>
+                            <div className="flex space-x-4">
+                                {['Medios', 'Corte', 'Ensamble'].map(area => (
+                                    <label key={area}>
+                                        <input 
+                                            type="radio" 
+                                            name="enQueArea" 
+                                            value={area} 
+                                            checked={workedBefore ? enQueArea === area : entrevIni?.entrevistaInicial?.enQueArea === area} 
+                                            onChange={workedBefore ? handleRadioChange(setEnQueArea) : undefined} 
+                                            readOnly={!workedBefore} 
+                                        />
+                                        {area}
+                                    </label>
+                                ))}
+                                <label>PROCESO DE LÍNEA:</label>
+                                <input 
+                                    className="border border-gray-300 p-2" 
+                                    type="text" 
+                                    defaultValue={entrevIni?.entrevistaInicial?.procesoLinea} 
+                                    readOnly={!workedBefore} 
+                                />
+                                <label>OTRA ÁREA:</label>
+                                <input 
+                                    className="border border-gray-300 p-2" 
+                                    type="text" 
+                                    defaultValue={entrevIni?.entrevistaInicial?.otraArea} 
+                                    readOnly={!workedBefore} 
+                                />
+                            </div>
                         </div>
-                    </div>
-                    <div className="mt-4">
-                        <div>Motivo de renuncia o retiro:</div>
-                        <input className="w-full border border-gray-300 p-2" type="text" defaultValue={entrevIni?.entrevistaInicial?.motivoRenuncia} />
+                        <div className="mt-4">
+                            <div>Motivo de renuncia o retiro:</div>
+                            <input 
+                                className="w-full border border-gray-300 p-2" 
+                                type="text" 
+                                defaultValue={entrevIni?.entrevistaInicial?.motivoRenuncia} 
+                                readOnly={!workedBefore} 
+                            />
+                        </div>
                     </div>
                 </div>
 
@@ -210,21 +331,66 @@ function EntrevistaDiseño() {
                 <div className="mb-4">
                     <div>¿Tienes hijos?</div>
                     <div className="flex space-x-4">
-                        <label><input type="checkbox" defaultChecked={entrevIni?.entrevistaInicial?.cant_hijos > 0} />Sí</label>
-                        <label><input type="checkbox" defaultChecked={entrevIni?.entrevistaInicial?.cant_hijos === null} />No</label>
+                        <label>
+                            <input type="radio" name="cant_hijos" value="Sí" checked={children} onChange={() => setChildren(true)} />Sí
+                        </label>
+                        <label>
+                            <input type="radio" name="cant_hijos" value="No" checked={!children} onChange={() => setChildren(false)} />No
+                        </label>
                         <div>Cuantos</div>
-                        <input className="border border-gray-300 p-2" type="text" defaultValue={entrevIni?.entrevistaInicial?.cant_hijos} />
+                        <input className="border border-gray-300 p-2" type="text" defaultValue={entrevIni?.entrevistaInicial?.cant_hijos} readOnly={!children}  />
                         <div>Edades de sus hijos</div>
-                        <input className="border border-gray-300 p-2" type="text" defaultValue={entrevIni?.entrevistaInicial?.edades_hijos} />
+                        <input className="border border-gray-300 p-2" type="text" defaultValue={entrevIni?.entrevistaInicial?.edades_hijos} readOnly={!children} />
                     </div>
                     <div className="mt-4">
                         <div>¿Quién los cuida?</div>
                         <div className="flex space-x-4">
-                            <label><input type="checkbox" defaultChecked={entrevIni?.entrevistaInicial?.cuidador === 'Esposo (A)'} />ESPOSO (A)</label>
-                            <label><input type="checkbox" defaultChecked={entrevIni?.entrevistaInicial?.cuidador === 'Abuelo (A)'} />ABUELO (A)</label>
-                            <label><input type="checkbox" defaultChecked={entrevIni?.entrevistaInicial?.cuidador === 'Vecino (A)'} />VECINO (A)</label>
-                            <label><input type="checkbox" defaultChecked={entrevIni?.entrevistaInicial?.cuidador === 'Otro'} />OTRO:</label>
-                            <input className="border border-gray-300 p-2" type="text" defaultValue={entrevIni?.entrevistaInicial?.cuidador === 'Otro' ? '' : ''} />
+                            <label>
+                                <input 
+                                    type="radio" 
+                                    name="cuidador" 
+                                    value="Esposo (A)" 
+                                    checked={children ? selectedCuidador === 'Esposo (A)' : ''} 
+                                    onChange={children ? handleRadioChange(setSelectedCuidador) : undefined} 
+                                    readOnly={!children} 
+                                />ESPOSO (A)
+                            </label>
+                            <label>
+                                <input 
+                                    type="radio" 
+                                    name="cuidador" 
+                                    value="Abuelo (A)" 
+                                    checked={children ? selectedCuidador === 'Abuelo (A)' : ''} 
+                                    onChange={children ? handleRadioChange(setSelectedCuidador) : undefined} 
+                                    readOnly={!children} 
+                                />ABUELO (A)
+                            </label>
+                            <label>
+                                <input 
+                                    type="radio" 
+                                    name="cuidador" 
+                                    value="Vecino (A)" 
+                                    checked={children ? selectedCuidador === 'Vecino (A)' : ''} 
+                                    onChange={children ? handleRadioChange(setSelectedCuidador) : undefined} 
+                                    readOnly={!children} 
+                                />VECINO (A)
+                            </label>
+                            <label>
+                                <input 
+                                    type="radio" 
+                                    name="cuidador" 
+                                    value="Otro" 
+                                    checked={children ? selectedCuidador === 'Otro' : ''} 
+                                    onChange={children ? handleRadioChange(setSelectedCuidador) : undefined} 
+                                    readOnly={!children} 
+                                />OTRO:
+                            </label>
+                            <input 
+                                className="border border-gray-300 p-2" 
+                                type="text" 
+                                defaultValue={selectedCuidador === 'Otro' ? '' : ''} 
+                                readOnly={selectedCuidador !== 'Otro'} 
+                            />
                         </div>
                     </div>
                 </div>
@@ -299,32 +465,48 @@ function EntrevistaDiseño() {
                         <input className="border border-gray-300 p-2" type="text" defaultValue={entrevIni?.entrevistaInicial?.pendientes} />
                         <div className="flex space-x-4 mt-4">
                             <label>Paga Renta</label>
-                            <label><input type="checkbox" defaultChecked={entrevIni?.entrevistaInicial?.renta} />Sí</label>
-                            <label><input type="checkbox" defaultChecked={!entrevIni?.entrevistaInicial?.renta} />No</label>
-                            <input className="border border-gray-300 p-2" type="text" />
+                            <label>
+                                <input type="radio" name="renta" value="Sí" checked={renta} onChange={() => setRenta(true)}  />Sí
+                            </label>
+                            <label>
+                                <input type="radio" name="renta" value="No" checked={!renta} onChange={() => setRenta(false)} />No
+                            </label>
+                            <input className="border border-gray-300 p-2" type="number" readOnly={!renta}  />
                         </div>
                         <div className="flex space-x-4 mt-4">
                             <label>FONACOT</label>
-                            <label><input type="checkbox" defaultChecked={entrevIni?.entrevistaInicial?.fonacot} />Sí</label>
-                            <label><input type="checkbox" defaultChecked={!entrevIni?.entrevistaInicial?.fonacot} />No</label>
-                            <input className="border border-gray-300 p-2" type="text" />
+                            <label>
+                                <input type="radio" name="fonacot" value="Sí" checked={fonacot} onChange={() => setFonacot(true)} />Sí
+                            </label>
+                            <label>
+                                <input type="radio" name="fonacot" value="No" checked={!fonacot} onChange={() => setFonacot(false)} />No
+                            </label>
+                            <input className="border border-gray-300 p-2" type="number" readOnly={!fonacot} />
                         </div>
                         <div className="flex space-x-4 mt-4">
                             <label>INFONAVIT</label>
-                            <label><input type="checkbox" defaultChecked={entrevIni?.entrevistaInicial?.infonavit} />Sí</label>
-                            <label><input type="checkbox" defaultChecked={!entrevIni?.entrevistaInicial?.infonavit} />No</label>
-                            <input className="border border-gray-300 p-2" type="text" />
+                            <label>
+                                <input type="radio" name="infonavit" value="Sí" checked={infonavit} onChange={() => setInfonavit(true)} />Sí
+                            </label>
+                            <label>
+                                <input type="radio" name="infonavit" value="No" checked={!infonavit} onChange={() => setInfonavit(false)} />No
+                            </label>
+                            <input className="border border-gray-300 p-2" type="number" readOnly={!infonavit} />
                         </div>
                     </div>
                     <div className="flex flex-col items-center justify-center">
                         <label>¿Tiene Antecedentes Penales?</label>
                         <div className="flex space-x-4">
-                            <label><input type="checkbox" defaultChecked={entrevIni?.entrevistaInicial?.antecedentesPen === 'Sí'} />Sí</label>
-                            <label><input type="checkbox" defaultChecked={entrevIni?.entrevistaInicial?.antecedentesPen === 'No'} />No</label>
+                            <label>
+                                <input type="radio" name="antecedentesPen" value="Sí" checked={antecedentes} onChange={() => setAntecedentes(true)} />Sí
+                            </label>
+                            <label>
+                                <input type="radio" name="antecedentesPen" value="No" checked={!antecedentes} onChange={() => setAntecedentes(false)} />No
+                            </label>
                         </div>
                         <div>
                             <label>Motivo</label>
-                            <input className="border border-gray-300 p-2" type="text" defaultValue={entrevIni?.entrevistaInicial?.antecedentesPen} />
+                            <input className="border border-gray-300 p-2" type="text" readOnly={!antecedentes} />
                         </div>
                     </div>
                 </div>
@@ -413,10 +595,14 @@ function EntrevistaDiseño() {
                 <div className="mb-4">
                     <div>¿Es Recomendado?</div>
                     <div className="flex space-x-4">
-                        <label><input type="checkbox" defaultChecked={entrevIni?.entrevistaInicial?.bonoContr === 'Sí'} />Sí</label>
-                        <label><input type="checkbox" defaultChecked={entrevIni?.entrevistaInicial?.bonoContr === 'No'} />No</label>
+                        <label>
+                            <input type="radio" name="bonoContr" value="Sí" checked={bono} onChange={() => setBono(true)} />Sí
+                        </label>
+                        <label>
+                            <input type="radio" name="bonoContr" value="No" checked={!bono} onChange={() => setBono(false)} />No
+                        </label>
                         <label>Pago bono contratacion:</label>
-                        <input className="w-full border border-gray-300" type="text" defaultValue={entrevIni?.entrevistaInicial?.bonoContr} />
+                        <input className="w-full border border-gray-300" type="number" readOnly={!bono} />
                     </div>
                 </div>
 
@@ -425,12 +611,24 @@ function EntrevistaDiseño() {
                     <div>¿A qué área o planta?</div>
                     <div className="flex flex-row space-x-4">
                         <div className="space-x-2">
-                            <label><input type="checkbox" defaultChecked={entrevIni?.entrevistaInicial?.areaOPlanta === 'Medios'} />MEDIOS</label>
-                            <label><input type="checkbox" defaultChecked={entrevIni?.entrevistaInicial?.areaOPlanta === 'Corte'} />CORTE</label>
-                            <label><input type="checkbox" defaultChecked={entrevIni?.entrevistaInicial?.areaOPlanta === 'TP1'} />TP1</label>
-                            <label><input type="checkbox" defaultChecked={entrevIni?.entrevistaInicial?.areaOPlanta === 'TP2'} />TP2</label>
-                            <label><input type="checkbox" defaultChecked={entrevIni?.entrevistaInicial?.areaOPlanta === 'TP3'} />TP3</label>
-                            <label><input type="checkbox" defaultChecked={entrevIni?.entrevistaInicial?.areaOPlanta === 'TP4'} />TP4</label>
+                            <label>
+                                <input type="radio" name="areaOPlanta" value="Medios" checked={selectedAreaOPlanta === 'Medios'} onChange={handleRadioChange(setSelectedAreaOPlanta)} />MEDIOS
+                            </label>
+                            <label>
+                                <input type="radio" name="areaOPlanta" value="Corte" checked={selectedAreaOPlanta === 'Corte'} onChange={handleRadioChange(setSelectedAreaOPlanta)} />CORTE
+                            </label>
+                            <label>
+                                <input type="radio" name="areaOPlanta" value="TP1" checked={selectedAreaOPlanta === 'TP1'} onChange={handleRadioChange(setSelectedAreaOPlanta)} />TP1
+                            </label>
+                            <label>
+                                <input type="radio" name="areaOPlanta" value="TP2" checked={selectedAreaOPlanta === 'TP2'} onChange={handleRadioChange(setSelectedAreaOPlanta)} />TP2
+                            </label>
+                            <label>
+                                <input type="radio" name="areaOPlanta" value="TP3" checked={selectedAreaOPlanta === 'TP3'} onChange={handleRadioChange(setSelectedAreaOPlanta)} />TP3
+                            </label>
+                            <label>
+                                <input type="radio" name="areaOPlanta" value="TP4" checked={selectedAreaOPlanta === 'TP4'} onChange={handleRadioChange(setSelectedAreaOPlanta)} />TP4
+                            </label>
                         </div>
                         <div className="space-x-2">
                             <label>Nombre completo:</label>
@@ -448,7 +646,6 @@ function EntrevistaDiseño() {
                         </div>
                     </div>
                 </div>
-
             </div>
             <button onClick={exportToPDF} className="mt-4 p-2 bg-blue-500 text-white">
                 Exportar a PDF
