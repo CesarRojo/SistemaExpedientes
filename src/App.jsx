@@ -22,6 +22,11 @@ import ExamMedDiseño from './ExamMedDiseño';
 import ExpFisicaDiseño from './ExpFisicaDiseño';
 import SolicIntDiseño from './SolicIntDiseño';
 import Consentimiento from './Consentimiento';
+import TablaFondoAhorro from './TablaFondoAhorro';
+import FondoAhorroDiseño from './FondoAhorroDiseño';
+import TablaInstrumentos from './TablaInstrumentos';
+import InstrumentosDiseño from './InstrumentosDiseño';
+import TemarioDiseño from './TemarioDiseño';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import useAuthStore from './authStore';
 
@@ -44,11 +49,16 @@ function App() {
         <Route path="/EntrevDiseño" element={isAuthenticated && loginType === 'normal' ? <EntrevistaDiseño /> : <Navigate to="/" />} />
         <Route path="/ExamMedDiseño" element={isAuthenticated && loginType === 'normal' ? <ExamMedDiseño /> : <Navigate to="/" />} />
         <Route path="/ExpFisicaDiseño" element={isAuthenticated && loginType === 'normal' ? <ExpFisicaDiseño /> : <Navigate to="/" />} />
+        <Route path="/FondoAhorroDiseño" element={isAuthenticated && loginType === 'normal' ? <FondoAhorroDiseño /> : <Navigate to="/" />} />
+        <Route path="/InstrumentosDiseño" element={isAuthenticated && loginType === 'normal' ? <InstrumentosDiseño /> : <Navigate to="/" />} />
+        <Route path="/TemarioDiseño" element={isAuthenticated && loginType === 'normal' ? <TemarioDiseño /> : <Navigate to="/" />} />
         <Route path="/SolicIntDiseño" element={isAuthenticated && loginType === 'normal' ? <SolicIntDiseño /> : <Navigate to="/" />} />
         <Route path="/TablaEntrev" element={isAuthenticated && loginType === 'normal' ? <TablaEntrevistas /> : <Navigate to="/" />} />
         <Route path="/TablaExamMed" element={isAuthenticated && loginType === 'normal' ? <TablaExamMed /> : <Navigate to="/" />} />
         <Route path="/TablaExFis" element={isAuthenticated && loginType === 'normal' ?  <TablaUsuarios /> : <Navigate to="/" />} />
         <Route path="/TablaSolInt" element={isAuthenticated && loginType === 'normal' ?  <TablaSolicInterna /> : <Navigate to="/" />} />
+        <Route path="/TablaFondoAhorro" element={isAuthenticated && loginType === 'normal' ?  <TablaFondoAhorro /> : <Navigate to="/" />} />
+        <Route path="/TablaInstrumentos" element={isAuthenticated && loginType === 'normal' ?  <TablaInstrumentos /> : <Navigate to="/" />} />
         <Route path="/TablaSubirDocs" element={isAuthenticated && loginType === 'normal' ?  <TablaSubirDocs /> : <Navigate to="/" />} />
         <Route path="/SubirDocs" element={isAuthenticated && loginType === 'normal' ?  <SubirDocumentos /> : <Navigate to="/" />} />
         <Route path="/ExamMedico" element={isAuthenticated ? (loginType === 'folio' && !hasWatchedAllVideos ? <Navigate to="/Videos" /> : <ExamenMedico />) : <Navigate to="/" />} />

@@ -70,7 +70,7 @@ const EntrevIniForm = () => {
 
   const fetchFolio = async () => {
     try {
-      const response = await axios.get(`http://192.168.1.68:5005/folio/${numFolio}`);
+      const response = await axios.get(`http://172.30.189.86:5005/folio/${numFolio}`);
       if (response.data.Usuario) {
         setFolioStatus('Folio ya está siendo usado');
       } else {
@@ -168,7 +168,7 @@ const EntrevIniForm = () => {
       },
     };
     try {
-      const response = await axios.post('http://192.168.1.68:5005/entrevIni', dataToSubmit);
+      const response = await axios.post('http://172.30.189.86:5005/entrevIni', dataToSubmit);
       console.log('Response idUsuario:', response.data.idUsuario);
       fetchFolio();
 
@@ -212,7 +212,7 @@ const EntrevIniForm = () => {
     formDataToSend.append('idUsuario', idUsuario); // Agregar idUsuario
 
     // Enviar el PDF al backend
-    const pdfUploadResponse = await axios.post('http://192.168.1.68:5005/pdf/upload-single-doc', formDataToSend, {
+    const pdfUploadResponse = await axios.post('http://172.30.189.86:5005/pdf/upload-single-doc', formDataToSend, {
         headers: {
             'Content-Type': 'multipart/form-data',
         },
@@ -300,7 +300,7 @@ const EntrevIniForm = () => {
       <form ref={pdfRef} onSubmit={handleSubmit} className="max-w-4xl mx-auto bg-white p-6 shadow-md pdf-container">
         {/* Header */}
         <div className="flex items-center justify-between mb-4">
-          <img alt="ATR Nayarit Logo" className="h-31" src="logo.png" />
+          <img alt="ATR Nayarit Logo" className="h-31 w-68" src="LOGO ATR_LOGO ATR NEGRO.png" />
           <div className="text-center bg-gray-200">
             <h1 className="text-xl font-bold">ENTREVISTA INICIAL | DEPARTAMENTO DE RECLUTAMIENTO</h1>
             <div className="flex space-x-2">
@@ -1064,6 +1064,8 @@ const EntrevIniForm = () => {
             </label>
             <label>Pago bono contratacion:</label>
             <input className="w-full border border-gray-300" type="number" name="bonoContr" value={formData.bonoContr} onChange={handleChange} readOnly={!bono} />
+            <label>Reloj de quien lo recomendó</label>
+            <input className="w-full border border-gray-300" type="number" name="bonoContr" value={''} onChange={handleChange} readOnly={!bono} />
           </div>
         </div>
 
