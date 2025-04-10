@@ -70,7 +70,7 @@ const EntrevIniForm = () => {
 
   const fetchFolio = async () => {
     try {
-      const response = await axios.get(`http://172.30.189.106:5005/folio/${numFolio}`);
+      const response = await axios.get(`http://192.168.1.68:5005/folio/${numFolio}`);
       if (response.data.Usuario) {
         setFolioStatus('Folio ya está siendo usado');
       } else {
@@ -168,9 +168,11 @@ const EntrevIniForm = () => {
       },
     };
     try {
-      const response = await axios.post('http://172.30.189.106:5005/entrevIni', dataToSubmit);
-      console.log('Response:', response.data);
+      const response = await axios.post('http://192.168.1.68:5005/entrevIni', dataToSubmit);
+      console.log('Response idUsuario:', response.data.idUsuario);
       fetchFolio();
+
+      const idUsuario = response.data.idUsuario;
 
       // Generar el PDF
       const pdfBlob = await new Promise((resolve) => {
@@ -206,11 +208,11 @@ const EntrevIniForm = () => {
 
     // Crear FormData para subir el PDF
     const formDataToSend = new FormData();
-    formDataToSend.append('document', pdfBlob, `exploracionfisica-${numFolio}.pdf`); // Agregar el PDF
-    formDataToSend.append('idUsuario', usuario.idUsuario); // Agregar idUsuario
+    formDataToSend.append('document', pdfBlob, `entrevistainicial-${numFolio}.pdf`); // Agregar el PDF
+    formDataToSend.append('idUsuario', idUsuario); // Agregar idUsuario
 
     // Enviar el PDF al backend
-    const pdfUploadResponse = await axios.post('http://172.30.189.106:5005/pdf/upload-single-doc', formDataToSend, {
+    const pdfUploadResponse = await axios.post('http://192.168.1.68:5005/pdf/upload-single-doc', formDataToSend, {
         headers: {
             'Content-Type': 'multipart/form-data',
         },
@@ -222,8 +224,6 @@ const EntrevIniForm = () => {
     }
   };
 
-  const [selectedSexo, setSelectedSexo] = useState('');
-  const [selectedEstadoCivil, setSelectedEstadoCivil] = useState('');
   const [selectedEscolaridad, setSelectedEscolaridad] = useState('');
   const [selectedActualDedica, setSelectedActualDedica] = useState('');
   const [otherActualDedica, setOtherActualDedica] = useState('');
@@ -240,6 +240,7 @@ const EntrevIniForm = () => {
   const [antecedentes, setAntecedentes] = useState(false);
   const [bono, setBono] = useState(false);
   const [otherEscolaridad, setOtherEscolaridad] = useState('');
+  const [otherArea, setOtherArea] = useState('');
   const [otherCuidador, setOtherCuidador] = useState('');
   const [otherEntroEmpleo, setOtherEntroEmpleo] = useState('');
 
@@ -623,7 +624,12 @@ const EntrevIniForm = () => {
                 name="workedBefore" 
                 value="Sí" 
                 checked={workedBefore} 
-                onChange={() => setWorkedBefore(true)} 
+                onChange={() => {
+                  setWorkedBefore(true); 
+                  setFormData({ ...formData, numIngresos: '', enQueArea: '', procesoLinea: '', otraArea: '', motivoRenuncia: '' }); 
+                  setEnQueArea('');
+                  setOtherArea('');
+                }} 
               />Sí
             </label>
             <label>
@@ -632,7 +638,12 @@ const EntrevIniForm = () => {
                 name="workedBefore" 
                 value="No" 
                 checked={!workedBefore} 
-                onChange={() => setWorkedBefore(false)} 
+                onChange={() => {
+                  setWorkedBefore(false); 
+                  setFormData({ ...formData, numIngresos: '', enQueArea: '', procesoLinea: '', otraArea: '', motivoRenuncia: '' }); 
+                  setEnQueArea('');
+                  setOtherArea('');
+                }} 
               />No
             </label>
           </div>
@@ -649,19 +660,58 @@ const EntrevIniForm = () => {
             <div className="mt-4">
               <div>¿En qué área?</div>
               <div className="flex space-x-4">
-                {['Medios', 'Corte', 'Ensamble'].map(area => (
-                  <label key={area}>
-                    <input 
-                      type="radio" 
-                      name="enQueArea" 
-                      value={area} 
-                      checked={workedBefore ? enQueArea === area : ''} 
-                      onChange={workedBefore ? handleRadioChange(setEnQueArea) : null} 
-                      readOnly={!workedBefore} 
-                    />
-                    {area}
-                  </label>
-                ))}
+                <label>
+                  <input 
+                    type="radio" 
+                    name="enQueArea" 
+                    value="Medios" 
+                    checked={enQueArea === 'Medios'} 
+                    onChange={() => {
+                      setEnQueArea('Medios');
+                      setFormData({ ...formData, enQueArea: 'Medios' });
+                    }}
+                    disabled={!workedBefore} 
+                  />MEDIOS
+                </label>
+                <label>
+                  <input 
+                    type="radio" 
+                    name="enQueArea" 
+                    value="Corte" 
+                    checked={enQueArea === 'Corte'} 
+                    onChange={() => {
+                      setEnQueArea('Corte');
+                      setFormData({ ...formData, enQueArea: 'Corte' });
+                    }}
+                    disabled={!workedBefore} 
+                  />CORTE
+                </label>
+                <label>
+                  <input 
+                    type="radio" 
+                    name="enQueArea" 
+                    value="Ensamble" 
+                    checked={enQueArea === 'Ensamble'} 
+                    onChange={() => {
+                      setEnQueArea('Ensamble');
+                      setFormData({ ...formData, enQueArea: 'Ensamble' });
+                    }}
+                    disabled={!workedBefore}
+                  />ENSAMBLE
+                </label>
+                <label>
+                  <input 
+                    type="radio" 
+                    name="enQueArea" 
+                    value="Otro" 
+                    checked={enQueArea === 'Otro'} 
+                    onChange={() => {
+                      setEnQueArea('Otro');
+                      setFormData({ ...formData, enQueArea: otherArea }); // Guardar en formData
+                    }} 
+                    disabled={!workedBefore} 
+                  />OTRO
+                </label>
                 <label>PROCESO DE LÍNEA:</label>
                 <input 
                   className="border border-gray-300 p-2" 
@@ -676,9 +726,14 @@ const EntrevIniForm = () => {
                   className="border border-gray-300 p-2" 
                   type="text" 
                   name="otraArea" 
-                  value={formData.otraArea} 
-                  onChange={handleChange} 
-                  readOnly={!workedBefore} 
+                  value={otherArea} 
+                  onChange={(e) => {
+                    setOtherArea(e.target.value);
+                    if (enQueArea === 'Otro') {
+                      setFormData({ ...formData, enQueArea: e.target.value }); // Guardar en formData
+                    }
+                  }} 
+                  disabled={enQueArea !== 'Otro'}  
                 />
               </div>
             </div>
@@ -701,10 +756,18 @@ const EntrevIniForm = () => {
           <div>¿Tienes hijos?</div>
           <div className="flex space-x-4">
             <label>
-              <input type="radio" name="cant_hijos" value="Sí" checked={children} onChange={() => setChildren(true)} />Sí
+              <input type="radio"  value="Sí" checked={children} onChange={() => {
+                setChildren(true);
+                setFormData({ ...formData, cant_hijos: '', edades_hijos: '', trab_cuidador: '' }); // Reiniciar los campos
+                setSelectedCuidador(''); // Limpiar la selección de cuidador
+              }} />Sí
             </label>
             <label>
-              <input type="radio" name="cant_hijos" value="No" checked={!children} onChange={() => setChildren(false)} />No
+              <input type="radio"  value="No" checked={!children} onChange={() => {
+                setChildren(false);
+                setFormData({ ...formData, cant_hijos: '', edades_hijos: '', trab_cuidador: '' }); // Reiniciar los campos si no tiene hijos
+                setSelectedCuidador(''); // Limpiar la selección de cuidador
+              }} />No
             </label>
             <div>Cuantos</div>
             <input className="border border-gray-300 p-2" type="text" name="cant_hijos" value={formData.cant_hijos} onChange={handleChange} readOnly={!children} />
@@ -719,9 +782,12 @@ const EntrevIniForm = () => {
                   type="radio" 
                   name="cuidador" 
                   value="Esposo (A)" 
-                  checked={children ? selectedCuidador === 'Esposo (A)' : ''} 
-                  onChange={children ? handleRadioChange(setSelectedCuidador) : undefined} 
-                  readOnly={!children} 
+                  checked={selectedCuidador === 'Esposo (A)'} 
+                  onChange={() => {
+                    setSelectedCuidador('Esposo (A)');
+                    setFormData({ ...formData, cuidador: 'Esposo (A)' }); // Guardar en formData
+                  }} 
+                  disabled={!children} 
                 />ESPOSO (A)
               </label>
               <label>
@@ -729,9 +795,12 @@ const EntrevIniForm = () => {
                   type="radio" 
                   name="cuidador" 
                   value="Abuelo (A)" 
-                  checked={children ? selectedCuidador === 'Abuelo (A)' : ''} 
-                  onChange={children ? handleRadioChange(setSelectedCuidador) : undefined} 
-                  readOnly={!children} 
+                  checked={selectedCuidador === 'Abuelo (A)'} 
+                  onChange={() => {
+                    setSelectedCuidador('Abuelo (A)');
+                    setFormData({ ...formData, cuidador: 'Abuelo (A)' }); // Guardar en formData
+                  }} 
+                  disabled={!children} 
                 />ABUELO (A)
               </label>
               <label>
@@ -739,9 +808,12 @@ const EntrevIniForm = () => {
                   type="radio" 
                   name="cuidador" 
                   value="Vecino (A)" 
-                  checked={children ? selectedCuidador === 'Vecino (A)' : ''} 
-                  onChange={children ? handleRadioChange(setSelectedCuidador) : undefined} 
-                  readOnly={!children} 
+                  checked={selectedCuidador === 'Vecino (A)'} 
+                  onChange={() => {
+                    setSelectedCuidador('Vecino (A)');
+                    setFormData({ ...formData, cuidador: 'Vecino (A)' }); // Guardar en formData
+                  }} 
+                  disabled={!children} 
                 />VECINO (A)
               </label>
               <label>
@@ -749,29 +821,37 @@ const EntrevIniForm = () => {
                   type="radio" 
                   name="cuidador" 
                   value="Otro" 
-                  checked={children ? selectedCuidador === 'Otro' : ''} 
-                  onChange={children ? handleRadioChange(setSelectedCuidador) : undefined} 
-                  readOnly={!children} 
+                  checked={selectedCuidador === 'Otro'} 
+                  onChange={() => {
+                    setSelectedCuidador('Otro');
+                    setFormData({ ...formData, cuidador: otherCuidador }); // Guardar en formData
+                  }} 
+                  disabled={!children} 
                 />OTRO:
               </label>
               <input 
                 className="border border-gray-300 p-2" 
                 type="text" 
                 value={otherCuidador} 
-                onChange={(e) => setOtherCuidador(e.target.value)} 
-                readOnly={selectedCuidador !== 'Otro'} 
+                onChange={(e) => {
+                  setOtherCuidador(e.target.value);
+                  if (selectedCuidador === 'Otro') {
+                    setFormData({ ...formData, cuidador: e.target.value }); // Guardar en formData
+                  }
+                }} 
+                disabled={selectedCuidador !== 'Otro'} 
               />
-            <div className="mt-4">
-              <label>¿Trabaja el cuidador?</label>
-              <input 
-                className="border border-gray-300 p-2" 
-                type="text" 
-                name="trab_cuidador" 
-                value={formData.trab_cuidador} 
-                onChange={handleChange} 
-                readOnly={!children} 
-              />
-            </div>
+              <div className="mt-4">
+                <label>¿Trabaja el cuidador?</label>
+                <input 
+                  className="border border-gray-300 p-2" 
+                  type="text" 
+                  name="trab_cuidador" 
+                  value={formData.trab_cuidador} 
+                  onChange={handleChange} 
+                  readOnly={!children} 
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -879,15 +959,15 @@ const EntrevIniForm = () => {
             <label>¿Tiene Antecedentes Penales?</label>
             <div className="flex space-x-4">
               <label>
-                <input type="radio" name="antecedentesPen" value="Sí" checked={antecedentes} onChange={() => setAntecedentes(true)} />Sí
+                <input type="radio"  value="Sí" checked={antecedentes} onChange={() => setAntecedentes(true)} />Sí
               </label>
               <label>
-                <input type="radio" name="antecedentesPen" value="No" checked={!antecedentes} onChange={() => setAntecedentes(false)} />No
+                <input type="radio"  value="No" checked={!antecedentes} onChange={() => setAntecedentes(false)} />No
               </label>
             </div>
             <div>
               <label>Motivo</label>
-              <input className="border border-gray-300 p-2" type="text" name="antecedentesMotivo" value={formData.antecedentesPen} onChange={handleChange} readOnly={!antecedentes} />
+              <input className="border border-gray-300 p-2" type="text" name="antecedentesPen" value={formData.antecedentesPen} onChange={handleChange} readOnly={!antecedentes} />
             </div>
           </div>
         </div>
@@ -977,13 +1057,13 @@ const EntrevIniForm = () => {
           <div>¿Es Recomendado?</div>
           <div className="flex space-x-4">
             <label>
-              <input type="radio" name="bonoContr" value="Sí" checked={bono} onChange={() => setBono(true)} />Sí
+              <input type="radio" value="Sí" checked={bono} onChange={() => setBono(true)} />Sí
             </label>
             <label>
-              <input type="radio" name="bonoContr" value="No" checked={!bono} onChange={() => setBono(false)} />No
+              <input type="radio" value="No" checked={!bono} onChange={() => setBono(false)} />No
             </label>
             <label>Pago bono contratacion:</label>
-            <input className="w-full border border-gray-300" type="number" name="bonoContrAmount" value={formData.bonoContr} onChange={handleChange} readOnly={!bono} />
+            <input className="w-full border border-gray-300" type="number" name="bonoContr" value={formData.bonoContr} onChange={handleChange} readOnly={!bono} />
           </div>
         </div>
 
