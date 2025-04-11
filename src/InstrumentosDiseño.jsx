@@ -20,7 +20,7 @@ function InstrumentosDiseño() {
 
     const fetchUsuarioFolio = async () => {
         try {
-            const response = await axios.get(`http://172.30.189.86:5005/usuario/${idUsuario}`);
+            const response = await axios.get(`http://172.30.189.94:5005/usuario/${idUsuario}`);
             console.log("fetchUsuario for instrumentos", response.data);
             setUsuario(response.data);
             setExplorFis(response.data.exploracionFisica);
@@ -45,7 +45,7 @@ function InstrumentosDiseño() {
     const handleSubmit = async () => {
 
         try {
-            // const response = await axios.post('http://172.30.189.86:5005/consent', {
+            // const response = await axios.post('http://172.30.189.94:5005/consent', {
             //     fecha,
             //     idUsuario: usuario.idUsuario,
             // });
@@ -90,7 +90,7 @@ function InstrumentosDiseño() {
         formDataToSend.append('idUsuario', idUsuario); // Agregar idUsuario
 
         // Enviar el PDF al backend
-        const pdfUploadResponse = await axios.post('http://172.30.189.86:5005/pdf/upload-single-doc', formDataToSend, {
+        const pdfUploadResponse = await axios.post('http://172.30.189.94:5005/pdf/upload-single-doc', formDataToSend, {
             headers: {
                 'Content-Type': 'multipart/form-data',
             },
@@ -103,7 +103,7 @@ function InstrumentosDiseño() {
             state: { idUsuario, nombre, apellidoPat, apellidoMat, numFolio },
         });
         } catch (error) {
-            console.error('Error al enviar el fondoAhorro:', error);
+            console.error('Error al enviar los instrumentos:', error);
         }
     };
 
@@ -127,9 +127,9 @@ function InstrumentosDiseño() {
 
                 {/* Datos personales */}
                 <div className="mb-4">
-                    <p><span className="font-bold">Nombre:</span> <span className="bg-yellow-300">{`${nombre} ${apellidoPat} ${apellidoMat}`}</span></p>
-                    <p><span className="font-bold">No. De reloj:</span> <span className="bg-yellow-300">{numFolio}</span></p>
-                    <p><span className="font-bold">Departamento:</span> <span className="bg-yellow-300">Departamento</span></p>
+                    <p><span className="font-bold">Nombre:</span> <span className="bg-yellow-300">{`${usuario.nombre} ${usuario.apellidoPat} ${usuario.apellidoMat}`}</span></p>
+                    <p><span className="font-bold">No. De reloj:</span> <span className="bg-yellow-300">{usuario.folio.numFolio}</span></p>
+                    <p><span className="font-bold">Departamento:</span> <span className="bg-yellow-300">{usuario.entrevistaInicial.areaDirige}</span></p>
                     <p><span className="font-bold">Fecha:</span> 
                         <span className="bg-yellow-300">
                             <input 

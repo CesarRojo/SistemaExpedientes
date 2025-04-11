@@ -51,7 +51,7 @@ const ExploracionFisica = () => {
 
   const fetchUsuarioFolio = async () => {
     try {
-      const response = await axios.get(`http://172.30.189.86:5005/usuario/${idUsuario}`);
+      const response = await axios.get(`http://172.30.189.94:5005/usuario/${idUsuario}`);
       setUsuario(response.data);
       setExamMed(response.data.examenMedico);
       setExpFisica(response.data.exploracionFisica);
@@ -94,7 +94,7 @@ const ExploracionFisica = () => {
     e.preventDefault();
     try {
       const { nombreCompleto, realizadoPor, ...dataToSend } = formData; // Omitir los campos
-      const response = await axios.post('http://172.30.189.86:5005/expFisica', {
+      const response = await axios.post('http://172.30.189.94:5005/expFisica', {
         ...dataToSend,
         peso: parseInt(formData.peso),
         talla: parseInt(formData.talla),
@@ -162,7 +162,7 @@ const ExploracionFisica = () => {
         formDataToSend.append('idUsuario', usuario.idUsuario); // Agregar idUsuario
 
         // Enviar el PDF al backend
-        const pdfUploadResponse = await axios.post('http://172.30.189.86:5005/pdf/upload-single-doc', formDataToSend, {
+        const pdfUploadResponse = await axios.post('http://172.30.189.94:5005/pdf/upload-single-doc', formDataToSend, {
             headers: {
                 'Content-Type': 'multipart/form-data',
             },

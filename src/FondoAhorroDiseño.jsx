@@ -20,7 +20,7 @@ function FondoAhorroDiseño() {
 
     const fetchUsuarioFolio = async () => {
         try {
-            const response = await axios.get(`http://172.30.189.86:5005/usuario/${idUsuario}`);
+            const response = await axios.get(`http://172.30.189.94:5005/usuario/${idUsuario}`);
             console.log("fetchUsuario for fondoAhorro", response.data);
             setUsuario(response.data);
             setExplorFis(response.data.exploracionFisica);
@@ -45,7 +45,7 @@ function FondoAhorroDiseño() {
     const handleSubmit = async () => {
 
         try {
-            // const response = await axios.post('http://172.30.189.86:5005/consent', {
+            // const response = await axios.post('http://172.30.189.94:5005/consent', {
             //     fecha,
             //     idUsuario: usuario.idUsuario,
             // });
@@ -90,7 +90,7 @@ function FondoAhorroDiseño() {
         formDataToSend.append('idUsuario', idUsuario); // Agregar idUsuario
 
         // Enviar el PDF al backend
-        const pdfUploadResponse = await axios.post('http://172.30.189.86:5005/pdf/upload-single-doc', formDataToSend, {
+        const pdfUploadResponse = await axios.post('http://172.30.189.94:5005/pdf/upload-single-doc', formDataToSend, {
             headers: {
                 'Content-Type': 'multipart/form-data',
             },
@@ -128,8 +128,8 @@ function FondoAhorroDiseño() {
                 {/* Datos personales */}
                 <div>
                     <div className='flex flex-cols gap-20'>
-                        <h4><span className='font-bold'>Nombre:</span> {`${nombre} ${apellidoPat} ${apellidoMat}`}</h4>
-                        <h4><span className='font-bold'>Reloj:</span> {numFolio}</h4>
+                        <h4><span className='font-bold'>Nombre:</span> {`${usuario.nombre} ${usuario.apellidoPat} ${usuario.apellidoMat}`}</h4>
+                        <h4><span className='font-bold'>Reloj:</span> {usuario.folio.numFolio}</h4>
                     </div>
                     <h4><span className='font-bold'>Fecha de ingreso a la planta:</span></h4>
                 </div>

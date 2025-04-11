@@ -11,7 +11,7 @@ function SolicIntDiseño() {
 
     const fetchEntrevIniData = async () => {
         try {
-            const response = await axios.get(`http://172.30.189.86:5005/usuario/${idUsuario}`);
+            const response = await axios.get(`http://172.30.189.94:5005/usuario/${idUsuario}`);
             setEntrevIni(response.data);
             console.log(response.data);
         } catch (error) {

@@ -27,6 +27,10 @@ import FondoAhorroDiseño from './FondoAhorroDiseño';
 import TablaInstrumentos from './TablaInstrumentos';
 import InstrumentosDiseño from './InstrumentosDiseño';
 import TemarioDiseño from './TemarioDiseño';
+import ListaVerifDiseño from './ListaVerifDiseño';
+import FonacotDiseño from './FonacotDiseño';
+import CtmDiseño from './CtmDiseño';
+import ValeMaterialDiseño from './ValeMaterialDiseño';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import useAuthStore from './authStore';
 
@@ -52,6 +56,10 @@ function App() {
         <Route path="/FondoAhorroDiseño" element={isAuthenticated && loginType === 'normal' ? <FondoAhorroDiseño /> : <Navigate to="/" />} />
         <Route path="/InstrumentosDiseño" element={isAuthenticated && loginType === 'normal' ? <InstrumentosDiseño /> : <Navigate to="/" />} />
         <Route path="/TemarioDiseño" element={isAuthenticated && loginType === 'normal' ? <TemarioDiseño /> : <Navigate to="/" />} />
+        <Route path="/CtmDiseño" element={isAuthenticated && loginType === 'normal' ? <CtmDiseño /> : <Navigate to="/" />} />
+        <Route path="/ValeDiseño" element={isAuthenticated && loginType === 'normal' ? <ValeMaterialDiseño /> : <Navigate to="/" />} />
+        <Route path="/ListaVerifDiseño" element={isAuthenticated && loginType === 'normal' ? <ListaVerifDiseño /> : <Navigate to="/" />} />
+        <Route path="/FonacotDiseño" element={isAuthenticated && loginType === 'normal' ? <FonacotDiseño /> : <Navigate to="/" />} />
         <Route path="/SolicIntDiseño" element={isAuthenticated && loginType === 'normal' ? <SolicIntDiseño /> : <Navigate to="/" />} />
         <Route path="/TablaEntrev" element={isAuthenticated && loginType === 'normal' ? <TablaEntrevistas /> : <Navigate to="/" />} />
         <Route path="/TablaExamMed" element={isAuthenticated && loginType === 'normal' ? <TablaExamMed /> : <Navigate to="/" />} />

@@ -70,7 +70,7 @@ const EntrevIniForm = () => {
 
   const fetchFolio = async () => {
     try {
-      const response = await axios.get(`http://172.30.189.86:5005/folio/${numFolio}`);
+      const response = await axios.get(`http://172.30.189.94:5005/folio/${numFolio}`);
       if (response.data.Usuario) {
         setFolioStatus('Folio ya está siendo usado');
       } else {
@@ -168,7 +168,7 @@ const EntrevIniForm = () => {
       },
     };
     try {
-      const response = await axios.post('http://172.30.189.86:5005/entrevIni', dataToSubmit);
+      const response = await axios.post('http://172.30.189.94:5005/entrevIni', dataToSubmit);
       console.log('Response idUsuario:', response.data.idUsuario);
       fetchFolio();
 
@@ -212,7 +212,7 @@ const EntrevIniForm = () => {
     formDataToSend.append('idUsuario', idUsuario); // Agregar idUsuario
 
     // Enviar el PDF al backend
-    const pdfUploadResponse = await axios.post('http://172.30.189.86:5005/pdf/upload-single-doc', formDataToSend, {
+    const pdfUploadResponse = await axios.post('http://172.30.189.94:5005/pdf/upload-single-doc', formDataToSend, {
         headers: {
             'Content-Type': 'multipart/form-data',
         },
@@ -626,7 +626,7 @@ const EntrevIniForm = () => {
                 checked={workedBefore} 
                 onChange={() => {
                   setWorkedBefore(true); 
-                  setFormData({ ...formData, numIngresos: '', enQueArea: '', procesoLinea: '', otraArea: '', motivoRenuncia: '' }); 
+                  setFormData({ ...formData, numIngresos: 0, enQueArea: '', procesoLinea: '', otraArea: '', motivoRenuncia: '' }); 
                   setEnQueArea('');
                   setOtherArea('');
                 }} 
@@ -640,7 +640,7 @@ const EntrevIniForm = () => {
                 checked={!workedBefore} 
                 onChange={() => {
                   setWorkedBefore(false); 
-                  setFormData({ ...formData, numIngresos: '', enQueArea: '', procesoLinea: '', otraArea: '', motivoRenuncia: '' }); 
+                  setFormData({ ...formData, numIngresos: 0, enQueArea: '', procesoLinea: '', otraArea: '', motivoRenuncia: '' }); 
                   setEnQueArea('');
                   setOtherArea('');
                 }} 

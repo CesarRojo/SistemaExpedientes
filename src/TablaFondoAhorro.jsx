@@ -32,7 +32,7 @@ const TablaFondoAhorro = () => {
     getFechaHoy();
     const fetchDatos = async () => {
       try {
-        const response = await axios.get('http://172.30.189.86:5005/usuario/fecha', {
+        const response = await axios.get('http://172.30.189.94:5005/usuario/fecha', {
           params: { fechaInicio, fechaFin },
         });
         setDatos(response.data);
@@ -49,7 +49,7 @@ const TablaFondoAhorro = () => {
       const idUsuarios = datos.map(dato => dato.idUsuario); // Obtener todos los idUsuario
       if (idUsuarios.length > 0) {
         try {
-          const response = await axios.get('http://172.30.189.86:5005/docs/byUser', {
+          const response = await axios.get('http://172.30.189.94:5005/docs/byUser', {
             params: { idUsuarios: idUsuarios.join(',') }, // Pasar los idUsuarios como un string separado por comas
           });
           const docsData = response.data.reduce((acc, doc) => {
@@ -82,6 +82,18 @@ const TablaFondoAhorro = () => {
     } else if (!documentosUsuario['temario']) {
       // Si no tiene el documento de temario, redirigir a esa pantalla
       navigate('/TemarioDiseño', { state: { idUsuario, nombre, apellidoPat, apellidoMat, numFolio } });
+    } else if (!documentosUsuario['verificar']) {
+      // Si no tiene el documento de lista de verificacion, redirigir a esa pantalla
+      navigate('/ListaVerifDiseño', { state: { idUsuario, nombre, apellidoPat, apellidoMat, numFolio } });
+    } else if (!documentosUsuario['fonacot']) {
+      // Si no tiene el documento de fonacot, redirigir a esa pantalla
+      navigate('/FonacotDiseño', { state: { idUsuario, nombre, apellidoPat, apellidoMat, numFolio } });
+    } else if (!documentosUsuario['ctm']) {
+      // Si no tiene el documento de ctm, redirigir a esa pantalla
+      navigate('/CtmDiseño', { state: { idUsuario, nombre, apellidoPat, apellidoMat, numFolio } });
+    } else if (!documentosUsuario['vale']) {
+      // Si no tiene el documento de vale de material, redirigir a esa pantalla
+      navigate('/ValeDiseño', { state: { idUsuario, nombre, apellidoPat, apellidoMat, numFolio } });
     } else {
       // Si todos los documentos están completos
       alert('Todos los pasos ya están completados.');
@@ -222,124 +234,142 @@ const TablaFondoAhorro = () => {
         </button>
       </div>
 
-      <p className='text-sm text-center font-bold'>Selecciona un usuario para realizar su fondo de ahorro</p>
+      <p className='text-sm text-center font-bold'>Selecciona un usuario para realizar su expediente interno</p>
 
       <table className="min-w-full divide-y divide-gray-200 mt-4">
         <thead>
           <tr>
-            <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
-            <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre</th>
-            <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Apellido Pat</th>
-            {/* <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Apellido Mat</th> */}
-            <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Reingreso</th>
-            <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Puesto</th>
-            <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Turno</th>
-            <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha</th>
-            <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Folio</th>
-            {/* <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Entrev. Inicial</th> */}
-            <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fondo Ahorro</th>
-            <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Instrumentos</th>
-            <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Temario</th>
-            <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Verificacion Docs</th>
-            <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">FONACOT</th>
-            <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">CTM</th>
+            <th className="py-3 bg-gray-50 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+            <th className="py-3 bg-gray-50 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre</th>
+            <th className="py-3 bg-gray-50 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Apellido Pat</th>
+            <th className="py-3 bg-gray-50 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Reingreso</th>
+            <th className="py-3 bg-gray-50 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Puesto</th>
+            <th className="py-3 bg-gray-50 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Turno</th>
+            <th className="py-3 bg-gray-50 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha</th>
+            <th className="py-3 bg-gray-50 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Folio</th>
+            <th className="py-3 bg-gray-50 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-20">Fondo Ahorro</th>
+            <th className="py-3 bg-gray-50 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Instrumentos</th>
+            <th className="py-3 bg-gray-50 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Temario</th>
+            <th className="py-3 bg-gray-50 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-20">Verificacion Docs</th>
+            <th className="py-3 bg-gray-50 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">FONACOT</th>
+            <th className="py-3 bg-gray-50 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">CTM</th>
+            <th className="py-3 bg-gray-50 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Vale</th>
           </tr>
         </thead>
         <tbody className="bg-white divide-y divide-gray-200">
           {datosFiltrados.map((dato, index) => (
             <tr key={index} onClick={() => handleFonAhorr(dato.idUsuario, dato.nombre, dato.apellidoPat, dato.apellidoMat, dato.folio.numFolio)} className="cursor-pointer hover:bg-gray-50">
-              <td className="px-6 py-4 whitespace-nowrap">{dato.idUsuario}</td>
-              <td className="px-6 py-4 whitespace-nowrap">{dato.nombre}</td>
-              <td className="px-6 py-4 whitespace-nowrap">{dato.apellidoPat}</td>
-              {/* <td className="px-6 py-4 whitespace-nowrap">{dato.apellidoMat}</td> */}
-              <td className="px-6 py-4 whitespace-nowrap">{dato.entrevistaInicial.numIngreso && dato.entrevistaInicial.numIngreso > 0 ? "Si" : "No"}</td>
-              <td className="px-6 py-4 whitespace-nowrap">{dato.entrevistaInicial.puesto}</td>
-              <td className="px-6 py-4 whitespace-nowrap">{dato.entrevistaInicial.turno}</td>
-              <td className="px-6 py-4 whitespace-nowrap">{dato.createdAt.split('T')[0]}</td>
-              <td className="px-6 py-4 whitespace-nowrap">{dato.folio.numFolio}</td>
-              {/* <td className={`px-6 py-4 whitespace-nowrap font-bold ${dato.entrevistaInicial ? 'text-green-600' : 'text-red-600'}`}>{dato.entrevistaInicial ? "Hecha" : "No hecha"}</td> */}
-              <td className="px-6 py-4 whitespace-nowrap">
+              <td className="text-center py-4 whitespace-nowrap">{dato.idUsuario}</td>
+              <td className="text-center py-4 whitespace-nowrap">{dato.nombre}</td>
+              <td className="text-center py-4 whitespace-nowrap">{dato.apellidoPat}</td>
+              <td className="text-center py-4 whitespace-nowrap">{dato.entrevistaInicial.numIngreso && dato.entrevistaInicial.numIngreso > 0 ? "Si" : "No"}</td>
+              <td className="text-center py-4 whitespace-nowrap">{dato.entrevistaInicial.puesto}</td>
+              <td className="text-center py-4 whitespace-nowrap">{dato.entrevistaInicial.turno}</td>
+              <td className="text-center py-4 whitespace-nowrap">{dato.createdAt.split('T')[0]}</td>
+              <td className="text-center py-4 whitespace-nowrap">{dato.folio.numFolio}</td>
+              <td className="text-center px-6 py-4 whitespace-nowrap">
                 {docs[dato.idUsuario] && docs[dato.idUsuario]['fondoahorro'] ? (
                   <a
-                    href={`http://172.30.189.86:5005${docs[dato.idUsuario]['fondoahorro'].path}`}
+                    href={`http://172.30.189.94:5005${docs[dato.idUsuario]['fondoahorro'].path}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-blue-500 hover:underline"
+                    onClick={(e) => e.stopPropagation()} // Detener propagación del evento
                   >
                     Ver PDF
                   </a>
                 ) : (
-                  <span className="text-gray-500">No disponible</span>
+                  <span className="text-gray-500" onClick={(e) => e.stopPropagation()}>No disponible</span>
                 )}
               </td>
-              <td className="px-6 py-4 whitespace-nowrap">
+              <td className="text-center py-4 whitespace-nowrap">
                 {docs[dato.idUsuario] && docs[dato.idUsuario]['instrumentos'] ? (
                   <a
-                    href={`http://172.30.189.86:5005${docs[dato.idUsuario]['instrumentos'].path}`}
+                    href={`http://172.30.189.94:5005${docs[dato.idUsuario]['instrumentos'].path}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-blue-500 hover:underline"
+                    onClick={(e) => e.stopPropagation()} // Detener propagación del evento
                   >
                     Ver PDF
                   </a>
                 ) : (
-                  <span className="text-gray-500">No disponible</span>
+                  <span className="text-gray-500" onClick={(e) => e.stopPropagation()}>No disponible</span>
                 )}
               </td>
-              <td className="px-6 py-4 whitespace-nowrap">
-                {docs[dato.idUsuario] && docs[dato.idUsuario]['fondoahorro'] ? (
+              <td className="text-center py-4 whitespace-nowrap">
+                {docs[dato.idUsuario] && docs[dato.idUsuario]['temario'] ? (
                   <a
-                    href={`http://172.30.189.86:5005${docs[dato.idUsuario]['fondoahorro'].path}`}
+                    href={`http://172.30.189.94:5005${docs[dato.idUsuario]['temario'].path}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-blue-500 hover:underline"
+                    onClick={(e) => e.stopPropagation()} // Detener propagación del evento
                   >
                     Ver PDF
                   </a>
                 ) : (
-                  <span className="text-gray-500">No disponible</span>
+                  <span className="text-gray-500" onClick={(e) => e.stopPropagation()}>No disponible</span>
                 )}
               </td>
-              <td className="px-6 py-4 whitespace-nowrap">
-                {docs[dato.idUsuario] && docs[dato.idUsuario]['fondoahorro'] ? (
+              <td className="text-center py-4 whitespace-nowrap">
+                {docs[dato.idUsuario] && docs[dato.idUsuario]['verificar'] ? (
                   <a
-                    href={`http://172.30.189.86:5005${docs[dato.idUsuario]['fondoahorro'].path}`}
+                    href={`http://172.30.189.94:5005${docs[dato.idUsuario]['verificar'].path}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-blue-500 hover:underline"
+                    onClick={(e) => e.stopPropagation()} // Detener propagación del evento
                   >
                     Ver PDF
                   </a>
                 ) : (
-                  <span className="text-gray-500">No disponible</span>
+                  <span className="text-gray-500" onClick={(e) => e.stopPropagation()}>No disponible</span>
                 )}
               </td>
-              <td className="px-6 py-4 whitespace-nowrap">
-                {docs[dato.idUsuario] && docs[dato.idUsuario]['fondoahorro'] ? (
+              <td className="text-center py-4 whitespace-nowrap">
+                {docs[dato.idUsuario] && docs[dato.idUsuario]['fonacot'] ? (
                   <a
-                    href={`http://172.30.189.86:5005${docs[dato.idUsuario]['fondoahorro'].path}`}
+                    href={`http://172.30.189.94:5005${docs[dato.idUsuario]['fonacot'].path}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-blue-500 hover:underline"
+                    onClick={(e) => e.stopPropagation()} // Detener propagación del evento
                   >
                     Ver PDF
                   </a>
                 ) : (
-                  <span className="text-gray-500">No disponible</span>
+                  <span className="text-gray-500" onClick={(e) => e.stopPropagation()}>No disponible</span>
                 )}
               </td>
-              <td className="px-6 py-4 whitespace-nowrap">
-                {docs[dato.idUsuario] && docs[dato.idUsuario]['fondoahorro'] ? (
+              <td className="text-center py-4 whitespace-nowrap">
+                {docs[dato.idUsuario] && docs[dato.idUsuario]['ctm'] ? (
                   <a
-                    href={`http://172.30.189.86:5005${docs[dato.idUsuario]['fondoahorro'].path}`}
+                    href={`http://172.30.189.94:5005${docs[dato.idUsuario]['ctm'].path}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-blue-500 hover:underline"
+                    onClick={(e) => e.stopPropagation()} // Detener propagación del evento
                   >
                     Ver PDF
                   </a>
                 ) : (
-                  <span className="text-gray-500">No disponible</span>
+                  <span className="text-gray-500" onClick={(e) => e.stopPropagation()}>No disponible</span>
+                )}
+              </td>
+              <td className="text-center py-4 whitespace-nowrap">
+                {docs[dato.idUsuario] && docs[dato.idUsuario]['vale'] ? (
+                  <a
+                    href={`http://172.30.189.94:5005${docs[dato.idUsuario]['vale'].path}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-500 hover:underline"
+                    onClick={(e) => e.stopPropagation()} // Detener propagación del evento
+                  >
+                    Ver PDF
+                  </a>
+                ) : (
+                  <span className="text-gray-500" onClick={(e) => e.stopPropagation()}>No disponible</span>
                 )}
               </td>
             </tr>

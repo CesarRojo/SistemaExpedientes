@@ -32,9 +32,10 @@ const TablaEntrevistas = () => {
     getFechaHoy();
     const fetchDatos = async () => {
       try {
-        const response = await axios.get('http://172.30.189.86:5005/usuario/fecha', {
+        const response = await axios.get('http://172.30.189.94:5005/usuario/fecha', {
           params: { fechaInicio, fechaFin },
         });
+        console.log(response.data);
         setDatos(response.data);
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -49,7 +50,7 @@ const TablaEntrevistas = () => {
       const idUsuarios = datos.map(dato => dato.idUsuario); // Obtener todos los idUsuario
       if (idUsuarios.length > 0) {
         try {
-          const response = await axios.get('http://172.30.189.86:5005/docs/byUser', {
+          const response = await axios.get('http://172.30.189.94:5005/docs/byUser', {
             params: { idUsuarios: idUsuarios.join(',') }, // Pasar los idUsuarios como un string separado por comas
           });
           const docsData = response.data.reduce((acc, doc) => {
@@ -84,7 +85,7 @@ const TablaEntrevistas = () => {
       Nombre: dato.nombre,
       ApellidoPaterno: dato.apellidoPat,
       ApellidoMaterno: dato.apellidoMat,
-      Reingreso: dato.entrevistaInicial.numIngreso && dato.entrevistaInicial.numIngreso > 0 ? "Si" : "No",
+      Reingreso: dato.entrevistaInicial.numIngresos && dato.entrevistaInicial.numIngresos > 0 ? "Si" : "No",
       Puesto: dato.entrevistaInicial.puesto,
       Turno: dato.entrevistaInicial.turno,
       Fecha: dato.createdAt.split('T')[0],
@@ -243,7 +244,7 @@ const TablaEntrevistas = () => {
               <td className="px-6 py-4 whitespace-nowrap">{dato.nombre}</td>
               <td className="px-6 py-4 whitespace-nowrap">{dato.apellidoPat}</td>
               <td className="px-6 py-4 whitespace-nowrap">{dato.apellidoMat}</td>
-              <td className="px-6 py-4 whitespace-nowrap">{dato.entrevistaInicial.numIngreso && dato.entrevistaInicial.numIngreso > 0 ? "Si" : "No"}</td>
+              <td className="px-6 py-4 whitespace-nowrap">{dato.entrevistaInicial && dato.entrevistaInicial?.numIngresos > 0 ? "Si" : "No"}</td>
               <td className="px-6 py-4 whitespace-nowrap">{dato.entrevistaInicial.puesto}</td>
               <td className="px-6 py-4 whitespace-nowrap">{dato.entrevistaInicial.turno}</td>
               <td className="px-6 py-4 whitespace-nowrap">{dato.createdAt.split('T')[0]}</td>
@@ -252,7 +253,7 @@ const TablaEntrevistas = () => {
               <td className="px-6 py-4 whitespace-nowrap">
                 {docs[dato.idUsuario] && docs[dato.idUsuario]['entrevistainicial'] ? (
                   <a
-                    href={`http://172.30.189.86:5005${docs[dato.idUsuario]['entrevistainicial'].path}`}
+                    href={`http://172.30.189.94:5005${docs[dato.idUsuario]['entrevistainicial'].path}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-blue-500 hover:underline"

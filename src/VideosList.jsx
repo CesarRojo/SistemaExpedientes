@@ -3,9 +3,9 @@ import { useEffect, useState } from "react";
 import io from 'socket.io-client';
 import useAuthStore from './authStore';
 
-const socket = io("http://172.30.189.86:5005");
+const socket = io("http://172.30.189.94:5005");
 
-const API_URL = "http://172.30.189.86:5005/api";
+const API_URL = "http://172.30.189.94:5005/api";
 
 const VideosList = () => {
   const [videos, setVideos] = useState([]);
@@ -89,7 +89,7 @@ const VideosList = () => {
             <div key={index}>
               <p>{video.filename}</p>
               <video width="300" controls onEnded={handleVideoEnded}>
-                <source src={`http://172.30.189.86:5005${video.path}`} type="video/mp4" />
+                <source src={`http://172.30.189.94:5005${video.path}`} type="video/mp4" />
                 Tu navegador no soporta el video.
               </video>
               <button onClick={() => deleteVideo(video.idVideo)}>Eliminar</button>
