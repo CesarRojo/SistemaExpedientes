@@ -36,6 +36,7 @@ const Navbar = () => {
         <li><Link to="/TablaSolInt" className="hover:text-gray-300">Solicitud Interna</Link></li>
         <li><Link to="/TablaSubirDocs" className="hover:text-gray-300">Subir Documentos</Link></li>
         <li><Link to="/TablaFondoAhorro" className="hover:text-gray-300">Expediente Interno</Link></li>
+        <li><Link to="/TablaContratos" className="hover:text-gray-300">Contratos</Link></li>
       </ul>
       <div className="relative">
         <button 

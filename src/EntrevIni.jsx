@@ -2,15 +2,17 @@ import React, { useRef, useState, useEffect } from 'react';
 import axios from 'axios';
 import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas-pro';
+import { useNavigate } from 'react-router-dom';
 
 const EntrevIniForm = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     areaDirige: '',
     puesto: '',
     turno: '',
     actualDedica: '',
     enteroEmpleo: '',
-    numIngresos: '',
+    numIngresos: 0,
     enQueArea: '',
     procesoLinea: '',
     motivoRenuncia: '',
@@ -70,7 +72,7 @@ const EntrevIniForm = () => {
 
   const fetchFolio = async () => {
     try {
-      const response = await axios.get(`http://172.30.189.94:5005/folio/${numFolio}`);
+      const response = await axios.get(`http://192.168.1.68:5005/folio/${numFolio}`);
       if (response.data.Usuario) {
         setFolioStatus('Folio ya está siendo usado');
       } else {
@@ -102,6 +104,34 @@ const EntrevIniForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Definir los campos requeridos
+    const requiredFields = [
+      'areaDirige', 'puesto', 'turno', 'actualDedica', 'enteroEmpleo', 
+      'fecha', 'image', 'encinte', 'tricky', 'artesanal', 
+      'enProceso', 'preparado', 'comprension', 'vista', 
+      'calificacion', 'comentarios', 'areaOPlanta', 
+      'nombre', 'apellidoPat', 'apellidoMat', 'sexo', 
+      'edad', 'estado_civil', 'tel_personal', 'tel_emergencia', 
+      'calle', 'numero', 'colonia', 'escolaridad', 'fechaNac'
+    ];
+
+    // Verificar si todos los campos requeridos están llenos
+    const missingFields = requiredFields.filter(field => !formData[field]);
+
+    if (missingFields.length > 0) {
+      // Crear un mensaje que indique qué campos faltan
+      const missingFieldsMessage = `Faltan por llenar los siguientes campos: ${missingFields.join(', ')}`;
+      alert(missingFieldsMessage);
+      return; // Detener el envío si hay campos faltantes
+    }
+
+    // Asegúrate de que numFolio tenga un valor
+    if (!numFolio) {
+      alert('El campo numFolio es requerido.');
+      return; // Detener el envío si numFolio está vacío
+    }
+
     const dataToSubmit = {
       entrevIniData: {
         areaDirige: formData.areaDirige,
@@ -168,7 +198,7 @@ const EntrevIniForm = () => {
       },
     };
     try {
-      const response = await axios.post('http://172.30.189.94:5005/entrevIni', dataToSubmit);
+      const response = await axios.post('http://192.168.1.68:5005/entrevIni', dataToSubmit);
       console.log('Response idUsuario:', response.data.idUsuario);
       fetchFolio();
 
@@ -212,13 +242,14 @@ const EntrevIniForm = () => {
     formDataToSend.append('idUsuario', idUsuario); // Agregar idUsuario
 
     // Enviar el PDF al backend
-    const pdfUploadResponse = await axios.post('http://172.30.189.94:5005/pdf/upload-single-doc', formDataToSend, {
+    const pdfUploadResponse = await axios.post('http://192.168.1.68:5005/pdf/upload-single-doc', formDataToSend, {
         headers: {
             'Content-Type': 'multipart/form-data',
         },
     });
 
     console.log('PDF subido con éxito:', pdfUploadResponse.data);
+    navigate('/TablaEntrev');
     } catch (error) {
       console.error('Error submitting the form:', error);
     }
@@ -305,7 +336,7 @@ const EntrevIniForm = () => {
             <h1 className="text-xl font-bold">ENTREVISTA INICIAL | DEPARTAMENTO DE RECLUTAMIENTO</h1>
             <div className="flex space-x-2">
               <div>ÁREA QUE SE DIRIGE:</div>
-              <input className="border border-gray-300 p-2" name='areaDirige' value={formData.areaDirige} onChange={handleChange} type="text" />
+              <input className="border border-gray-300 p-2" name='areaDirige' value={formData.areaDirige} onChange={handleChange} type="text" required />
             </div>
             <div className="flex space-x-2">
               <div>PUESTO:</div>

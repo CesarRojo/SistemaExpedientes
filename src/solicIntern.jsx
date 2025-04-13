@@ -115,7 +115,7 @@ const SolicitudInternaForm = () => {
 
   const fetchUsuarioFolio = async () => {
     try {
-      const response = await axios.get(`http://172.30.189.94:5005/usuario/folio/${idFolio}`);
+      const response = await axios.get(`http://192.168.1.68:5005/usuario/folio/${idFolio}`);
       console.log(response.data);
       setUsuario(response.data);
       setSolInt(response.data.solicitudInterna);
@@ -265,7 +265,7 @@ const SolicitudInternaForm = () => {
 
         const { fechaNac, ...dataWithoutFechaNac } = dataToSend;
 
-        const response = await axios.post('http://172.30.189.94:5005/solicInt', dataWithoutFechaNac);
+        const response = await axios.post('http://192.168.1.68:5005/solicInt', dataWithoutFechaNac);
 
         console.log('Data submitted successfully:', response.data);
 
@@ -300,7 +300,7 @@ const SolicitudInternaForm = () => {
         formDataToSend.append('document', pdfBlob, `solicitudinterna-${numFolio}.pdf`);
         formDataToSend.append('idUsuario', usuario.idUsuario);
 
-        const pdfUploadResponse = await axios.post('http://172.30.189.94:5005/pdf/upload-single-doc', formDataToSend, {
+        const pdfUploadResponse = await axios.post('http://192.168.1.68:5005/pdf/upload-single-doc', formDataToSend, {
             headers: {
                 'Content-Type': 'multipart/form-data',
             },
@@ -446,7 +446,7 @@ const SolicitudInternaForm = () => {
                   type="radio"
                   name="estado_civil"
                   value="Soltero"
-                  checked={usuario.estado_civil === 'Soltero'}
+                  checked={usuario.estado_civil === 'Soltero (a)'}
                   readOnly
                 />
                 Soltero (a)
@@ -465,18 +465,18 @@ const SolicitudInternaForm = () => {
                 <input
                   type="radio"
                   name="estado_civil"
-                  value="Divorciado"
-                  checked={usuario.estado_civil === 'Divorciado'}
+                  value="Separado"
+                  checked={usuario.estado_civil === 'Separado (a)'}
                   readOnly
                 />
-                Divorciado (a)
+                Separado (a)
               </label>
               <label>
                 <input
                   type="radio"
                   name="estado_civil"
                   value="Viudo"
-                  checked={usuario.estado_civil === 'Viudo'}
+                  checked={usuario.estado_civil === 'Viudo (a)'}
                   readOnly
                 />
                 Viudo (a)

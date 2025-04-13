@@ -20,7 +20,7 @@ function FondoAhorroDiseño() {
 
     const fetchUsuarioFolio = async () => {
         try {
-            const response = await axios.get(`http://172.30.189.94:5005/usuario/${idUsuario}`);
+            const response = await axios.get(`http://192.168.1.68:5005/usuario/${idUsuario}`);
             console.log("fetchUsuario for fondoAhorro", response.data);
             setUsuario(response.data);
             setExplorFis(response.data.exploracionFisica);
@@ -45,7 +45,7 @@ function FondoAhorroDiseño() {
     const handleSubmit = async () => {
 
         try {
-            // const response = await axios.post('http://172.30.189.94:5005/consent', {
+            // const response = await axios.post('http://192.168.1.68:5005/consent', {
             //     fecha,
             //     idUsuario: usuario.idUsuario,
             // });
@@ -90,7 +90,7 @@ function FondoAhorroDiseño() {
         formDataToSend.append('idUsuario', idUsuario); // Agregar idUsuario
 
         // Enviar el PDF al backend
-        const pdfUploadResponse = await axios.post('http://172.30.189.94:5005/pdf/upload-single-doc', formDataToSend, {
+        const pdfUploadResponse = await axios.post('http://192.168.1.68:5005/pdf/upload-single-doc', formDataToSend, {
             headers: {
                 'Content-Type': 'multipart/form-data',
             },
@@ -107,13 +107,17 @@ function FondoAhorroDiseño() {
         }
     };
 
-    if (!explorFis) {
-        return <div className="text-center">Por favor, completa la exploración física antes de continuar con este paso.</div>;
-    }
+    // if (!explorFis) {
+    //     return <div className="text-center">Por favor, completa la exploración física antes de continuar con este paso.</div>;
+    // }
 
     // if (consent) {
     //     return <div className="text-center">Ya realizaste el consentimiento.</div>;
     // }
+
+    if (!usuario) {
+        return <div className="text-center">Cargando datos del usuario...</div>;
+    }
 
     return (
         <>

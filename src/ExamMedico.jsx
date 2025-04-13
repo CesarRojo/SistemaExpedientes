@@ -40,7 +40,7 @@ function ExamenMedico() {
 
     const fetchEntrevIniData = async () => {
         try {
-            const response = await axios.get(`http://172.30.189.94:5005/usuario/folio/${idFolio}`);
+            const response = await axios.get(`http://192.168.1.68:5005/usuario/folio/${idFolio}`);
             setUsuario(response.data);
             setEntrevistaInicial(response.data.entrevistaInicial);
             setExamMed(response.data.examenMedico);
@@ -52,7 +52,7 @@ function ExamenMedico() {
 
     const fetchAntecedentesPatologicos = async () => {
       try {
-        const response = await axios.get('http://172.30.189.94:5005/antecPatolog');
+        const response = await axios.get('http://192.168.1.68:5005/antecPatolog');
         setAntecedentesPatologicos(response.data);
       } catch (error) {
         console.error('Error al obtener antecedentes patológicos:', error);
@@ -186,6 +186,18 @@ function ExamenMedico() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Verificar si los campos requeridos están llenos
+    const requiredFields = ['planta', 'fecha'];
+    const missingFields = requiredFields.filter(field => !formData[field]);
+
+    if (missingFields.length > 0) {
+        // Crear un mensaje que indique qué campos faltan
+        const missingFieldsMessage = `Faltan por llenar los siguientes campos: ${missingFields.join(', ')}`;
+        alert(missingFieldsMessage);
+        return; // Detener el envío si hay campos faltantes
+    }
+
     try {
         // Filtra los objetos incompletos en antecFam
         const formattedAntecFam = formData.antecFam
@@ -198,7 +210,7 @@ function ExamenMedico() {
             }));
 
         // Enviar datos del examen médico al backend
-        const examMedicoResponse = await axios.post('http://172.30.189.94:5005/examMedico', {
+        const examMedicoResponse = await axios.post('http://192.168.1.68:5005/examMedico', {
             examMedicoData: {
                 planta: formData.planta,
                 fecha: new Date(formData.fecha),
@@ -260,7 +272,7 @@ function ExamenMedico() {
         formDataToSend.append('idUsuario', usuario.idUsuario); // Agregar idUsuario
 
         // Enviar el PDF al backend
-        const pdfUploadResponse = await axios.post('http://172.30.189.94:5005/pdf/upload-single-doc', formDataToSend, {
+        const pdfUploadResponse = await axios.post('http://192.168.1.68:5005/pdf/upload-single-doc', formDataToSend, {
             headers: {
                 'Content-Type': 'multipart/form-data',
             },

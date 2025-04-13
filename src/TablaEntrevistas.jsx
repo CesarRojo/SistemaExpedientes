@@ -32,7 +32,7 @@ const TablaEntrevistas = () => {
     getFechaHoy();
     const fetchDatos = async () => {
       try {
-        const response = await axios.get('http://172.30.189.94:5005/usuario/fecha', {
+        const response = await axios.get('http://192.168.1.68:5005/usuario/fecha', {
           params: { fechaInicio, fechaFin },
         });
         console.log(response.data);
@@ -50,7 +50,7 @@ const TablaEntrevistas = () => {
       const idUsuarios = datos.map(dato => dato.idUsuario); // Obtener todos los idUsuario
       if (idUsuarios.length > 0) {
         try {
-          const response = await axios.get('http://172.30.189.94:5005/docs/byUser', {
+          const response = await axios.get('http://192.168.1.68:5005/docs/byUser', {
             params: { idUsuarios: idUsuarios.join(',') }, // Pasar los idUsuarios como un string separado por comas
           });
           const docsData = response.data.reduce((acc, doc) => {
@@ -253,7 +253,7 @@ const TablaEntrevistas = () => {
               <td className="px-6 py-4 whitespace-nowrap">
                 {docs[dato.idUsuario] && docs[dato.idUsuario]['entrevistainicial'] ? (
                   <a
-                    href={`http://172.30.189.94:5005${docs[dato.idUsuario]['entrevistainicial'].path}`}
+                    href={`http://192.168.1.68:5005${docs[dato.idUsuario]['entrevistainicial'].path}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-blue-500 hover:underline"

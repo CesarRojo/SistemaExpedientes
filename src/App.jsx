@@ -31,6 +31,8 @@ import ListaVerifDiseño from './ListaVerifDiseño';
 import FonacotDiseño from './FonacotDiseño';
 import CtmDiseño from './CtmDiseño';
 import ValeMaterialDiseño from './ValeMaterialDiseño';
+import TablaContratos from './TablaContratos';
+import SubirContratos from './SubirContratos';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import useAuthStore from './authStore';
 
@@ -68,6 +70,8 @@ function App() {
         <Route path="/TablaFondoAhorro" element={isAuthenticated && loginType === 'normal' ?  <TablaFondoAhorro /> : <Navigate to="/" />} />
         <Route path="/TablaInstrumentos" element={isAuthenticated && loginType === 'normal' ?  <TablaInstrumentos /> : <Navigate to="/" />} />
         <Route path="/TablaSubirDocs" element={isAuthenticated && loginType === 'normal' ?  <TablaSubirDocs /> : <Navigate to="/" />} />
+        <Route path="/TablaContratos" element={isAuthenticated && loginType === 'normal' ?  <TablaContratos /> : <Navigate to="/" />} />
+        <Route path="/SubirContratos" element={isAuthenticated && loginType === 'normal' ?  <SubirContratos /> : <Navigate to="/" />} />
         <Route path="/SubirDocs" element={isAuthenticated && loginType === 'normal' ?  <SubirDocumentos /> : <Navigate to="/" />} />
         <Route path="/ExamMedico" element={isAuthenticated ? (loginType === 'folio' && !hasWatchedAllVideos ? <Navigate to="/Videos" /> : <ExamenMedico />) : <Navigate to="/" />} />
         <Route path="/ExpFisica" element={isAuthenticated && loginType === 'normal' ? <ExploracionFisica /> : <Navigate to="/" />} />

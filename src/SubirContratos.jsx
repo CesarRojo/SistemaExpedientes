@@ -1,23 +1,22 @@
-// UpdateDocsModal.js
-import React, { useState } from 'react';
 import { useDropzone } from 'react-dropzone';
+import { useState } from 'react';
 import axios from 'axios';
+import { useLocation } from 'react-router-dom';
+import './App.css';
 
-const UpdateDocsModal = ({ isOpen, onClose, idUsuario, numFolio }) => {
+const SubirContratos = () => {
   const initialFilesState = {
-    ine: null,
-    fiscal: null,
-    nss: null,
-    domicilio: null,
-    nacimiento: null,
-    curp: null,
-    estudios: null, // Opcional
+    c_determinado: null,
+    c_indeterminado: null,
+    seguro: null,
   };
 
   const [files, setFiles] = useState(initialFilesState);
   const [errors, setErrors] = useState({});
   const [uploading, setUploading] = useState(false);
   const [message, setMessage] = useState("");
+  const location = useLocation();
+  const { idUsuario, numFolio } = location.state || {};
 
   const handleDrop = (field) => (acceptedFiles, fileRejections) => {
     if (fileRejections.length > 0) {
@@ -33,6 +32,20 @@ const UpdateDocsModal = ({ isOpen, onClose, idUsuario, numFolio }) => {
   };
 
   const handleUpload = async () => {
+    // Validate required fields
+    const requiredFields = ['c_determinado', 'c_indeterminado', 'seguro'];
+    const missingFields = requiredFields.filter((field) => !files[field]);
+  
+    if (missingFields.length > 0) {
+      setErrors((prev) =>
+        missingFields.reduce(
+          (acc, field) => ({ ...acc, [field]: "Este campo es obligatorio" }),
+          {}
+        )
+      );
+      return;
+    }
+  
     const formData = new FormData();
     Object.entries(files).forEach(([key, file]) => {
       if (file) formData.append(key, file);
@@ -44,17 +57,17 @@ const UpdateDocsModal = ({ isOpen, onClose, idUsuario, numFolio }) => {
     if (numFolio) {
       formData.append("numFolio", numFolio);
     }
-
+  
     setUploading(true);
     try {
-      const response = await axios.put(`http://192.168.1.68:5005/update-docs/${idUsuario}`, formData, {
+      const response = await axios.post("http://192.168.1.68:5005/pdf/upload-contracts", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
-
+  
       setMessage(response.data.message);
       setFiles(initialFilesState);
     } catch (err) {
-      setMessage("Error al actualizar los documentos");
+      setMessage("Error al subir los documentos");
     } finally {
       setUploading(false);
     }
@@ -82,31 +95,19 @@ const UpdateDocsModal = ({ isOpen, onClose, idUsuario, numFolio }) => {
     );
   };
 
-  if (!isOpen) return null;
-
   return (
-    <div className="modal">
-      <div className="modal-content">
-        <h2>Actualizar Documentos</h2>
-        {renderDropzone("INE Representante legal", "ine")}
-        {renderDropzone("Constancia Situación Fiscal", "fiscal")}
-        {renderDropzone("NSS Número Seguro Social", "nss")}
-        {renderDropzone("Comprobante de Domicilio", "domicilio")}
-        {renderDropzone("Acta de Nacimiento", "nacimiento")}
-        {renderDropzone("CURP", "curp")}
-        {renderDropzone("Comprobante de Estudios", "estudios", true)}
+    <div className="container">
+      {renderDropzone("Contrato determinado", "c_determinado")}
+      {renderDropzone("Contrato indeterminado", "c_indeterminado")}
+      {renderDropzone("Seguro de vida", "seguro")}
 
-        {message && <p className="success">{message}</p>}
+      {message && <p className="success">{message}</p>}
 
-        <button onClick={handleUpload} disabled={uploading} className="px-4 py-2 font-bold text-white bg-gray-600 rounded-md hover:bg-gray-700 focus:outline-none focus:ring focus:ring-gray-200">
-          {uploading ? "Subiendo..." : "Actualizar Documentos"}
-        </button>
-        <button onClick={onClose} className="px-4 py-2 font-bold text-white bg-red-600 rounded-md hover:bg-red-700 focus:outline-none focus:ring focus:ring-red-200">
-          Cerrar
-        </button>
-      </div>
+      <button onClick={handleUpload} disabled={uploading} className="px-4 py-2 font-bold text-white bg-gray-600 rounded-md hover:bg-gray-700 focus:outline-none focus:ring focus:ring-gray-200">
+        {uploading ? "Subiendo..." : "Subir Documentos"}
+      </button>
     </div>
   );
 };
 
-export default UpdateDocsModal;
+export default SubirContratos;

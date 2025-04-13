@@ -35,7 +35,7 @@ const SubirVideos = () => {
 
     setUploading(true);
     try {
-      const response = await axios.post("http://172.30.189.94:5005/api/upload", formData, {
+      const response = await axios.post("http://192.168.1.68:5005/api/upload", formData, {
         headers: { "Content-Type": "multipart/form-data" }
       });
 
