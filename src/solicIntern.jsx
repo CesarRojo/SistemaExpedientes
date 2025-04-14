@@ -3,7 +3,8 @@ import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas-pro';
 import axios from 'axios';
 import useAuthStore from './authStore';
-import RfcFacil from 'rfc-facil'; // Importar la librería
+import { useNavigate } from 'react-router-dom';
+import RfcFacil from 'rfc-facil';
 
 const estados = [
   { clave: "AS", nombre: "Aguascalientes" },
@@ -40,45 +41,96 @@ const estados = [
   { clave: "ZS", nombre: "Zacatecas" }
 ];
 
-// Listado de palabras altisonantes para la CURP en base al instructivo normativo de la SEGOB Marzo 2006
-const palabrasInconvenientes = {
-  "BACA": "BXCA", "BAKA": "BXKA", "BUEI": "BXEI", "BUEY": "BXEY",
-  "CACA": "CXCA", "CACO": "CXCO", "CAGA": "CXGA", "CAGO": "CXGO",
-  "CAKA": "CXKA", "CAKO": "CXKO", "COGE": "CXGE", "COGI": "CXGI",
-  "COJA": "CXJA", "COJE": "CXJE", "COJI": "CXJI", "COJO": "CXJO",
-  "COLA": "CXLA", "CULO": "CXLO", "FALO": "FXLO", "FETO": "FXTO",
-  "GETA": "GXTA", "GUEI": "GXEI", "GUEY": "GXEY", "JETA": "JXTA",
-  "JOTO": "JXTO", "KACA": "KXCA", "KACO": "KXCO", "KAGA": "KXGA",
-  "KAGO": "KXGO", "KAKA": "KXKA", "KAKO": "KXKO", "KOGE": "KXGE",
-  "KOGI": "KXGI", "KOJA": "KXJA", "KOJE": "KXJE", "KOJI": "KXJI",
-  "KOJO": "KXJO", "KOLA": "KXLA", "KULO": "KXLO", "LILO": "LXLO",
-  "LOCA": "LXCA", // Agregar más palabras según sea necesario
-};
+function buscaVocal(str) {
+  const vocales = "AEIOU";
+  for (let i = 1; i < str.length; i++) {
+    if (vocales.includes(str[i])) return str[i];
+  }
+  return "X";
+}
 
-const palabrasIgnoradas = ["DE", "DEL", "LA", "LOS", "LAS", "Y", "E", "O", "UN", "UNA"];
+function buscaConsonante(str) {
+  const vocales = "AEIOU Ñ.";
+  for (let i = 1; i < str.length; i++) {
+    if (!vocales.includes(str[i])) return str[i];
+  }
+  return "X";
+}
 
-const obtenerPrimeraLetra = (nombre) => {
-  if (!nombre || nombre.trim() === "") return "X";
-  const partes = nombre.split(" ").filter(part => !palabrasIgnoradas.includes(part.toUpperCase()));
-  const primeraPalabra = partes[0] ? partes[0].toUpperCase() : "X";
+function cambiaPalabra(str) {
+  const malas = [
+    "BUEI","BUEY","CACA","CACO","CAGA","CAGO","CAKA","CAKO","COGE","COJA","COJE",
+    "COJI","COJO","CULO","FETO","GUEY","JOTO","KACA","KACO","KAGA","KAGO","KOGE",
+    "KOJO","KAKA","KULO","LOCA","LOCO","MAME","MAMO","MEAR","MEAS","MEON","MION",
+    "MOCO","MULA","PEDA","PEDO","PENE","PUTA","PUTO","QULO","RATA","RUIN"
+  ];
+  if (malas.includes(str)) {
+    return str[0] + "X" + str.slice(2);
+  }
+  return str;
+}
 
-  // Manejo de nombres compuestos
-  if (primeraPalabra === "MARIA" || primeraPalabra === "MA." || primeraPalabra === "MA" || primeraPalabra === "JOSE" || primeraPalabra === "J" || primeraPalabra === "J.") {
-    return partes.length > 1 ? partes[1].charAt(0) : "X";
+function estadoCodigo(index) {
+  return estados[index]?.clave || "NE";
+}
+
+function ultdig(curp) {
+  const tabla = (c) => {
+    if ("0" <= c && c <= "9") return c.charCodeAt(0) - 48;
+    if ("A" <= c && c <= "N") return c.charCodeAt(0) - 55;
+    if ("O" <= c && c <= "Z") return c.charCodeAt(0) - 54;
+    return 0;
+  };
+  let dv = 0;
+  for (let i = 0; i < curp.length; i++) {
+    dv += tabla(curp[i]) * (18 - i);
+  }
+  dv %= 10;
+  return dv === 0 ? 0 : 10 - dv;
+}
+
+function generaCURP({ nombre, paterno, materno, fecha, genero, estado }) {
+  if (!nombre || !paterno || !fecha || !genero || estado === "") return "";
+
+  nombre = nombre.toUpperCase().trim();
+  paterno = paterno.toUpperCase().trim();
+  materno = materno.toUpperCase().trim() || "X";
+  genero = genero.toUpperCase();
+
+  // Quitar prefijos comunes
+  const quitar = /^(DE |DEL |LO |LOS |LA |LAS )/;
+  const nombresQuitar = /^(MARIA |JOSE )/;
+
+  nombre = nombre.replace(quitar, "").replace(nombresQuitar, "").replace(quitar, "");
+  paterno = paterno.replace(quitar, "");
+  materno = materno.replace(quitar, "");
+
+  let curp = paterno[0] + buscaVocal(paterno) + materno[0] + nombre[0];
+  curp = cambiaPalabra(curp);
+
+  // Fecha en formato yyyy-mm-dd
+  let dia, mes, anio;
+  if (fecha.includes("/")) {
+    [dia, mes, anio] = fecha.split("/");
+  } else if (fecha.includes("-")) {
+    [anio, mes, dia] = fecha.split("-");
+  } else {
+    return "";
   }
 
-  return primeraPalabra.charAt(0);
-};
+  curp += anio.slice(-2) + mes + dia;
+  curp += genero === "H" || genero === "M" ? genero : "X";
+  curp += estadoCodigo(parseInt(estado));
 
-const obtenerPrimeraVocalInterna = (palabra) => {
-  let vocales = palabra.slice(1).match(/[AEIOU]/);
-  return vocales ? vocales[0] : "X";
-};
+  curp += buscaConsonante(paterno) + buscaConsonante(materno) + buscaConsonante(nombre);
 
-const obtenerPrimeraConsonanteInterna = (palabra) => {
-  let consonantes = palabra.slice(1).match(/[^AEIOU]/);
-  return consonantes ? consonantes[0] : "X";
-};
+  // Año para homoclave
+  curp += anio.startsWith("19") ? "0" : "A";
+
+  curp += ultdig(curp);
+
+  return curp;
+}
 
 const SolicitudInternaForm = () => {
   const [formData, setFormData] = useState({
@@ -112,10 +164,11 @@ const SolicitudInternaForm = () => {
   const idFolio = user?.idFolio;
   const numFolio = user?.numFolio;
   const pdfRef = useRef();
+  const navigate = useNavigate();
 
   const fetchUsuarioFolio = async () => {
     try {
-      const response = await axios.get(`http://192.168.1.68:5005/usuario/folio/${idFolio}`);
+      const response = await axios.get(`http://172.30.189.86:5005/usuario/folio/${idFolio}`);
       console.log(response.data);
       setUsuario(response.data);
       setSolInt(response.data.solicitudInterna);
@@ -154,68 +207,6 @@ const SolicitudInternaForm = () => {
     }));
   };
 
-  const generarDiferenciadorHomonimia = (fechaNac) => {
-    const year = parseInt(fechaNac.split('-')[0]);
-    // Si el año es menor a 2000, devuelve '0', si es 2000 o mayor, devuelve 'A'
-    return year < 2000 ? '0' : 'A'; 
-  };
-  
-  const calcularDigitoVerificador = (curp) => {
-    const valores = "0123456789ABCDEFGHIJKLMNÑOPQRSTUVWXYZ";
-    let suma = 0;
-  
-    for (let i = 0; i < curp.length; i++) {
-      suma += valores.indexOf(curp.charAt(i)) * (18 - i);
-    }
-  
-    const digitoVerificador = 10 - (suma % 10);
-    return digitoVerificador === 10 ? '0' : digitoVerificador.toString();
-  };
-
-  const generateCURP = () => {
-    if (!usuario) return '';
-  
-    const { nombre, apellidoPat, apellidoMat, fechaNac, sexo } = usuario;
-    if (!nombre || !apellidoPat || !apellidoMat || !fechaNac || !sexo || !formData.estado) return '';
-  
-    const apellidoP = apellidoPat.toUpperCase().split(" ").filter(part => !palabrasIgnoradas.includes(part))[0]; // Solo la primera palabra que no es ignorada
-    const apellidoM = apellidoMat.toUpperCase().split(" ").filter(part => !palabrasIgnoradas.includes(part))[0]; // Solo la primera palabra que no es ignorada
-    const nombreU = nombre.toUpperCase().split(" ").filter(part => !palabrasIgnoradas.includes(part))[0]; // Solo la primera palabra que no es ignorada
-  
-    // Aplicar reglas de palabras inconvenientes
-    const primeraLetraApellidoP = palabrasInconvenientes[apellidoP] || obtenerPrimeraLetra(apellidoP);
-    const primeraVocalInternaP = obtenerPrimeraVocalInterna(apellidoP);
-    const primeraLetraApellidoM = palabrasInconvenientes[apellidoM] || obtenerPrimeraLetra(apellidoM);
-    const primeraLetraNombreU = palabrasInconvenientes[nombreU] || obtenerPrimeraLetra(nombreU);
-  
-    let curp = '';
-    curp += primeraLetraApellidoP; // Primera letra del primer apellido
-    curp += primeraVocalInternaP; // Primera vocal interna del primer apellido
-    curp += primeraLetraApellidoM; // Primera letra del segundo apellido
-    curp += primeraLetraNombreU; // Primera letra del nombre
-  
-    // Fecha de nacimiento (YYMMDD)
-    const [year, month, day] = fechaNac.split('T')[0].split('-');
-    curp += year.slice(-2) + month + day;
-  
-    curp += (sexo === 'H' ? 'H' : 'M'); // Género H o M
-    curp += formData.estado; // Clave del estado de nacimiento
-  
-    curp += obtenerPrimeraConsonanteInterna(apellidoP);
-    curp += obtenerPrimeraConsonanteInterna(apellidoM);
-    curp += obtenerPrimeraConsonanteInterna(nombreU);
-  
-    // Generar el diferenciador de homonimia
-    const diferenciador = generarDiferenciadorHomonimia(fechaNac);
-    curp += diferenciador;
-  
-    // Calcular el dígito verificador
-    const digitoVerificador = calcularDigitoVerificador(curp);
-    curp += digitoVerificador;
-  
-    return curp;
-  };
-
   const generateRFC = (usuario) => {
     if (!usuario) return '';
     
@@ -238,21 +229,51 @@ const SolicitudInternaForm = () => {
   };
 
   useEffect(() => {
-    if (usuario) {
-      const curp = generateCURP();
-      const rfc = generateRFC(usuario); // Generar el RFC aquí
+    if (usuario && formData.estado) {
+      const rfc = generateRFC(usuario);
+      const fecha = usuario.fechaNac ? usuario.fechaNac.split("T")[0] : "";
+  
+      // Obtener el índice del estado basado en el nombre
+      const estadoIndex = estados.findIndex(estado => estado.nombre === formData.estado);
+  
+      // Generar CURP usando el índice
+      const curpFinal = generaCURP({
+        nombre: usuario.nombre || "",
+        paterno: usuario.apellidoPat || "",
+        materno: usuario.apellidoMat || "",
+        fecha: fecha,
+        genero: usuario.sexo || "",
+        estado: estadoIndex.toString(), // Aquí se pasa el índice como string
+      });
+  
       setFormData((prevData) => ({
         ...prevData,
-        CURP: curp,
-        RFC: rfc, // Actualizar el RFC en el estado
+        CURP: curpFinal,
+        RFC: rfc,
       }));
     }
   }, [usuario, formData.estado]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Verificar si los campos requeridos están llenos
+    const requiredFields = [
+      'fecha', 'lugarNac', 'RFC', 'CURP', 'NSS', 
+      'CP', 'ciudad', 'estado', 'municipio', 'viveCon'
+    ];
+    
+    const missingFields = requiredFields.filter(field => !formData[field]);
+
+    if (missingFields.length > 0) {
+      const missingFieldsMessage = `Faltan por llenar los siguientes campos: ${missingFields.join(', ')}`;
+      alert(missingFieldsMessage);
+      return; // Detener el envío si hay campos faltantes
+    }
+
     try {
       if (usuario) {
+        //Para mandar solo los datosFam que tengan los campos nombre u apellidos, si no tienen estos campos no se mandan
         const filteredDatosFam = formData.datosFam.filter(fam => 
           fam.nombre || fam.apellidos
         );
@@ -265,7 +286,7 @@ const SolicitudInternaForm = () => {
 
         const { fechaNac, ...dataWithoutFechaNac } = dataToSend;
 
-        const response = await axios.post('http://192.168.1.68:5005/solicInt', dataWithoutFechaNac);
+        const response = await axios.post('http://172.30.189.86:5005/solicInt', dataWithoutFechaNac);
 
         console.log('Data submitted successfully:', response.data);
 
@@ -300,13 +321,14 @@ const SolicitudInternaForm = () => {
         formDataToSend.append('document', pdfBlob, `solicitudinterna-${numFolio}.pdf`);
         formDataToSend.append('idUsuario', usuario.idUsuario);
 
-        const pdfUploadResponse = await axios.post('http://192.168.1.68:5005/pdf/upload-single-doc', formDataToSend, {
+        const pdfUploadResponse = await axios.post('http://172.30.189.86:5005/pdf/upload-single-doc', formDataToSend, {
             headers: {
                 'Content-Type': 'multipart/form-data',
             },
         });
 
         console.log('PDF subido con éxito:', pdfUploadResponse.data);
+        navigate('/home');
       } else {
         console.error('Usuario no cargado');
       }
@@ -316,7 +338,7 @@ const SolicitudInternaForm = () => {
   };
 
   if (!consent) {
-    return <div className="text-center">Por favor, firma tu consentimiento antes de continuar con este paso.</div>;
+    return <div className="text-center">Por favor, realiza tu consentimiento antes de continuar con este paso.</div>;
   }
 
   if (solInt) {
@@ -328,7 +350,7 @@ const SolicitudInternaForm = () => {
       <form onSubmit={handleSubmit} ref={pdfRef} className="max-w-4xl mx-auto bg-white p-6 shadow-md pdf-container">
         {/* Header */}
         <div className="flex items-center mb-4">
-          <img alt="ATR Nayarit Logo" className="h-31" src="logo.png" />
+          <img alt="ATR Nayarit Logo" className="h-31 w-68" src="LOGO ATR_LOGO ATR NEGRO.png" />
           <div className="w-full text-center bg-gray-200">
             <h1 className="text-xl ">SOLICITUD INTERNA</h1>
             <div className="flex space-x-2">
@@ -632,7 +654,7 @@ const SolicitudInternaForm = () => {
               >
                 <option value="">Selecciona un estado</option>
                 {estados.map((estado) => (
-                  <option key={estado.clave} value={estado.clave}>{estado.nombre}</option>
+                  <option key={estado.clave} value={estado.nombre}>{estado.nombre}</option>
                 ))}
               </select>
             </div>

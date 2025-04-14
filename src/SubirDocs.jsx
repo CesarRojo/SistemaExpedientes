@@ -1,7 +1,7 @@
 import { useDropzone } from 'react-dropzone';
 import { useState } from 'react';
 import axios from 'axios';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import './App.css';
 
 const SubirDocs = () => {
@@ -19,6 +19,7 @@ const SubirDocs = () => {
   const [errors, setErrors] = useState({});
   const [uploading, setUploading] = useState(false);
   const [message, setMessage] = useState("");
+  const navigate = useNavigate();
   const location = useLocation();
   const { idUsuario, numFolio } = location.state || {};
 
@@ -64,7 +65,7 @@ const SubirDocs = () => {
   
     setUploading(true);
     try {
-      const response = await axios.post("http://192.168.1.68:5005/pdf/upload-docs", formData, {
+      const response = await axios.post("http://172.30.189.86:5005/pdf/upload-docs", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
   
@@ -74,6 +75,7 @@ const SubirDocs = () => {
       setMessage("Error al subir los documentos");
     } finally {
       setUploading(false);
+      navigate('/TablaSubirDocs');
     }
   };
 

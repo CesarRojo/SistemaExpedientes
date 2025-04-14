@@ -2,10 +2,11 @@ import React, { useRef, useState, useEffect } from 'react';
 import axios from 'axios';
 import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas-pro';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import useAuthStore from './authStore';
 
 const ExploracionFisica = () => {
+  const navigate = useNavigate();
   const location = useLocation();
   const { idUsuario, nombre, apellidoPat } = location.state || {};
   const user = useAuthStore((state) => state.user);
@@ -51,7 +52,8 @@ const ExploracionFisica = () => {
 
   const fetchUsuarioFolio = async () => {
     try {
-      const response = await axios.get(`http://192.168.1.68:5005/usuario/${idUsuario}`);
+      const response = await axios.get(`http://172.30.189.86:5005/usuario/${idUsuario}`);
+      console.log("datos usuario expfisica", response.data);
       setUsuario(response.data);
       setExamMed(response.data.examenMedico);
       setExpFisica(response.data.exploracionFisica);
@@ -92,9 +94,29 @@ const ExploracionFisica = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Verificar si los campos requeridos están llenos
+    const requiredFields = [
+      'peso', 'talla', 'temperatura', 'FR', 'FC', 'TA', 
+      'finkelstein', 'tinel', 'phalen', 'movAnormales', 
+      'marcha', 'comprension', 'visionLejos', 'visionCerca', 
+      'daltonismo', 'OI', 'OD', 'calificacion', 'piel', 
+      'higiene', 'tipoPeso', 'lesionOcular', 'lesionOido', 
+      'bocaDienEnc', 'torax', 'columVert', 'extremidades', 
+      'capacEsp', 'calificacionFinal'
+    ];
+    
+    const missingFields = requiredFields.filter(field => !formData[field]);
+
+    if (missingFields.length > 0) {
+      const missingFieldsMessage = `Faltan por llenar los siguientes campos: ${missingFields.join(', ')}`;
+      alert(missingFieldsMessage);
+      return; // Detener el envío si hay campos faltantes
+    }
+
     try {
       const { nombreCompleto, realizadoPor, ...dataToSend } = formData; // Omitir los campos
-      const response = await axios.post('http://192.168.1.68:5005/expFisica', {
+      const response = await axios.post('http://172.30.189.86:5005/expFisica', {
         ...dataToSend,
         peso: parseInt(formData.peso),
         talla: parseInt(formData.talla),
@@ -158,17 +180,18 @@ const ExploracionFisica = () => {
 
         // Crear FormData para subir el PDF
         const formDataToSend = new FormData();
-        formDataToSend.append('document', pdfBlob, `exploracionfisica-${numFolio}.pdf`); // Agregar el PDF
+        formDataToSend.append('document', pdfBlob, `exploracionfisica-${usuario.folio.numFolio}.pdf`); // Agregar el PDF
         formDataToSend.append('idUsuario', usuario.idUsuario); // Agregar idUsuario
 
         // Enviar el PDF al backend
-        const pdfUploadResponse = await axios.post('http://192.168.1.68:5005/pdf/upload-single-doc', formDataToSend, {
+        const pdfUploadResponse = await axios.post('http://172.30.189.86:5005/pdf/upload-single-doc', formDataToSend, {
             headers: {
                 'Content-Type': 'multipart/form-data',
             },
         });
 
         console.log('PDF subido con éxito:', pdfUploadResponse.data);
+        navigate('/TablaExFis');
     } catch (error) {
       if (error.response) {
     // La solicitud se realizó y el servidor respondió con un código de estado
@@ -197,7 +220,7 @@ const ExploracionFisica = () => {
       <form onSubmit={handleSubmit} ref={pdfRef} className="max-w-4xl mx-auto bg-white p-6 shadow-md pdf-container">
         {/* Header */}
         <div className="flex items-center mb-4">
-          <img alt="ATR Nayarit Logo" className="h-31" src="logo.png" />
+          <img alt="ATR Nayarit Logo" className="h-31 w-68" src="LOGO ATR_LOGO ATR NEGRO.png" />
           <div className="w-full text-center bg-gray-200">
             <h1 className="text-xl ">EXPLORACION FISICA</h1>
           </div>

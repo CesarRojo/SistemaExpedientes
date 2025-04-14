@@ -10,7 +10,8 @@ button {
 
 .pdf-container input[type="text"],
 .pdf-container input[type="date"],
-.pdf-container input[type="number"] {
+.pdf-container input[type="number"],
+.pdf-container select {
     border: 0 !important;
     border-bottom: 1px solid #000 !important;
     line-height: 4 !important; 

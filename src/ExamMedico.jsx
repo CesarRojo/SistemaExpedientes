@@ -1,11 +1,12 @@
 import { useRef, useEffect, useState } from 'react';
 import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas-pro';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import useAuthStore from './authStore';
 
 function ExamenMedico() {
+    const navigate = useNavigate();
     const [usuario, setUsuario] = useState(null);
     const [antecedentesPatologicos, setAntecedentesPatologicos] = useState([]);
     const [entrevistaInicial, setEntrevistaInicial] = useState(null);
@@ -40,7 +41,7 @@ function ExamenMedico() {
 
     const fetchEntrevIniData = async () => {
         try {
-            const response = await axios.get(`http://192.168.1.68:5005/usuario/folio/${idFolio}`);
+            const response = await axios.get(`http://172.30.189.86:5005/usuario/folio/${idFolio}`);
             setUsuario(response.data);
             setEntrevistaInicial(response.data.entrevistaInicial);
             setExamMed(response.data.examenMedico);
@@ -52,7 +53,7 @@ function ExamenMedico() {
 
     const fetchAntecedentesPatologicos = async () => {
       try {
-        const response = await axios.get('http://192.168.1.68:5005/antecPatolog');
+        const response = await axios.get('http://172.30.189.86:5005/antecPatolog');
         setAntecedentesPatologicos(response.data);
       } catch (error) {
         console.error('Error al obtener antecedentes patológicos:', error);
@@ -210,7 +211,7 @@ function ExamenMedico() {
             }));
 
         // Enviar datos del examen médico al backend
-        const examMedicoResponse = await axios.post('http://192.168.1.68:5005/examMedico', {
+        const examMedicoResponse = await axios.post('http://172.30.189.86:5005/examMedico', {
             examMedicoData: {
                 planta: formData.planta,
                 fecha: new Date(formData.fecha),
@@ -272,13 +273,14 @@ function ExamenMedico() {
         formDataToSend.append('idUsuario', usuario.idUsuario); // Agregar idUsuario
 
         // Enviar el PDF al backend
-        const pdfUploadResponse = await axios.post('http://192.168.1.68:5005/pdf/upload-single-doc', formDataToSend, {
+        const pdfUploadResponse = await axios.post('http://172.30.189.86:5005/pdf/upload-single-doc', formDataToSend, {
             headers: {
                 'Content-Type': 'multipart/form-data',
             },
         });
 
         console.log('PDF subido con éxito:', pdfUploadResponse.data);
+        navigate('/home');
     } catch (error) {
         console.error('Error al crear Examen Médico o subir PDF:', error);
     }
@@ -318,7 +320,7 @@ function ExamenMedico() {
             <form onSubmit={handleSubmit} ref={pdfRef} className="max-w-4xl mx-auto bg-white p-6 shadow-md pdf-container">
                 {/* Header */}
                 <div className="flex items-center justify-between mb-4">
-                    <img alt="ATR Nayarit Logo" className="h-31" src="logo.png" />
+                    <img alt="ATR Nayarit Logo" className="h-31 w-68" src="LOGO ATR_LOGO ATR NEGRO.png" />
                     <div className="text-center bg-gray-200">
                         <h1 className="text-xl ">EXAMEN MEDICO</h1>
                         <div className='flex flex-row'>
@@ -356,11 +358,46 @@ function ExamenMedico() {
                         <div className="mb-4">
                             <div className="flex flex-row gap-4">
                                 <div>ESTADO CIVIL:</div>
-                                <label><input type="radio" name="estadoCivil" value="soltero" onChange={handleChange} />Soltero (a)</label>
-                                <label><input type="radio" name="estadoCivil" value="casado" onChange={handleChange} />Casado (a)</label>
-                                <label><input type="radio" name="estadoCivil" value="unionLibre" onChange={handleChange} />Unión Libre</label>
-                                <label><input type="radio" name="estadoCivil" value="separado" onChange={handleChange} />Separado (a)</label>
-                                <label><input type="radio" name="estadoCivil" value="viudo" onChange={handleChange} />Viudo (a)</label>
+                                <label>
+                                    <input
+                                    type="radio"
+                                    name="estado_civil"
+                                    value="Soltero"
+                                    checked={usuario.estado_civil === 'Soltero (a)'}
+                                    readOnly
+                                    />
+                                    Soltero (a)
+                                </label>
+                                <label>
+                                    <input
+                                    type="radio"
+                                    name="estado_civil"
+                                    value="Casado"
+                                    checked={usuario.estado_civil === 'Casado'}
+                                    readOnly
+                                    />
+                                    Casado (a)
+                                </label>
+                                <label>
+                                    <input
+                                    type="radio"
+                                    name="estado_civil"
+                                    value="Separado"
+                                    checked={usuario.estado_civil === 'Separado (a)'}
+                                    readOnly
+                                    />
+                                    Separado (a)
+                                </label>
+                                <label>
+                                    <input
+                                    type="radio"
+                                    name="estado_civil"
+                                    value="Viudo"
+                                    checked={usuario.estado_civil === 'Viudo (a)'}
+                                    readOnly
+                                    />
+                                    Viudo (a)
+                                </label>
                             </div>
                         </div>
                     </div>

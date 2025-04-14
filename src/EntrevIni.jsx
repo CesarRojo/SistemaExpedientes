@@ -72,7 +72,7 @@ const EntrevIniForm = () => {
 
   const fetchFolio = async () => {
     try {
-      const response = await axios.get(`http://192.168.1.68:5005/folio/${numFolio}`);
+      const response = await axios.get(`http://172.30.189.86:5005/folio/${numFolio}`);
       if (response.data.Usuario) {
         setFolioStatus('Folio ya está siendo usado');
       } else {
@@ -198,7 +198,7 @@ const EntrevIniForm = () => {
       },
     };
     try {
-      const response = await axios.post('http://192.168.1.68:5005/entrevIni', dataToSubmit);
+      const response = await axios.post('http://172.30.189.86:5005/entrevIni', dataToSubmit);
       console.log('Response idUsuario:', response.data.idUsuario);
       fetchFolio();
 
@@ -242,7 +242,7 @@ const EntrevIniForm = () => {
     formDataToSend.append('idUsuario', idUsuario); // Agregar idUsuario
 
     // Enviar el PDF al backend
-    const pdfUploadResponse = await axios.post('http://192.168.1.68:5005/pdf/upload-single-doc', formDataToSend, {
+    const pdfUploadResponse = await axios.post('http://172.30.189.86:5005/pdf/upload-single-doc', formDataToSend, {
         headers: {
             'Content-Type': 'multipart/form-data',
         },
@@ -336,15 +336,57 @@ const EntrevIniForm = () => {
             <h1 className="text-xl font-bold">ENTREVISTA INICIAL | DEPARTAMENTO DE RECLUTAMIENTO</h1>
             <div className="flex space-x-2">
               <div>ÁREA QUE SE DIRIGE:</div>
-              <input className="border border-gray-300 p-2" name='areaDirige' value={formData.areaDirige} onChange={handleChange} type="text" required />
+                <select
+                  name='areaDirige'
+                  value={formData.areaDirige}
+                  onChange={handleChange}
+                  className="border border-gray-300 p-2"
+                  required
+                >
+                  <option value="">Seleccione un área</option>
+                  <option value="Produccion">Producción</option>
+                  <option value="Calidad">Calidad</option>
+                  <option value="Materiales">Materiales</option>
+                  <option value="Mantenimiento">Mantenimiento</option>
+                  <option value="Ingenieria">Ingeniería</option>
+                  <option value="Seguridad">Seguridad</option>
+                  <option value="Sistemas">Sistemas</option>
+                  <option value="Recursos Humanos">Recursos Humanos</option>
+                  <option value="Enfermeria/Dpto. Medico">Enfermería/Dpto. Médico</option>
+                  <option value="Otro">Otro</option>
+                </select>
             </div>
             <div className="flex space-x-2">
               <div>PUESTO:</div>
-              <input className="border border-gray-300 p-2" name='puesto' value={formData.puesto} onChange={handleChange} type="text" />
+                <select
+                  name='puesto'
+                  value={formData.puesto}
+                  onChange={handleChange}
+                  className="border border-gray-300 p-2"
+                >
+                  <option value="">Seleccione un puesto</option>
+                  <option value="Operador">Operador</option>
+                  <option value="Inspector">Inspector</option>
+                  <option value="Materialista">Materialista</option>
+                  <option value="Tec. Mantenimiento">Técnico Mantenimiento</option>
+                  <option value="Tec. Ingenieria">Técnico Ingeniería</option>
+                  <option value="Practicante">Practicante</option>
+                  <option value="Supervisor Jr.">Supervisor Jr.</option>
+                  <option value="Supervisor Admin.">Supervisor Admin.</option>
+                </select>
             </div>
             <div className="flex space-x-2">
               <div>TURNO:</div>
-              <input className="border border-gray-300 p-2" name='turno' value={formData.turno} onChange={handleChange} type="text" />
+                <select
+                    name='turno'
+                    value={formData.turno}
+                    onChange={handleChange}
+                    className="border border-gray-300 p-2"
+                  >
+                    <option value="">Seleccione un turno</option>
+                    <option value="A">A</option>
+                    <option value="B">B</option>
+                  </select>
             </div>
           </div>
         </div>

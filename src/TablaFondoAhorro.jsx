@@ -32,7 +32,7 @@ const TablaFondoAhorro = () => {
     getFechaHoy();
     const fetchDatos = async () => {
       try {
-        const response = await axios.get('http://192.168.1.68:5005/usuario/fecha', {
+        const response = await axios.get('http://172.30.189.86:5005/usuario/fecha', {
           params: { fechaInicio, fechaFin },
         });
         setDatos(response.data);
@@ -49,7 +49,7 @@ const TablaFondoAhorro = () => {
       const idUsuarios = datos.map(dato => dato.idUsuario); // Obtener todos los idUsuario
       if (idUsuarios.length > 0) {
         try {
-          const response = await axios.get('http://192.168.1.68:5005/docs/byUser', {
+          const response = await axios.get('http://172.30.189.86:5005/docs/byUser', {
             params: { idUsuarios: idUsuarios.join(',') }, // Pasar los idUsuarios como un string separado por comas
           });
           const docsData = response.data.reduce((acc, doc) => {
@@ -282,7 +282,7 @@ const TablaFondoAhorro = () => {
               <td className="text-center px-6 py-4 whitespace-nowrap">
                 {docs[dato.idUsuario] && docs[dato.idUsuario]['fondoahorro'] ? (
                   <a
-                    href={`http://192.168.1.68:5005${docs[dato.idUsuario]['fondoahorro'].path}`}
+                    href={`http://172.30.189.86:5005${docs[dato.idUsuario]['fondoahorro'].path}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-blue-500 hover:underline"
@@ -297,7 +297,7 @@ const TablaFondoAhorro = () => {
               <td className="text-center py-4 whitespace-nowrap">
                 {docs[dato.idUsuario] && docs[dato.idUsuario]['instrumentos'] ? (
                   <a
-                    href={`http://192.168.1.68:5005${docs[dato.idUsuario]['instrumentos'].path}`}
+                    href={`http://172.30.189.86:5005${docs[dato.idUsuario]['instrumentos'].path}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-blue-500 hover:underline"
@@ -312,7 +312,7 @@ const TablaFondoAhorro = () => {
               <td className="text-center py-4 whitespace-nowrap">
                 {docs[dato.idUsuario] && docs[dato.idUsuario]['temario'] ? (
                   <a
-                    href={`http://192.168.1.68:5005${docs[dato.idUsuario]['temario'].path}`}
+                    href={`http://172.30.189.86:5005${docs[dato.idUsuario]['temario'].path}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-blue-500 hover:underline"
@@ -327,7 +327,7 @@ const TablaFondoAhorro = () => {
               <td className="text-center py-4 whitespace-nowrap">
                 {docs[dato.idUsuario] && docs[dato.idUsuario]['verificar'] ? (
                   <a
-                    href={`http://192.168.1.68:5005${docs[dato.idUsuario]['verificar'].path}`}
+                    href={`http://172.30.189.86:5005${docs[dato.idUsuario]['verificar'].path}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-blue-500 hover:underline"
@@ -342,7 +342,7 @@ const TablaFondoAhorro = () => {
               <td className="text-center py-4 whitespace-nowrap">
                 {docs[dato.idUsuario] && docs[dato.idUsuario]['fonacot'] ? (
                   <a
-                    href={`http://192.168.1.68:5005${docs[dato.idUsuario]['fonacot'].path}`}
+                    href={`http://172.30.189.86:5005${docs[dato.idUsuario]['fonacot'].path}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-blue-500 hover:underline"
@@ -357,7 +357,7 @@ const TablaFondoAhorro = () => {
               <td className="text-center py-4 whitespace-nowrap">
                 {docs[dato.idUsuario] && docs[dato.idUsuario]['ctm'] ? (
                   <a
-                    href={`http://192.168.1.68:5005${docs[dato.idUsuario]['ctm'].path}`}
+                    href={`http://172.30.189.86:5005${docs[dato.idUsuario]['ctm'].path}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-blue-500 hover:underline"
@@ -372,7 +372,7 @@ const TablaFondoAhorro = () => {
               <td className="text-center py-4 whitespace-nowrap">
                 {docs[dato.idUsuario] && docs[dato.idUsuario]['vale'] ? (
                   <a
-                    href={`http://192.168.1.68:5005${docs[dato.idUsuario]['vale'].path}`}
+                    href={`http://172.30.189.86:5005${docs[dato.idUsuario]['vale'].path}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-blue-500 hover:underline"
