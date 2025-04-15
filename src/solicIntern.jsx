@@ -168,7 +168,7 @@ const SolicitudInternaForm = () => {
 
   const fetchUsuarioFolio = async () => {
     try {
-      const response = await axios.get(`http://172.30.189.86:5005/usuario/folio/${idFolio}`);
+      const response = await axios.get(`http://172.30.189.100:5005/usuario/folio/${idFolio}`);
       console.log(response.data);
       setUsuario(response.data);
       setSolInt(response.data.solicitudInterna);
@@ -286,7 +286,7 @@ const SolicitudInternaForm = () => {
 
         const { fechaNac, ...dataWithoutFechaNac } = dataToSend;
 
-        const response = await axios.post('http://172.30.189.86:5005/solicInt', dataWithoutFechaNac);
+        const response = await axios.post('http://172.30.189.100:5005/solicInt', dataWithoutFechaNac);
 
         console.log('Data submitted successfully:', response.data);
 
@@ -321,7 +321,7 @@ const SolicitudInternaForm = () => {
         formDataToSend.append('document', pdfBlob, `solicitudinterna-${numFolio}.pdf`);
         formDataToSend.append('idUsuario', usuario.idUsuario);
 
-        const pdfUploadResponse = await axios.post('http://172.30.189.86:5005/pdf/upload-single-doc', formDataToSend, {
+        const pdfUploadResponse = await axios.post('http://172.30.189.100:5005/pdf/upload-single-doc', formDataToSend, {
             headers: {
                 'Content-Type': 'multipart/form-data',
             },
@@ -713,7 +713,7 @@ const SolicitudInternaForm = () => {
           </div>
           <div className='grid grid-cols-[1fr_5fr] gap-2'>
             <div className='flex items-center gap-2'>
-              <label><input type="radio" />PRIMARIA</label>
+              <label><input type="radio" checked={usuario.escolaridad === 'Primaria'} readOnly />PRIMARIA</label>
             </div>
             <div>
               <label>TECNICO EN:</label>
@@ -722,7 +722,7 @@ const SolicitudInternaForm = () => {
           </div>
           <div className='grid grid-cols-[1fr_5fr] gap-2'>
             <div className='flex items-center gap-2'>
-              <label><input type="radio" />SECUNDARIA</label>
+              <label><input type="radio" checked={usuario.escolaridad === 'Secundaria'} readOnly />SECUNDARIA</label>
             </div>
             <div>
               <label>LICENCIATURA EN:</label>
@@ -731,7 +731,7 @@ const SolicitudInternaForm = () => {
           </div>
           <div className='grid grid-cols-[1fr_5fr] gap-2'>
             <div className='flex items-center gap-2'>
-              <label><input type="radio" />PREPARATORIA</label>
+              <label><input type="radio" checked={usuario.escolaridad === 'Bachillerato'} readOnly/>PREPARATORIA</label>
             </div>
             <div>
               <label>INGENIERIA EN:</label>

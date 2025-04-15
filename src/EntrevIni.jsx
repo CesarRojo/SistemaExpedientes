@@ -3,6 +3,7 @@ import axios from 'axios';
 import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas-pro';
 import { useNavigate } from 'react-router-dom';
+import Modal from './ModalFirma';
 
 const EntrevIniForm = () => {
   const navigate = useNavigate();
@@ -69,10 +70,16 @@ const EntrevIniForm = () => {
   const [numFolio, setNumFolio] = useState('');
   const [folioStatus, setFolioStatus] = useState('');
   const pdfRef = useRef();
+  const [isModalOpen, setIsModalOpen] = useState(false); // Estado para el modal
+  const [signatureImage, setSignatureImage] = useState(''); // Estado para la imagen de la firma
+
+    const handleSignatureCaptured = (image) => {
+        setSignatureImage(image); // Guarda la imagen de la firma en el estado
+    };
 
   const fetchFolio = async () => {
     try {
-      const response = await axios.get(`http://172.30.189.86:5005/folio/${numFolio}`);
+      const response = await axios.get(`http://172.30.189.100:5005/folio/${numFolio}`);
       if (response.data.Usuario) {
         setFolioStatus('Folio ya está siendo usado');
       } else {
@@ -139,7 +146,7 @@ const EntrevIniForm = () => {
         turno: formData.turno,
         actualDedica: formData.actualDedica,
         enteroEmpleo: formData.enteroEmpleo,
-        numIngresos: formData.numIngresos ? parseInt(formData.numIngresos, 10) : null,
+        numIngresos: formData.numIngresos ? parseInt(formData.numIngresos, 10) : 0,
         enQueArea: formData.enQueArea ? formData.enQueArea : null,
         procesoLinea: formData.procesoLinea ? formData.procesoLinea : null,
         motivoRenuncia: formData.motivoRenuncia ? formData.motivoRenuncia : null,
@@ -198,7 +205,7 @@ const EntrevIniForm = () => {
       },
     };
     try {
-      const response = await axios.post('http://172.30.189.86:5005/entrevIni', dataToSubmit);
+      const response = await axios.post('http://172.30.189.100:5005/entrevIni', dataToSubmit);
       console.log('Response idUsuario:', response.data.idUsuario);
       fetchFolio();
 
@@ -242,7 +249,7 @@ const EntrevIniForm = () => {
     formDataToSend.append('idUsuario', idUsuario); // Agregar idUsuario
 
     // Enviar el PDF al backend
-    const pdfUploadResponse = await axios.post('http://172.30.189.86:5005/pdf/upload-single-doc', formDataToSend, {
+    const pdfUploadResponse = await axios.post('http://172.30.189.100:5005/pdf/upload-single-doc', formDataToSend, {
         headers: {
             'Content-Type': 'multipart/form-data',
         },
@@ -260,7 +267,7 @@ const EntrevIniForm = () => {
   const [otherActualDedica, setOtherActualDedica] = useState('');
   const [selectedEntroEmpleo, setSelectedEntroEmpleo] = useState('');
   const [enQueArea, setEnQueArea] = useState('');
-  const [selectedPendiente, setSelectedPendiente] = useState('');
+  const [selectedPendiente, setSelectedPendiente] = useState([]);
   const [selectedCuidador, setSelectedCuidador] = useState('');
   const [selectedAreaOPlanta, setSelectedAreaOPlanta] = useState('');
   const [workedBefore, setWorkedBefore] = useState(false);
@@ -299,9 +306,37 @@ const EntrevIniForm = () => {
     }
   }, [selectedEntroEmpleo]);
 
+  const handleSignatureClick = () => {
+    setIsModalOpen(true); // Abre el modal al hacer clic en el campo de firma
+  };
+
+  // Función para manejar el cambio de los checkboxes de pendientes
+  const handlePendienteChange = (e) => {
+    const { value } = e.target;
+    setSelectedPendiente((prev) => {
+      if (prev.includes(value)) {
+        // Si ya está seleccionado, lo eliminamos
+        return prev.filter((pendiente) => pendiente !== value);
+      } else {
+        // Si no está seleccionado, lo agregamos
+        return [...prev, value];
+      }
+    });
+  };
+
+  // Actualiza el campo de pendientes en el formData
+  useEffect(() => {
+    setFormData((prev) => ({
+      ...prev,
+      pendientes: selectedPendiente.join(', '), // Concatenar los pendientes
+    }));
+  }, [selectedPendiente]);
+
   const handleRadioChange = (setter) => (e) => {
     setter(e.target.value);
   };
+
+  console.log("isModalOpen",isModalOpen);
 
   return (
     <>
@@ -995,8 +1030,45 @@ const EntrevIniForm = () => {
         {/* Pending Issues */}
         <div className="mb-4 grid grid-cols-2">
           <div className="">
-            <div>¿Tienes algun pendiente?</div>
-            <input className="border border-gray-300 p-2" type="text" name="pendientes" value={formData.pendientes} onChange={handleChange} />
+            <div>¿Tienes algún pendiente?</div>
+              <div className="flex flex-row space-x-3">
+                <label>
+                  <input
+                    type="checkbox"
+                    value="Cita médica"
+                    checked={selectedPendiente.includes("Cita médica")}
+                    onChange={handlePendienteChange}
+                  />
+                  Cita médica
+                </label>
+                <label>
+                  <input
+                    type="checkbox"
+                    value="Finiquito"
+                    checked={selectedPendiente.includes("Finiquito")}
+                    onChange={handlePendienteChange}
+                  />
+                  Finiquito
+                </label>
+                <label>
+                  <input
+                    type="checkbox"
+                    value="Trámite Legal"
+                    checked={selectedPendiente.includes("Trámite Legal")}
+                    onChange={handlePendienteChange}
+                  />
+                  Trámite Legal
+                </label>
+                <label>
+                  <input
+                    type="checkbox"
+                    value="Salida ciudad"
+                    checked={selectedPendiente.includes("Salida ciudad")}
+                    onChange={handlePendienteChange}
+                  />
+                  Salida ciudad
+                </label>
+              </div>
             <div className="flex space-x-4 mt-4">
               <label>Paga Renta</label>
               <label>
@@ -1249,9 +1321,13 @@ const EntrevIniForm = () => {
                 className="w-90 border-b border-gray-300 p-2" 
                 type="text" 
                 name="firmaArea" 
-                value={formData.firmaArea} 
-                onChange={(e) => setFormData({ ...formData, firmaArea: e.target.value })} 
+                value={signatureImage} 
+                // onChange={(e) => setFormData({ ...formData, firmaArea: e.target.value })} 
+                onClick={handleSignatureClick} // Abre el modal al hacer clic
               />
+              {signatureImage && (
+                <img src={signatureImage} alt="Firma" style={{ maxWidth: '100%', maxHeight: '100px' }} />
+              )}
             </div>
           </div>
         </div>
@@ -1263,6 +1339,15 @@ const EntrevIniForm = () => {
       >
         Enviar Entrevista Inicial
       </button>
+      {/* Modal para la firma */}
+      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onSignatureCaptured={handleSignatureCaptured}>
+                <h2>Captura de Firma</h2>
+                {/* Aquí puedes agregar el componente de firma o cualquier otro contenido */}
+                <div>
+                    <p>Por favor, firme aquí:</p>
+                    {/* Aquí puedes integrar el componente de firma o cualquier otro elemento que necesites */}
+                </div>
+      </Modal>
     </>
   );
 };

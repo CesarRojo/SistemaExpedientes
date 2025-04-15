@@ -20,7 +20,7 @@ function TemarioDiseño() {
 
     const fetchUsuarioFolio = async () => {
         try {
-            const response = await axios.get(`http://172.30.189.86:5005/usuario/${idUsuario}`);
+            const response = await axios.get(`http://172.30.189.100:5005/usuario/${idUsuario}`);
             console.log("fetchUsuario for instrumentos", response.data);
             setUsuario(response.data);
             setExplorFis(response.data.exploracionFisica);
@@ -45,7 +45,7 @@ function TemarioDiseño() {
     const handleSubmit = async () => {
 
         try {
-            // const response = await axios.post('http://172.30.189.86:5005/consent', {
+            // const response = await axios.post('http://172.30.189.100:5005/consent', {
             //     fecha,
             //     idUsuario: usuario.idUsuario,
             // });
@@ -90,7 +90,7 @@ function TemarioDiseño() {
         formDataToSend.append('idUsuario', idUsuario); // Agregar idUsuario
 
         // Enviar el PDF al backend
-        const pdfUploadResponse = await axios.post('http://172.30.189.86:5005/pdf/upload-single-doc', formDataToSend, {
+        const pdfUploadResponse = await axios.post('http://172.30.189.100:5005/pdf/upload-single-doc', formDataToSend, {
             headers: {
                 'Content-Type': 'multipart/form-data',
             },
