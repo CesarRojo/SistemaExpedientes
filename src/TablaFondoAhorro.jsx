@@ -32,7 +32,7 @@ const TablaFondoAhorro = () => {
     getFechaHoy();
     const fetchDatos = async () => {
       try {
-        const response = await axios.get('http://172.30.189.97:5005/usuario/fecha', {
+        const response = await axios.get('http://172.30.189.95:5005/usuario/fecha', {
           params: { fechaInicio, fechaFin },
         });
         setDatos(response.data);
@@ -49,7 +49,7 @@ const TablaFondoAhorro = () => {
       const idUsuarios = datos.map(dato => dato.idUsuario); // Obtener todos los idUsuario
       if (idUsuarios.length > 0) {
         try {
-          const response = await axios.get('http://172.30.189.97:5005/docs/byUser', {
+          const response = await axios.get('http://172.30.189.95:5005/docs/byUser', {
             params: { idUsuarios: idUsuarios.join(',') }, // Pasar los idUsuarios como un string separado por comas
           });
           const docsData = response.data.reduce((acc, doc) => {
@@ -70,7 +70,7 @@ const TablaFondoAhorro = () => {
     fetchDocs();
   }, [datos]);
 
-  const handleFonAhorr = (idUsuario, nombre, apellidoPat, apellidoMat, numFolio) => {
+  const handleFonAhorr = async (idUsuario, nombre, apellidoPat, apellidoMat, numFolio) => {
     const documentosUsuario = docs[idUsuario] || {}; // Obtener los documentos del usuario actual
 
     // Definir los documentos requeridos
@@ -80,37 +80,50 @@ const TablaFondoAhorro = () => {
     const documentosFaltantes = documentosRequeridos.filter(doc => !documentosUsuario[doc]);
 
     if (documentosFaltantes.length > 0) {
-      // Si faltan documentos, mostrar un mensaje de alerta
-      alert(`Primero debes subir tus documentos de contratacion`);
-      return; // No continuar con la navegación
+        // Si faltan documentos, mostrar un mensaje de alerta
+        alert(`Primero debes subir tus documentos de contratacion`);
+        return; // No continuar con la navegación
     }
-  
-    if (!documentosUsuario['fondoahorro']) {
-      // Si no tiene el documento de fondo de ahorro, redirigir a esa pantalla
-      navigate('/FondoAhorroDiseño', { state: { idUsuario, nombre, apellidoPat, apellidoMat, numFolio } });
-    } else if (!documentosUsuario['instrumentos']) {
-      // Si no tiene el documento de instrumentos, redirigir a esa pantalla
-      navigate('/InstrumentosDiseño', { state: { idUsuario, nombre, apellidoPat, apellidoMat, numFolio } });
-    } else if (!documentosUsuario['temario']) {
-      // Si no tiene el documento de temario, redirigir a esa pantalla
-      navigate('/TemarioDiseño', { state: { idUsuario, nombre, apellidoPat, apellidoMat, numFolio } });
-    } else if (!documentosUsuario['verificar']) {
-      // Si no tiene el documento de lista de verificacion, redirigir a esa pantalla
-      navigate('/ListaVerifDiseño', { state: { idUsuario, nombre, apellidoPat, apellidoMat, numFolio } });
-    } else if (!documentosUsuario['fonacot']) {
-      // Si no tiene el documento de fonacot, redirigir a esa pantalla
-      navigate('/FonacotDiseño', { state: { idUsuario, nombre, apellidoPat, apellidoMat, numFolio } });
-    } else if (!documentosUsuario['ctm']) {
-      // Si no tiene el documento de ctm, redirigir a esa pantalla
-      navigate('/CtmDiseño', { state: { idUsuario, nombre, apellidoPat, apellidoMat, numFolio } });
-    } else if (!documentosUsuario['vale']) {
-      // Si no tiene el documento de vale de material, redirigir a esa pantalla
-      navigate('/ValeDiseño', { state: { idUsuario, nombre, apellidoPat, apellidoMat, numFolio } });
-    } else {
-      // Si todos los documentos están completos
-      alert('Todos los pasos ya están completados.');
+
+    // Formatear el nombre como "ApellidoPat ApellidoMat, Nombres"
+    const nombreCompleto = `${apellidoPat} ${apellidoMat}, ${nombre}`;
+    console.log(nombreCompleto);
+
+    try {
+        // Hacer la solicitud a la API para obtener los datos del colaborador
+        const response = await axios.get('http://172.30.189.95:5005/colabora/name', {
+            params: { name: nombreCompleto }
+        });
+
+        const colaboraData = response.data;
+        console.log("datos",colaboraData);
+        console.log("datos",colaboraData[0].CB_CODIGO);
+
+        // Aquí puedes manejar la respuesta de la API como desees
+        // Por ejemplo, redirigir a la pantalla correspondiente según los documentos
+        if (!documentosUsuario['fondoahorro']) {
+            navigate('/FondoAhorroDiseño', { state: { idUsuario, colaboraData, numFolio, reloj: colaboraData[0].CB_CODIGO } });
+        } else if (!documentosUsuario['instrumentos']) {
+            navigate('/InstrumentosDiseño', { state: { idUsuario, colaboraData, numFolio, reloj: colaboraData[0].CB_CODIGO } });
+        } else if (!documentosUsuario['temario']) {
+            navigate('/TemarioDiseño', { state: { idUsuario, colaboraData, numFolio, reloj: colaboraData[0].CB_CODIGO } });
+        } else if (!documentosUsuario['verificar']) {
+            navigate('/ListaVerifDiseño', { state: { idUsuario, colaboraData, numFolio, reloj: colaboraData[0].CB_CODIGO } });
+        } else if (!documentosUsuario['fonacot']) {
+            navigate('/FonacotDiseño', { state: { idUsuario, colaboraData, numFolio, reloj: colaboraData[0].CB_CODIGO } });
+        } else if (!documentosUsuario['ctm']) {
+            navigate('/CtmDiseño', { state: { idUsuario, colaboraData, numFolio, reloj: colaboraData[0].CB_CODIGO } });
+        } else if (!documentosUsuario['vale']) {
+            navigate('/ValeDiseño', { state: { idUsuario, colaboraData, numFolio, reloj: colaboraData[0].CB_CODIGO } });
+        } else {
+            // Si todos los documentos están completos
+            alert('Todos los pasos ya están completados.');
+        }
+    } catch (error) {
+        console.error('Error fetching colabora data:', error);
+        alert('Error al obtener los datos del colaborador / Este colaborador no está en el sistema TRESS.');
     }
-  };
+};
 
   const handleExportarExcel = () => {
     const datosParaExportar = datos.map((dato) => ({
@@ -282,7 +295,7 @@ const TablaFondoAhorro = () => {
               <td className="text-center px-6 py-4 whitespace-nowrap">
                 {docs[dato.idUsuario] && docs[dato.idUsuario]['fondoahorro'] ? (
                   <a
-                    href={`http://172.30.189.97:5005${docs[dato.idUsuario]['fondoahorro'].path}`}
+                    href={`http://172.30.189.95:5005${docs[dato.idUsuario]['fondoahorro'].path}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-blue-500 hover:underline"
@@ -297,7 +310,7 @@ const TablaFondoAhorro = () => {
               <td className="text-center py-4 whitespace-nowrap">
                 {docs[dato.idUsuario] && docs[dato.idUsuario]['instrumentos'] ? (
                   <a
-                    href={`http://172.30.189.97:5005${docs[dato.idUsuario]['instrumentos'].path}`}
+                    href={`http://172.30.189.95:5005${docs[dato.idUsuario]['instrumentos'].path}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-blue-500 hover:underline"
@@ -312,7 +325,7 @@ const TablaFondoAhorro = () => {
               <td className="text-center py-4 whitespace-nowrap">
                 {docs[dato.idUsuario] && docs[dato.idUsuario]['temario'] ? (
                   <a
-                    href={`http://172.30.189.97:5005${docs[dato.idUsuario]['temario'].path}`}
+                    href={`http://172.30.189.95:5005${docs[dato.idUsuario]['temario'].path}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-blue-500 hover:underline"
@@ -327,7 +340,7 @@ const TablaFondoAhorro = () => {
               <td className="text-center py-4 whitespace-nowrap">
                 {docs[dato.idUsuario] && docs[dato.idUsuario]['verificar'] ? (
                   <a
-                    href={`http://172.30.189.97:5005${docs[dato.idUsuario]['verificar'].path}`}
+                    href={`http://172.30.189.95:5005${docs[dato.idUsuario]['verificar'].path}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-blue-500 hover:underline"
@@ -342,7 +355,7 @@ const TablaFondoAhorro = () => {
               <td className="text-center py-4 whitespace-nowrap">
                 {docs[dato.idUsuario] && docs[dato.idUsuario]['fonacot'] ? (
                   <a
-                    href={`http://172.30.189.97:5005${docs[dato.idUsuario]['fonacot'].path}`}
+                    href={`http://172.30.189.95:5005${docs[dato.idUsuario]['fonacot'].path}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-blue-500 hover:underline"
@@ -357,7 +370,7 @@ const TablaFondoAhorro = () => {
               <td className="text-center py-4 whitespace-nowrap">
                 {docs[dato.idUsuario] && docs[dato.idUsuario]['ctm'] ? (
                   <a
-                    href={`http://172.30.189.97:5005${docs[dato.idUsuario]['ctm'].path}`}
+                    href={`http://172.30.189.95:5005${docs[dato.idUsuario]['ctm'].path}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-blue-500 hover:underline"
@@ -372,7 +385,7 @@ const TablaFondoAhorro = () => {
               <td className="text-center py-4 whitespace-nowrap">
                 {docs[dato.idUsuario] && docs[dato.idUsuario]['vale'] ? (
                   <a
-                    href={`http://172.30.189.97:5005${docs[dato.idUsuario]['vale'].path}`}
+                    href={`http://172.30.189.95:5005${docs[dato.idUsuario]['vale'].path}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-blue-500 hover:underline"

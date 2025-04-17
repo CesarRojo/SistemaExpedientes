@@ -47,7 +47,7 @@ const UpdateDocsModal = ({ isOpen, onClose, idUsuario, numFolio }) => {
 
     setUploading(true);
     try {
-      const response = await axios.put(`http://172.30.189.97:5005/update-docs/${idUsuario}`, formData, {
+      const response = await axios.put(`http://172.30.189.95:5005/update-docs/${idUsuario}`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
 

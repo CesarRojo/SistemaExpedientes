@@ -65,7 +65,7 @@ const SubirDocs = () => {
   
     setUploading(true);
     try {
-      const response = await axios.post("http://172.30.189.97:5005/pdf/upload-docs", formData, {
+      const response = await axios.post("http://172.30.189.95:5005/pdf/upload-docs", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
   

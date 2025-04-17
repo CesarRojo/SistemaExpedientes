@@ -10,7 +10,7 @@ function FondoAhorroDiseño() {
     const navigate = useNavigate();
     const user = useAuthStore((state) => state.user);
     const location = useLocation();
-    const { idUsuario, nombre, apellidoPat, apellidoMat, numFolio } = location.state || {};
+    const { idUsuario, nombre, apellidoPat, apellidoMat, numFolio, reloj } = location.state || {};
 
     const [usuario, setUsuario] = useState(null);
     const [fecha, setFecha] = useState('');
@@ -26,7 +26,7 @@ function FondoAhorroDiseño() {
 
     const fetchUsuarioFolio = async () => {
         try {
-            const response = await axios.get(`http://172.30.189.97:5005/usuario/${idUsuario}`);
+            const response = await axios.get(`http://172.30.189.95:5005/usuario/${idUsuario}`);
             setUsuario(response.data);
         } catch (error) {
             console.error('Error al obtener datos del usuario:', error);
@@ -77,7 +77,7 @@ function FondoAhorroDiseño() {
             formDataToSend.append('idUsuario', idUsuario);
 
             // Enviar el PDF al backend
-            const pdfUploadResponse = await axios.post('http://172.30.189.97:5005/pdf/upload-single-doc', formDataToSend, {
+            const pdfUploadResponse = await axios.post('http://172.30.189.95:5005/pdf/upload-single-doc', formDataToSend, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },
@@ -85,7 +85,7 @@ function FondoAhorroDiseño() {
 
             console.log('PDF subido con éxito:', pdfUploadResponse.data);
             navigate('/InstrumentosDiseño', {
-                state: { idUsuario, nombre, apellidoPat, apellidoMat, numFolio },
+                state: { idUsuario, nombre, apellidoPat, apellidoMat, numFolio, reloj },
             });
         } catch (error) {
             console.error('Error al enviar el fondoAhorro:', error);
@@ -135,7 +135,7 @@ function FondoAhorroDiseño() {
                 <div>
                     <div className='flex flex-cols gap-20'>
                         <h4><span className='font-bold'>Nombre:</span> {`${usuario.nombre} ${usuario.apellidoPat} ${usuario.apellidoMat}`}</h4>
-                        <h4><span className='font-bold'>Reloj:</span> {usuario.folio.numFolio}</h4>
+                        <h4><span className='font-bold'>Reloj:</span> {reloj}</h4>
                     </div>
                     <h4><span className='font-bold'>Fecha de ingreso a la planta:</span></h4>
                 </div>

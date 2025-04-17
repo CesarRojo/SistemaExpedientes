@@ -23,7 +23,7 @@ const SignatureModal = ({ onClose }) => {
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-99">
       <div className="bg-white rounded-lg shadow-lg p-6">
         <iframe
-          src="src/sigweb.html" // Asegúrate de que la ruta sea correcta
+          src="src/sigweb.html"
           width="1200"
           height="330"
           title="Signature"

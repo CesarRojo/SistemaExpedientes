@@ -64,7 +64,7 @@ const ExploracionFisica = () => {
 
   const fetchUsuarioFolio = async () => {
     try {
-      const response = await axios.get(`http://172.30.189.97:5005/usuario/${idUsuario}`);
+      const response = await axios.get(`http://172.30.189.95:5005/usuario/${idUsuario}`);
       console.log("datos usuario expfisica", response.data);
       setUsuario(response.data);
       setExamMed(response.data.examenMedico);
@@ -128,30 +128,30 @@ const ExploracionFisica = () => {
 
     try {
       const { nombreCompleto, realizadoPor, ...dataToSend } = formData; // Omitir los campos
-      const response = await axios.post('http://172.30.189.97:5005/expFisica', {
+      const response = await axios.post('http://172.30.189.95:5005/expFisica', {
         ...dataToSend,
-        peso: parseInt(formData.peso),
-        talla: parseInt(formData.talla),
-        temperatura: parseInt(formData.temperatura),
-        FR: parseInt(formData.FR),
-        FC: parseInt(formData.FC),
-        TA: parseInt(formData.TA),
-        finkelstein: parseInt(formData.finkelstein),
-        tinel: parseInt(formData.tinel),
-        phalen: parseInt(formData.phalen),
-        comprension: parseInt(formData.comprension),
-        visionLejos: parseInt(formData.visionLejos),
-        visionCerca: parseInt(formData.visionCerca),
-        daltonismo: parseInt(formData.daltonismo),
-        OI: parseInt(formData.OI),
-        OD: parseInt(formData.OD),
-        calificacion: parseInt(formData.calificacion),
-        lesionOcular: parseInt(formData.lesionOcular),
-        lesionOido: parseInt(formData.lesionOido),
-        bocaDienEnc: parseInt(formData.bocaDienEnc),
-        torax: parseInt(formData.torax),
-        columVert: parseInt(formData.columVert),
-        extremidades: parseInt(formData.extremidades),
+        peso:  formData.peso,
+        talla:  formData.talla,
+        temperatura:  formData.temperatura,
+        FR:  formData.FR,
+        FC:  formData.FC,
+        TA:  formData.TA,
+        finkelstein:  formData.finkelstein,
+        tinel:  formData.tinel,
+        phalen:  formData.phalen,
+        comprension:  formData.comprension,
+        visionLejos:  formData.visionLejos,
+        visionCerca:  formData.visionCerca,
+        daltonismo:  formData.daltonismo,
+        OI:  formData.OI,
+        OD:  formData.OD,
+        calificacion:  formData.calificacion,
+        lesionOcular:  formData.lesionOcular,
+        lesionOido:  formData.lesionOido,
+        bocaDienEnc:  formData.bocaDienEnc,
+        torax:  formData.torax,
+        columVert:  formData.columVert,
+        extremidades:  formData.extremidades,
         observaciones: formData.observaciones ? formData.observaciones : null,
         createdAt: usuario.createdAt,
       });
@@ -196,7 +196,7 @@ const ExploracionFisica = () => {
         formDataToSend.append('idUsuario', usuario.idUsuario); // Agregar idUsuario
 
         // Enviar el PDF al backend
-        const pdfUploadResponse = await axios.post('http://172.30.189.97:5005/pdf/upload-single-doc', formDataToSend, {
+        const pdfUploadResponse = await axios.post('http://172.30.189.95:5005/pdf/upload-single-doc', formDataToSend, {
             headers: {
                 'Content-Type': 'multipart/form-data',
             },

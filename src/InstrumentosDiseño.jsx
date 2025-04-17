@@ -23,7 +23,7 @@ function InstrumentosDiseño() {
 
     const fetchUsuarioFolio = async () => {
         try {
-            const response = await axios.get(`http://172.30.189.97:5005/usuario/${idUsuario}`);
+            const response = await axios.get(`http://172.30.189.95:5005/usuario/${idUsuario}`);
             setUsuario(response.data);
         } catch (error) {
             console.error('Error al obtener datos del usuario:', error);
@@ -74,7 +74,7 @@ function InstrumentosDiseño() {
             formDataToSend.append('idUsuario', idUsuario);
 
             // Enviar el PDF al backend
-            const pdfUploadResponse = await axios.post('http://172.30.189.97:5005/pdf/upload-single-doc', formDataToSend, {
+            const pdfUploadResponse = await axios.post('http://172.30.189.95:5005/pdf/upload-single-doc', formDataToSend, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },
