@@ -4,6 +4,7 @@ import html2canvas from 'html2canvas-pro';
 import axios from 'axios';
 import useAuthStore from './authStore';
 import { useLocation, useNavigate } from 'react-router-dom';
+import SignatureModal from './Firmas';
 
 function TemarioDiseño() {
     const navigate = useNavigate();
@@ -17,10 +18,24 @@ function TemarioDiseño() {
     const [explorFis, setExplorFis] = useState(null);
     const [consent, setConsent] = useState(null);
     const [fecha, setFecha] = useState(''); // Estado para la fecha seleccionada
+    // Estado para la firma del empleado
+    const [signatureImageEmpleado, setSignatureImageEmpleado] = useState('');
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [currentSignature, setCurrentSignature] = useState(null); // Para identificar qué firma se está capturando
+
+    const handleSignatureClick = () => {
+        setCurrentSignature('empleado');
+        setIsModalOpen(true);
+    };
+
+    const handleSignatureClose = (image) => {
+        setSignatureImageEmpleado(image);
+        setIsModalOpen(false);
+    };
 
     const fetchUsuarioFolio = async () => {
         try {
-            const response = await axios.get(`http://172.30.189.100:5005/usuario/${idUsuario}`);
+            const response = await axios.get(`http://172.30.189.97:5005/usuario/${idUsuario}`);
             console.log("fetchUsuario for instrumentos", response.data);
             setUsuario(response.data);
             setExplorFis(response.data.exploracionFisica);
@@ -45,7 +60,7 @@ function TemarioDiseño() {
     const handleSubmit = async () => {
 
         try {
-            // const response = await axios.post('http://172.30.189.100:5005/consent', {
+            // const response = await axios.post('http://172.30.189.97:5005/consent', {
             //     fecha,
             //     idUsuario: usuario.idUsuario,
             // });
@@ -90,7 +105,7 @@ function TemarioDiseño() {
         formDataToSend.append('idUsuario', idUsuario); // Agregar idUsuario
 
         // Enviar el PDF al backend
-        const pdfUploadResponse = await axios.post('http://172.30.189.100:5005/pdf/upload-single-doc', formDataToSend, {
+        const pdfUploadResponse = await axios.post('http://172.30.189.97:5005/pdf/upload-single-doc', formDataToSend, {
             headers: {
                 'Content-Type': 'multipart/form-data',
             },
@@ -233,12 +248,28 @@ function TemarioDiseño() {
                 </table>
                 <div className="text-center mt-8">
                     <p className="mb-8">DE CONFORMIDAD</p>
-                    <div className='flex flex-col items-center mt-4'>
-                        <input type="text" className='w-100' />
-                        <label>Firma del empleado</label>
+                    <div className='flex flex-col items-center mt-4 relative'>
+                        {signatureImageEmpleado && (
+                            <img 
+                            src={`data:image/png;base64,${signatureImageEmpleado}`} 
+                            alt="Firma del empleado" 
+                            className="mt-2 absolute bottom-4" 
+                            style={{ width: '350px', height: 'auto' }} 
+                        />
+                        )}
+                        <input 
+                            type="text" 
+                            className='w-100 z-10' 
+                            onClick={handleSignatureClick} 
+                            readOnly 
+                        />
+                        <label className='z-10'>Firma del empleado</label>
                     </div>
                 </div>
             </div>
+            {isModalOpen && (
+                <SignatureModal onClose={handleSignatureClose} />
+            )}
             <button onClick={handleSubmit} className="mt-4 p-2 bg-green-500 text-white">
                 Guardar
             </button>

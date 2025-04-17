@@ -60,7 +60,7 @@ const SubirContratos = () => {
   
     setUploading(true);
     try {
-      const response = await axios.post("http://172.30.189.100:5005/pdf/upload-contracts", formData, {
+      const response = await axios.post("http://172.30.189.97:5005/pdf/upload-contracts", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
   

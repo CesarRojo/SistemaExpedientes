@@ -4,6 +4,7 @@ import html2canvas from 'html2canvas-pro';
 import axios from 'axios';
 import useAuthStore from './authStore';
 import { useNavigate } from 'react-router-dom';
+import SignatureModal from './Firmas';
 
 function Consentimiento() {
     const navigate = useNavigate();
@@ -14,11 +15,19 @@ function Consentimiento() {
     const [usuario, setUsuario] = useState(null);
     const [explorFis, setExplorFis] = useState(null);
     const [consent, setConsent] = useState(null);
-    const [fecha, setFecha] = useState(''); // Estado para la fecha seleccionada
+    const [fecha, setFecha] = useState('');
+    
+    // Estados para las firmas
+    const [signatureImageInteresado, setSignatureImageInteresado] = useState('');
+    const [signatureImageMedico, setSignatureImageMedico] = useState('');
+    const [signatureImageReclutamiento, setSignatureImageReclutamiento] = useState('');
+    
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [currentSignature, setCurrentSignature] = useState(null); // Para identificar qué firma se está capturando
 
     const fetchUsuarioFolio = async () => {
         try {
-            const response = await axios.get(`http://172.30.189.100:5005/usuario/folio/${idFolio}`);
+            const response = await axios.get(`http://172.30.189.97:5005/usuario/folio/${idFolio}`);
             console.log("fetchUsuario for consentimiento", response.data);
             setUsuario(response.data);
             setExplorFis(response.data.exploracionFisica);
@@ -40,27 +49,6 @@ function Consentimiento() {
 
     const pdfRef = useRef();
 
-    // const exportToPDF = () => {
-    //     const input = pdfRef.current;
-
-    //     html2canvas(input, { scale: 3 }).then((canvas) => {
-    //         const imgData = canvas.toDataURL('image/png');
-    //         const pdf = new jsPDF('p', 'mm', 'legal');
-    //         const imgWidth = 216;
-    //         const pageHeight = 330;
-    //         const imgHeight = (canvas.height * imgWidth) / canvas.width;
-
-    //         if (imgHeight > pageHeight) {
-    //             const scaleFactor = pageHeight / imgHeight;
-    //             pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, (imgHeight * scaleFactor) + 30);
-    //         } else {
-    //             pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
-    //         }
-
-    //         pdf.save(`consentimiento-${numFol}.pdf`);
-    //     });
-    // };
-
     const enviarConsentimiento = async () => {
         if (!fecha || !usuario?.idUsuario) {
             alert('Por favor, selecciona una fecha y asegúrate de que el usuario esté cargado.');
@@ -68,7 +56,7 @@ function Consentimiento() {
         }
 
         try {
-            const response = await axios.post('http://172.30.189.100:5005/consent', {
+            const response = await axios.post('http://172.30.189.97:5005/consent', {
                 fecha,
                 idUsuario: usuario.idUsuario,
             });
@@ -76,54 +64,73 @@ function Consentimiento() {
             console.log('Consentimiento enviado:', response.data);
 
             // Generar el PDF
-        const pdfBlob = await new Promise((resolve) => {
-            const input = pdfRef.current;
-            html2canvas(input, { scale: 0.8 }).then((canvas) => { //A mas 'scale' más calidad tiene el pdf, pero tambien es más pesado
-              const imgData = canvas.toDataURL('image/png');
-              const pdf = new jsPDF('p', 'mm', 'legal');
-              const imgWidth = 216;
-              const pageHeight = 330;
-              const imgHeight = (canvas.height * imgWidth) / canvas.width;
-  
-              if (imgHeight > pageHeight) {
-                  const scaleFactor = pageHeight / imgHeight;
-                  pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, (imgHeight * scaleFactor) + 30);
-              } else {
-                  pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
-              }
+            const pdfBlob = await new Promise((resolve) => {
+                const input = pdfRef.current;
+                html2canvas(input, { scale: 0.8 }).then((canvas) => {
+                    const imgData = canvas.toDataURL('image/png');
+                    const pdf = new jsPDF('p', 'mm', 'legal');
+                    const imgWidth = 216;
+                    const pageHeight = 330;
+                    const imgHeight = (canvas.height * imgWidth) / canvas.width;
 
-                // Convertir el PDF a un Blob
-                const pdfOutput = pdf.output('blob');
-                resolve(pdfOutput);
+                    if (imgHeight > pageHeight) {
+                        const scaleFactor = pageHeight / imgHeight;
+                        pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, (imgHeight * scaleFactor) + 30);
+                    } else {
+                        pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+                    }
+
+                    const pdfOutput = pdf.output('blob');
+                    resolve(pdfOutput);
+                });
             });
-        });
 
-        // console.log('Tipo de archivo:', pdfBlob.type); // Esto debería ser 'application/pdf'
+            // Verificar el tamaño del Blob
+            if (pdfBlob.size > 20 * 1024 * 1024) {
+                console.log("Tamaño del pdf", pdfBlob.size);
+                console.error('El archivo PDF es demasiado grande.');
+                return;
+            }
 
-        // Verificar el tamaño del Blob
-        if (pdfBlob.size > 20 * 1024 * 1024) { // 20MB
-          console.log("Tamaño del pdf",pdfBlob.size);
-          console.error('El archivo PDF es demasiado grande.');
-          return; // Detener el proceso si el archivo es demasiado grande
-        }
+            // Crear FormData para subir el PDF
+            const formDataToSend = new FormData ();
+            formDataToSend.append('document', pdfBlob, `consentimiento-${numFol}.pdf`);
+            formDataToSend.append('idUsuario', usuario.idUsuario);
 
-        // Crear FormData para subir el PDF
-        const formDataToSend = new FormData();
-        formDataToSend.append('document', pdfBlob, `consentimiento-${numFol}.pdf`); // Agregar el PDF
-        formDataToSend.append('idUsuario', usuario.idUsuario); // Agregar idUsuario
+            // Enviar el PDF al backend
+            const pdfUploadResponse = await axios.post('http://172.30.189.97:5005/pdf/upload-single-doc', formDataToSend, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
 
-        // Enviar el PDF al backend
-        const pdfUploadResponse = await axios.post('http://172.30.189.100:5005/pdf/upload-single-doc', formDataToSend, {
-            headers: {
-                'Content-Type': 'multipart/form-data',
-            },
-        });
-
-        console.log('PDF subido con éxito:', pdfUploadResponse.data);
-        navigate('/home');
+            console.log('PDF subido con éxito:', pdfUploadResponse.data);
+            navigate('/home');
         } catch (error) {
             console.error('Error al enviar el consentimiento:', error);
         }
+    };
+
+    const handleSignatureClick = (signatureType) => {
+        setCurrentSignature(signatureType);
+        setIsModalOpen(true);
+    };
+
+    const handleSignatureClose = (image) => {
+        switch (currentSignature) {
+            case 'interesado':
+                setSignatureImageInteresado(image);
+                break;
+            case 'medico':
+                setSignatureImageMedico(image);
+                break;
+            case 'reclutamiento':
+                setSignatureImageReclutamiento(image);
+                break;
+            default:
+                break;
+        }
+        setIsModalOpen(false);
     };
 
     if (!explorFis) {
@@ -152,7 +159,7 @@ function Consentimiento() {
                         className="w-full border-b h-10 border-gray-300 text-center align-middle leading-[4]"
                         type="date"
                         value={fecha}
-                        onChange={(e) => setFecha(e.target.value)} // Actualizar el estado de la fecha
+                        onChange={(e) => setFecha(e.target.value)}
                     />
                 </div>
 
@@ -197,23 +204,65 @@ function Consentimiento() {
                 </div>
 
                 {/* Firmas */}
-                <div className="grid grid-rows-2 gap-4 mt-10 text-center text-xl">
-                    <div className="flex flex-col mb-15">
-                        <input className="border border-gray-300 p-2" type="text" />
+                <div className="grid grid-rows-2 gap-4 mt-2 text-center text -xl">
+                    <div className="flex flex-col mb-2 relative">
+                        {signatureImageInteresado && (
+                            <img
+                                src={`data:image/png;base64,${signatureImageInteresado}`}
+                                alt="Firma del interesado"
+                                className="mt-2 absolute top-0 left-0 right-0 bottom-100 m-auto"
+                                style={{ width: '350px', height: 'auto' }}
+                            />
+                        )}
+                        <input
+                            className="border border-gray-300 p-2 mt-10"
+                            type="text"
+                            onClick={() => handleSignatureClick('interesado')}
+                            readOnly
+                        />
                         <label>Firma del interesado</label>
                     </div>
                     <div className="grid grid-cols-2 gap-4">
-                        <div className="flex flex-col">
-                            <input className="border border-gray-300 p-2" type="text" />
+                        <div className="flex flex-col relative">
+                            {signatureImageMedico && (
+                                <img
+                                    src={`data:image/png;base64,${signatureImageMedico}`}
+                                    alt="Firma del dpto. médico"
+                                    className="mt-2 absolute top-0 left-0 right-0 bottom-100 m-auto"
+                                    style={{ width: '350px', height: 'auto' }}
+                                />
+                            )}
+                            <input
+                                className="border border-gray-300 p-2 mt-10"
+                                type="text"
+                                onClick={() => handleSignatureClick('medico')}
+                                readOnly
+                            />
                             <label>Firma del dpto. médico</label>
                         </div>
-                        <div className="flex flex-col">
-                            <input className="border border-gray-300 p-2" type="text" />
+                        <div className="flex flex-col relative">
+                            {signatureImageReclutamiento && (
+                                <img
+                                    src={`data:image/png;base64,${signatureImageReclutamiento}`}
+                                    alt="Firma del dpto. reclutamiento"
+                                    className="mt-2 absolute top-0 left-0 right-0 bottom-100 m-auto"
+                                    style={{ width: '350px', height: 'auto' }}
+                                />
+                            )}
+                            <input
+                                className="border border-gray-300 p-2 mt-10"
+                                type="text"
+                                onClick={() => handleSignatureClick('reclutamiento')}
+                                readOnly
+                            />
                             <label>Firma del dpto. reclutamiento</label>
                         </div>
                     </div>
                 </div>
             </div>
+            {isModalOpen && (
+                <SignatureModal onClose={handleSignatureClose} />
+            )}
             <button onClick={enviarConsentimiento} className="mt-4 p-2 bg-green-500 text-white">
                 Enviar Consentimiento
             </button>

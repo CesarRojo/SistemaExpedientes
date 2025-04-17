@@ -19,10 +19,12 @@ const Login = () => {
   };
   
   return (
+    <>
     <div className="flex items-center justify-center min-h-screen bg-gray-100 flex-col">
-      <h1 className="text-6xl font-bold text-center title-log mb-30">Kiroku 記録</h1>
+      {/* <h1 className="text-6xl font-bold text-center title-log mb-30"></h1> */}
+      <img src="LOGO ATR_LOGO ATR AZUL.png" alt="" className='w-120 mb-10' />
       <div className="w-full max-w-md p-8 space-y-6 bg-white rounded shadow-md">
-        <h1 className="text-2xl font-bold text-center">Login</h1>
+        <h1 className="text-2xl font-bold text-center">Administracion de personal</h1>
         <form onSubmit={handleLogin} className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700">Usuario:</label>
@@ -61,6 +63,10 @@ const Login = () => {
         </div>
       </div>
     </div>
+    <footer>
+      <p className="font-bold text-center font-protest title-log bg-gray-100 ">Kiroku</p>
+    </footer>
+    </>
   );
 };
 

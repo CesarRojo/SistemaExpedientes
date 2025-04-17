@@ -4,6 +4,7 @@ import html2canvas from 'html2canvas-pro';
 import axios from 'axios';
 import useAuthStore from './authStore';
 import { useLocation, useNavigate } from 'react-router-dom';
+import SignatureModal from './Firmas';
 
 function InstrumentosDiseño() {
     const navigate = useNavigate();
@@ -11,27 +12,22 @@ function InstrumentosDiseño() {
     const location = useLocation();
     const { idUsuario, nombre, apellidoPat, apellidoMat, numFolio } = location.state || {};
 
-    console.log(idUsuario);
-
     const [usuario, setUsuario] = useState(null);
-    const [explorFis, setExplorFis] = useState(null);
-    const [consent, setConsent] = useState(null);
-    const [fecha, setFecha] = useState(''); // Estado para la fecha seleccionada
+    const [fecha, setFecha] = useState('');
+    
+    // Estado para la firma del empleado
+    const [signatureImageEmpleado, setSignatureImageEmpleado] = useState('');
+    
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [currentSignature, setCurrentSignature] = useState(null); // Para identificar qué firma se está capturando
 
     const fetchUsuarioFolio = async () => {
         try {
-            const response = await axios.get(`http://172.30.189.100:5005/usuario/${idUsuario}`);
-            console.log("fetchUsuario for instrumentos", response.data);
+            const response = await axios.get(`http://172.30.189.97:5005/usuario/${idUsuario}`);
             setUsuario(response.data);
-            setExplorFis(response.data.exploracionFisica);
-            setConsent(response.data.consentimiento);
         } catch (error) {
             console.error('Error al obtener datos del usuario:', error);
         }
-    };
-
-    const nombreUsuario = () => {
-        return usuario?.nombre + ' ' + usuario?.apellidoPat + ' ' + usuario?.apellidoMat;
     };
 
     useEffect(() => {
@@ -43,83 +39,71 @@ function InstrumentosDiseño() {
     const pdfRef = useRef();
 
     const handleSubmit = async () => {
-
         try {
-            // const response = await axios.post('http://172.30.189.100:5005/consent', {
-            //     fecha,
-            //     idUsuario: usuario.idUsuario,
-            // });
-
-            // console.log('Consentimiento enviado:', response.data);
-
             // Generar el PDF
-        const pdfBlob = await new Promise((resolve) => {
-            const input = pdfRef.current;
-            html2canvas(input, { scale: 0.8 }).then((canvas) => { //A mas 'scale' más calidad tiene el pdf, pero tambien es más pesado
-              const imgData = canvas.toDataURL('image/png');
-              const pdf = new jsPDF('p', 'mm', 'legal');
-              const imgWidth = 216;
-              const pageHeight = 330;
-              const imgHeight = (canvas.height * imgWidth) / canvas.width;
-  
-              if (imgHeight > pageHeight) {
-                  const scaleFactor = pageHeight / imgHeight;
-                  pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, (imgHeight * scaleFactor) + 30);
-              } else {
-                  pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
-              }
+            const pdfBlob = await new Promise((resolve) => {
+                const input = pdfRef.current;
+                html2canvas(input, { scale: 0.8 }).then((canvas) => {
+                    const imgData = canvas.toDataURL('image/png');
+                    const pdf = new jsPDF('p', 'mm', 'legal');
+                    const imgWidth = 216;
+                    const pageHeight = 330;
+                    const imgHeight = (canvas.height * imgWidth) / canvas.width;
 
-                // Convertir el PDF a un Blob
-                const pdfOutput = pdf.output('blob');
-                resolve(pdfOutput);
+                    if (imgHeight > pageHeight) {
+                        const scaleFactor = pageHeight / imgHeight;
+                        pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, (imgHeight * scaleFactor) + 30);
+                    } else {
+                        pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+                    }
+
+                    const pdfOutput = pdf.output('blob');
+                    resolve(pdfOutput);
+                });
             });
-        });
 
-        // console.log('Tipo de archivo:', pdfBlob.type); // Esto debería ser 'application/pdf'
+            // Verificar el tamaño del Blob
+            if (pdfBlob.size > 20 * 1024 * 1024) {
+                console.error('El archivo PDF es demasiado grande.');
+                return;
+            }
 
-        // Verificar el tamaño del Blob
-        if (pdfBlob.size > 20 * 1024 * 1024) { // 20MB
-          console.log("Tamaño del pdf",pdfBlob.size);
-          console.error('El archivo PDF es demasiado grande.');
-          return; // Detener el proceso si el archivo es demasiado grande
-        }
+            // Crear FormData para subir el PDF
+            const formDataToSend = new FormData();
+            formDataToSend.append('document', pdfBlob, `instrumentos-${numFolio}.pdf`);
+            formDataToSend.append('idUsuario', idUsuario);
 
-        // Crear FormData para subir el PDF
-        const formDataToSend = new FormData();
-        formDataToSend.append('document', pdfBlob, `instrumentos-${numFolio}.pdf`); // Agregar el PDF
-        formDataToSend.append('idUsuario', idUsuario); // Agregar idUsuario
+            // Enviar el PDF al backend
+            const pdfUploadResponse = await axios.post('http://172.30.189.97:5005/pdf/upload-single-doc', formDataToSend, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
 
-        // Enviar el PDF al backend
-        const pdfUploadResponse = await axios.post('http://172.30.189.100:5005/pdf/upload-single-doc', formDataToSend, {
-            headers: {
-                'Content-Type': 'multipart/form-data',
-            },
-        });
-
-        console.log('PDF subido con éxito:', pdfUploadResponse.data);
-
-        // Redirigir a /TemarioInduc con los datos del usuario
-        navigate('/TemarioDiseño', {
-            state: { idUsuario, nombre, apellidoPat, apellidoMat, numFolio },
-        });
+            console.log('PDF subido con éxito:', pdfUploadResponse.data);
+            navigate('/TemarioDiseño', {
+                state: { idUsuario, nombre, apellidoPat, apellidoMat, numFolio },
+            });
         } catch (error) {
             console.error('Error al enviar los instrumentos:', error);
         }
     };
 
-    // if (!explorFis) {
-    //     return <div className="text-center">Por favor, completa la exploración física antes de continuar con este paso.</div>;
-    // }
+    const handleSignatureClick = () => {
+        setCurrentSignature('empleado');
+        setIsModalOpen(true);
+    };
 
-    // if (consent) {
-    //     return <div className="text-center">Ya realizaste el consentimiento.</div>;
-    // }
+    const handleSignatureClose = (image) => {
+        setSignatureImageEmpleado(image);
+        setIsModalOpen(false);
+    };
 
     if (!usuario) {
         return <div className="text-center">Cargando datos del usuario...</div>;
     }
 
-    return (
+ return (
         <>
             <div ref={pdfRef} className="max-w-4xl mx-auto bg-white p-6 shadow-md pdf-container">
                 {/* Header */}
@@ -151,9 +135,22 @@ function InstrumentosDiseño() {
                     </p>
                 </div>
 
-                <div className='flex flex-col items-center mt-4'>
-                    <input type="text" className='w-100' />
-                    <label>Firma del empleado</label>
+                <div className='flex flex-col items-center mt-4 relative'>
+                    {signatureImageEmpleado && (
+                        <img 
+                        src={`data:image/png;base64,${signatureImageEmpleado}`} 
+                        alt="Firma del empleado" 
+                        className="mt-2 absolute bottom-4" 
+                        style={{ width: '350px', height: 'auto' }} 
+                    />
+                    )}
+                    <input 
+                        type="text" 
+                        className='w-100 z-10' 
+                        onClick={handleSignatureClick} 
+                        readOnly 
+                    />
+                    <label className='z-10'>Firma del empleado</label>
                 </div>
 
                 <div className="overflow-x-auto">
@@ -305,26 +302,42 @@ function InstrumentosDiseño() {
                     </tr>
                     </tbody>
                 </table>
-                <div className="mt-8 mb-4">
-                    <p className="font-bold text-center">En caso de baja del empleado</p>
-                    <p>
-                        Con fecha
+                    <div className="mt-8 mb-4">
+                        <p className="font-bold text-center">En caso de baja del empleado</p>
+                        <p>
+                            Con fecha
+                            <input 
+                                type="date" 
+                                className="border border-gray-300 rounded-md mx-2 px-2 py-1" 
+                            /> 
+                            hago entrega de las siguientes herramientas, uniformes y/o utensilios de trabajo que me fueron entregados para realizar mis funciones durante el tiempo que labore en la compañía.
+                        </p>
+                    </div>
+                    <div className="text-center font-bold mb-4">
+                        <p>DE CONFORMIDAD</p>
+                    </div>
+                    <div className='flex flex-col items-center mt-4 relative'>
+                        {signatureImageEmpleado && (
+                            <img 
+                            src={`data:image/png;base64,${signatureImageEmpleado}`} 
+                            alt="Firma del empleado" 
+                            className="mt-2 absolute bottom-4" 
+                            style={{ width: '350px', height: 'auto' }} 
+                        />
+                        )}
                         <input 
-                        type="date" 
-                        className="border border-gray-300 rounded-md mx-2 px-2 py-1" 
-                        /> 
-                        hago entrega de las siguientes herramientas, uniformes y/o utensilios de trabajo que me fueron entregados para realizar mis funciones durante el tiempo que labore en la compañía.
-                    </p>
-                </div>
-                <div className="text-center font-bold mb-4">
-                    <p>DE CONFORMIDAD</p>
-                </div>
-                <div className='flex flex-col items-center mt-4'>
-                    <input type="text" className='w-100' />
-                    <label>Firma del empleado</label>
+                            type="text" 
+                            className='w-100 z-10' 
+                            onClick={handleSignatureClick} 
+                            readOnly 
+                        />
+                        <label className='z-10'>Firma del empleado</label>
+                    </div>
                 </div>
             </div>
-            </div>
+            {isModalOpen && (
+                <SignatureModal onClose={handleSignatureClose} />
+            )}
             <button onClick={handleSubmit} className="mt-4 p-2 bg-green-500 text-white">
                 Guardar
             </button>

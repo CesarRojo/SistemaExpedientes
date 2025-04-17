@@ -41,7 +41,7 @@ function ExamenMedico() {
 
     const fetchEntrevIniData = async () => {
         try {
-            const response = await axios.get(`http://172.30.189.100:5005/usuario/folio/${idFolio}`);
+            const response = await axios.get(`http://172.30.189.97:5005/usuario/folio/${idFolio}`);
             setUsuario(response.data);
             setEntrevistaInicial(response.data.entrevistaInicial);
             setExamMed(response.data.examenMedico);
@@ -53,7 +53,7 @@ function ExamenMedico() {
 
     const fetchAntecedentesPatologicos = async () => {
       try {
-        const response = await axios.get('http://172.30.189.100:5005/antecPatolog');
+        const response = await axios.get('http://172.30.189.97:5005/antecPatolog');
         setAntecedentesPatologicos(response.data);
       } catch (error) {
         console.error('Error al obtener antecedentes patológicos:', error);
@@ -211,7 +211,7 @@ function ExamenMedico() {
             }));
 
         // Enviar datos del examen médico al backend
-        const examMedicoResponse = await axios.post('http://172.30.189.100:5005/examMedico', {
+        const examMedicoResponse = await axios.post('http://172.30.189.97:5005/examMedico', {
             examMedicoData: {
                 planta: formData.planta,
                 fecha: new Date(formData.fecha),
@@ -273,7 +273,7 @@ function ExamenMedico() {
         formDataToSend.append('idUsuario', usuario.idUsuario); // Agregar idUsuario
 
         // Enviar el PDF al backend
-        const pdfUploadResponse = await axios.post('http://172.30.189.100:5005/pdf/upload-single-doc', formDataToSend, {
+        const pdfUploadResponse = await axios.post('http://172.30.189.97:5005/pdf/upload-single-doc', formDataToSend, {
             headers: {
                 'Content-Type': 'multipart/form-data',
             },

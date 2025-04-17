@@ -4,6 +4,7 @@ import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas-pro';
 import { useLocation, useNavigate } from 'react-router-dom';
 import useAuthStore from './authStore';
+import SignatureModal from './Firmas';
 
 const ExploracionFisica = () => {
   const navigate = useNavigate();
@@ -49,10 +50,21 @@ const ExploracionFisica = () => {
   const [examMed, setExamMed] = useState(null);
   const [usuario, setUsuario] = useState(null);
   const pdfRef = useRef();
+  const [isModalOpen, setIsModalOpen] = useState(false); // Estado para el modal
+  const [signatureImage, setSignatureImage] = useState(''); // Estado para la imagen de la firma
+
+  const handleSignatureClick = () => {
+    setIsModalOpen(true); // Abre el modal al hacer clic en el campo de firma
+  };
+
+  const handleSignatureClose = (image) => {
+    setSignatureImage(image); // Guarda la imagen de la firma en el estado
+    setIsModalOpen(false); // Cierra el modal
+  };
 
   const fetchUsuarioFolio = async () => {
     try {
-      const response = await axios.get(`http://172.30.189.100:5005/usuario/${idUsuario}`);
+      const response = await axios.get(`http://172.30.189.97:5005/usuario/${idUsuario}`);
       console.log("datos usuario expfisica", response.data);
       setUsuario(response.data);
       setExamMed(response.data.examenMedico);
@@ -116,7 +128,7 @@ const ExploracionFisica = () => {
 
     try {
       const { nombreCompleto, realizadoPor, ...dataToSend } = formData; // Omitir los campos
-      const response = await axios.post('http://172.30.189.100:5005/expFisica', {
+      const response = await axios.post('http://172.30.189.97:5005/expFisica', {
         ...dataToSend,
         peso: parseInt(formData.peso),
         talla: parseInt(formData.talla),
@@ -184,7 +196,7 @@ const ExploracionFisica = () => {
         formDataToSend.append('idUsuario', usuario.idUsuario); // Agregar idUsuario
 
         // Enviar el PDF al backend
-        const pdfUploadResponse = await axios.post('http://172.30.189.100:5005/pdf/upload-single-doc', formDataToSend, {
+        const pdfUploadResponse = await axios.post('http://172.30.189.97:5005/pdf/upload-single-doc', formDataToSend, {
             headers: {
                 'Content-Type': 'multipart/form-data',
             },
@@ -594,15 +606,39 @@ const ExploracionFisica = () => {
           </div>
           <div className='text-center flex flex-col justify-end items-center h-full'>
             <label>Firma</label>
-          </div>
-          <div>
             <label className='font-bold'>Realizado por</label>
-            <input className="border border-gray-300 p-1 w-full" type="text" name="realizadoPor" onChange={handleChange} />
+          </div>
+          <div className='grid grid-rows-2 relative'>
+            {signatureImage && (
+                <img
+                  src={`data:image/png;base64,${signatureImage}`}
+                  alt="Firma"
+                  className="absolute top-0 left-0 right-0 bottom-0 m-auto"
+                  style={{ width: '450px', height: 'auto' }} // Ajusta el tamaño de la imagen aquí
+                />
+              )}
+              <input
+                type="text"
+                name="firmaArea"
+                onClick={handleSignatureClick} // Abre el modal al hacer clic
+                readOnly // Hacerlo de solo lectura
+                style={{ position: 'relative', zIndex: 0 }} // Asegúrate de que el input esté detrás
+                className="p-2 relative top-10" // Estilo del input
+              />
           </div>
         </div>
 
-        <button type="submit" className="w-full bg-blue-500 text-white font-bold py-2 rounded hover:bg-blue-600">Enviar</button>
       </form>
+      {isModalOpen && (
+        <SignatureModal onClose={handleSignatureClose} />
+      )}
+        <button 
+          type="submit" 
+          className="mt-4 p-2 bg-blue-500 text-white"
+          onClick={() => pdfRef.current.dispatchEvent(new Event('submit', { bubbles: true }))} // Llama a submit del formulario
+        >
+          Enviar Exploracion Fisica
+        </button>
     </>
   );
 };

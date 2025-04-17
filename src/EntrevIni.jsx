@@ -3,7 +3,7 @@ import axios from 'axios';
 import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas-pro';
 import { useNavigate } from 'react-router-dom';
-import Modal from './ModalFirma';
+import SignatureModal from './Firmas';
 
 const EntrevIniForm = () => {
   const navigate = useNavigate();
@@ -79,7 +79,7 @@ const EntrevIniForm = () => {
 
   const fetchFolio = async () => {
     try {
-      const response = await axios.get(`http://172.30.189.100:5005/folio/${numFolio}`);
+      const response = await axios.get(`http://172.30.189.97:5005/folio/${numFolio}`);
       if (response.data.Usuario) {
         setFolioStatus('Folio ya está siendo usado');
       } else {
@@ -205,7 +205,7 @@ const EntrevIniForm = () => {
       },
     };
     try {
-      const response = await axios.post('http://172.30.189.100:5005/entrevIni', dataToSubmit);
+      const response = await axios.post('http://172.30.189.97:5005/entrevIni', dataToSubmit);
       console.log('Response idUsuario:', response.data.idUsuario);
       fetchFolio();
 
@@ -249,7 +249,7 @@ const EntrevIniForm = () => {
     formDataToSend.append('idUsuario', idUsuario); // Agregar idUsuario
 
     // Enviar el PDF al backend
-    const pdfUploadResponse = await axios.post('http://172.30.189.100:5005/pdf/upload-single-doc', formDataToSend, {
+    const pdfUploadResponse = await axios.post('http://172.30.189.97:5005/pdf/upload-single-doc', formDataToSend, {
         headers: {
             'Content-Type': 'multipart/form-data',
         },
@@ -308,6 +308,11 @@ const EntrevIniForm = () => {
 
   const handleSignatureClick = () => {
     setIsModalOpen(true); // Abre el modal al hacer clic en el campo de firma
+  };
+
+  const handleSignatureClose = (image) => {
+    setSignatureImage(image); // Guarda la imagen de la firma en el estado
+    setIsModalOpen(false); // Cierra el modal
   };
 
   // Función para manejar el cambio de los checkboxes de pendientes
@@ -1315,23 +1320,33 @@ const EntrevIniForm = () => {
                 readOnly={selectedAreaOPlanta !== 'Otro'} 
               />
             </div>
-            <div>
-              <label className="pr-14">Firma:</label>
-              <input 
-                className="w-90 border-b border-gray-300 p-2" 
-                type="text" 
-                name="firmaArea" 
-                value={signatureImage} 
-                // onChange={(e) => setFormData({ ...formData, firmaArea: e.target.value })} 
-                onClick={handleSignatureClick} // Abre el modal al hacer clic
-              />
+            <label className="pr-14 z-10">Firma:</label> {/* Añadir clase absoluta para el label */}
+            <div className="absolute" style={{ right: 450, width: '500px', height: '100px' }}> {/* Ajusta el tamaño aquí */}
               {signatureImage && (
-                <img src={signatureImage} alt="Firma" style={{ maxWidth: '100%', maxHeight: '100px' }} />
+                <img
+                  src={`data:image/png;base64,${signatureImage}`}
+                  alt="Firma"
+                  className="absolute top-2 left-0"
+                  style={{ width: '300px', height: 'auto' }} // Ajusta el tamaño de la imagen aquí
+                />
               )}
+              <input
+                type="text"
+                name="firmaArea"
+                onClick={handleSignatureClick} // Abre el modal al hacer clic
+                readOnly // Hacerlo de solo lectura
+                style={{ position: 'relative', zIndex: 0 }} // Asegúrate de que el input esté detrás
+                className="absolute p-2 left-10 bottom-0" // Estilo del input
+              />
             </div>
           </div>
         </div>
       </form>
+
+      {isModalOpen && (
+        <SignatureModal onClose={handleSignatureClose} />
+      )}
+
       <button 
         type="submit" 
         className="mt-4 p-2 bg-blue-500 text-white"
@@ -1339,15 +1354,6 @@ const EntrevIniForm = () => {
       >
         Enviar Entrevista Inicial
       </button>
-      {/* Modal para la firma */}
-      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onSignatureCaptured={handleSignatureCaptured}>
-                <h2>Captura de Firma</h2>
-                {/* Aquí puedes agregar el componente de firma o cualquier otro contenido */}
-                <div>
-                    <p>Por favor, firme aquí:</p>
-                    {/* Aquí puedes integrar el componente de firma o cualquier otro elemento que necesites */}
-                </div>
-      </Modal>
     </>
   );
 };

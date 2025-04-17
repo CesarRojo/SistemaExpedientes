@@ -20,7 +20,7 @@ const TablaContratos = () => {
 
   const fetchDatos = async () => {
     try {
-      const response = await axios.get('http://172.30.189.100:5005/usuario/fecha', {
+      const response = await axios.get('http://172.30.189.97:5005/usuario/fecha', {
         params: { fechaInicio, fechaFin },
       });
       setDatos(response.data);
@@ -31,7 +31,7 @@ const TablaContratos = () => {
 
   const fetchDocs = async (idUsuarios) => {
     try {
-      const response = await axios.get('http://172.30.189.100:5005/docs/byUser', {
+      const response = await axios.get('http://172.30.189.97:5005/docs/byUser', {
         params: { idUsuarios: idUsuarios.join(',') }, // Pasar los idUsuarios como un string separado por comas
       });
       const docsData = response.data.reduce((acc, doc) => {
@@ -169,7 +169,7 @@ const TablaContratos = () => {
                   <td key={docType} className="px-6 py-4 whitespace-nowrap">
                     {documentos[docType] ? (
                       <a
-                        href={`http://172.30.189.100:5005${documentos[docType].path}`}
+                        href={`http://172.30.189.97:5005${documentos[docType].path}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-blue-500 hover:underline"

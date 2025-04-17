@@ -4,6 +4,7 @@ import html2canvas from 'html2canvas-pro';
 import axios from 'axios';
 import useAuthStore from './authStore';
 import { useLocation, useNavigate } from 'react-router-dom';
+import SignatureModal from './Firmas';
 
 function CtmDiseño() {
     const navigate = useNavigate();
@@ -16,10 +17,30 @@ function CtmDiseño() {
     const [salario, setSalario] = useState('');
     const [consent, setConsent] = useState(null);
     const [fecha, setFecha] = useState(''); // Estado para la fecha seleccionada
+    // Estados para las firmas
+    const [signatureImageInteresado, setSignatureImageInteresado] = useState('');
+    const [signatureImageSecretario, setSignatureImageSecretario] = useState('');
+    
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [currentSignature, setCurrentSignature] = useState(null); // Para identificar qué firma se está capturando
+
+    const handleSignatureClick = (signatureType) => {
+        setCurrentSignature(signatureType);
+        setIsModalOpen(true);
+    };
+
+    const handleSignatureClose = (image) => {
+        if (currentSignature === 'interesado') {
+            setSignatureImageInteresado(image);
+        } else if ( currentSignature === 'secretario') {
+            setSignatureImageSecretario(image);
+        }
+        setIsModalOpen(false);
+    };
 
     const fetchUsuarioFolio = async () => {
         try {
-            const response = await axios.get(`http://172.30.189.100:5005/usuario/${idUsuario}`);
+            const response = await axios.get(`http://172.30.189.97:5005/usuario/${idUsuario}`);
             console.log("fetchUsuario for instrumentos", response.data);
             setUsuario(response.data);
             setExplorFis(response.data.exploracionFisica);
@@ -44,7 +65,7 @@ function CtmDiseño() {
     const handleSubmit = async () => {
 
         try {
-            // const response = await axios.post('http://172.30.189.100:5005/consent', {
+            // const response = await axios.post('http://172.30.189.97:5005/consent', {
             //     fecha,
             //     idUsuario: usuario.idUsuario,
             // });
@@ -89,7 +110,7 @@ function CtmDiseño() {
         formDataToSend.append('idUsuario', idUsuario); // Agregar idUsuario
 
         // Enviar el PDF al backend
-        const pdfUploadResponse = await axios.post('http://172.30.189.100:5005/pdf/upload-single-doc', formDataToSend, {
+        const pdfUploadResponse = await axios.post('http://172.30.189.97:5005/pdf/upload-single-doc', formDataToSend, {
             headers: {
                 'Content-Type': 'multipart/form-data',
             },
@@ -170,7 +191,7 @@ function CtmDiseño() {
                     </div>
                     <div className="flex mb-2">
                         <label className="w-1/3 font-bold">SALARIO DIARIO</label>
-                        <input type="text" className="border-b border-black flex-grow" value={salario} onChange={(e) => { //Al escribir renderiza el componente cada vez???
+                        <input type="text" className="border-b border-black flex-grow" value={salario} onChange={(e) => {
                             setSalario(e.target.value);
                         }} />
                     </div>
@@ -190,22 +211,51 @@ function CtmDiseño() {
                 </div>
                 <div className="w-full text-center mb-4">
                     <p>
-                        Tepic, Nayarit,  
+                        Tepic, Nayarit,
                         <input type="date" className="border-b border-black" /> 
                     </p>
                 </div>
                 <div className="flex justify-around mt-35">
-                    <div className="text-center">
-                        <input type="text" className="border-b border-black flex-grow w-70" />
-                        <p className="font-bold">SECRETARIO DE ORGANIZACIÓN</p>
-                        <p className="font-bold">Y ESTADISTICA</p>
+                    <div className="text-center relative">
+                        {signatureImageSecretario && (
+                            <img 
+                            src={`data:image/png;base64,${signatureImageSecretario}`} 
+                            alt="Firma del Secretario" 
+                            className="mt-2 absolute bottom-13" 
+                            style={{ width: '350px', height: 'auto' }} 
+                        />
+                        )}
+                        <input 
+                            type="text" 
+                            className="border-b border-black flex-grow w-70 z-10" 
+                            onClick={() => handleSignatureClick('secretario')} 
+                            readOnly 
+                        />
+                        <p className="font-bold z-10">SECRETARIO DE ORGANIZACIÓN</p>
+                        <p className="font-bold z-10">Y ESTADISTICA</p>
                     </div>
-                    <div className="text-center">
-                        <input type="text" className="border-b border-black flex-grow w-70" />
-                        <p className="font-bold">FIRMA DEL INTERESADO</p>
+                    <div className="text-center relative">
+                        {signatureImageInteresado && (
+                            <img 
+                            src={`data:image/png;base64,${signatureImageInteresado}`} 
+                            alt="Firma del Interesado" 
+                            className="mt-2 absolute bottom-13" 
+                            style={{ width: '350px', height: 'auto' }} 
+                        />
+                        )}
+                        <input 
+                            type="text" 
+                            className="border-b border-black flex-grow w-70 z-10" 
+                            onClick={() => handleSignatureClick('interesado')} 
+                            readOnly 
+                        />
+                        <p className="font-bold z-10">FIRMA DEL INTERESADO</p>
                     </div>
                 </div>
             </div>
+            {isModalOpen && (
+                <SignatureModal onClose={handleSignatureClose} />
+            )}
             <button onClick={handleSubmit} className="mt-4 p-2 bg-green-500 text-white">
                 Guardar
             </button>

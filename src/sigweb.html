@@ -1,0 +1,277 @@
+
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+	<meta http-equiv="origin-trial" content="Anx9M3J0aHLpGAMe3zP5qpGiORIM9XVPn0kCEMBGlIzpUAmigST4zEpCybneyUtCHHt8N6xJqNEI/eczFA3E8QoAAAB6eyJvcmlnaW4iOiJodHRwczovL3d3dy5zaWdwbHVzd2ViLmNvbTo0NDMiLCJmZWF0dXJlIjoiQWxsb3dTeW5jWEhSSW5QYWdlRGlzbWlzc2FsIiwiZXhwaXJ5IjoxNTk1MTc3MTgxLCJpc1N1YmRvbWFpbiI6dHJ1ZX0=">
+
+  <title>PRUEBA FIRMASSS</title>
+
+
+
+  <script type="text/javascript" src="SigWebTablet.js"></script>
+  <!--SigWebTablet.js is required for SigWeb to function-->
+  <!--SigWebTablet.js is located here and may be copied for your own use-->
+  <!--http://www.sigplusweb.com/SigWebTablet.js-->
+
+
+  <script type="text/javascript">
+  var tmr;
+
+  var resetIsSupported = false;
+  var SigWeb_1_6_4_0_IsInstalled = false; //SigWeb 1.6.4.0 and above add the Reset() and GetSigWebVersion functions
+  var SigWeb_1_7_0_0_IsInstalled = false; //SigWeb 1.7.0.0 and above add the GetDaysUntilCertificateExpires() function
+  var SigWeb_1_7_2_0_IsInstalled = false; //SigWeb 1.7.2.0 and above add Preflight responses to support Chrome update
+
+  window.onload = function(){
+  
+		if(IsSigWebInstalled()){
+			var sigWebVer = "";
+			try{
+				sigWebVer = GetSigWebVersion();
+			} catch(err){console.log("Unable to get SigWeb Version: "+err.message)}
+			
+				if(sigWebVer != ""){				
+					try {
+						SigWeb_1_7_2_0_IsInstalled = isSigWeb_1_7_2_0_Installed(sigWebVer);
+					} catch( err ){console.log(err.message)};
+					//if SigWeb 1.7.2.0 is installed, then enable corresponding functionality
+					if(SigWeb_1_7_2_0_IsInstalled){
+						 
+						resetIsSupported = true;
+						try{
+							var daysUntilCertExpires = GetDaysUntilCertificateExpires();
+							document.getElementById("daysUntilExpElement").innerHTML = "SigWeb Certificate expires in " + daysUntilCertExpires + " days.";
+						} catch( err ){console.log(err.message)};
+						var note = document.getElementById("sigWebVrsnNote");
+						note.innerHTML = "SigWeb "+sigWebVer.slice(0, sigWebVer.lastIndexOf("."))+" installed";
+					} else {
+						try {
+						SigWeb_1_7_0_0_IsInstalled = isSigWeb_1_7_0_0_Installed(sigWebVer);
+						} catch( err ){console.log(err.message)};
+						//if SigWeb 1.7.0.0 is installed, then enable corresponding functionality
+						if(SigWeb_1_7_0_0_IsInstalled){
+							 
+							resetIsSupported = true;
+							try{
+								var daysUntilCertExpires = GetDaysUntilCertificateExpires();
+								document.getElementById("daysUntilExpElement").innerHTML = "SigWeb Certificate expires in " + daysUntilCertExpires + " days.";
+							} catch( err ){console.log(err.message)};
+							var note = document.getElementById("sigWebVrsnNote");
+							note.innerHTML = "SigWeb "+sigWebVer.slice(0, sigWebVer.lastIndexOf("."))+" installed. Install the newer version of SigWeb from the following link: ";
+							note.appendChild(sigweb_link);
+						} else {
+							try{
+								SigWeb_1_6_4_0_IsInstalled = isSigWeb_1_6_4_0_Installed(sigWebVer);
+								//if SigWeb 1.6.4.0 is installed, then enable corresponding functionality						
+							} catch( err ){console.log(err.message)};
+							if(SigWeb_1_6_4_0_IsInstalled){
+								resetIsSupported = true;
+								var sigweb_link = document.createElement("a");
+								sigweb_link.href = "https://www.topazsystems.com/software/sigweb.exe";
+								sigweb_link.innerHTML = "https://www.topazsystems.com/software/sigweb.exe";
+
+								var note = document.getElementById("sigWebVrsnNote");
+								note.innerHTML = "SigWeb "+sigWebVer.slice(0, sigWebVer.lastIndexOf("."))+" is installed. Install the newer version of SigWeb from the following link: ";
+								note.appendChild(sigweb_link);
+							} else{
+								var sigweb_link = document.createElement("a");
+								sigweb_link.href = "https://www.topazsystems.com/software/sigweb.exe";
+								sigweb_link.innerHTML = "https://www.topazsystems.com/software/sigweb.exe";
+
+								var note = document.getElementById("sigWebVrsnNote");
+								note.innerHTML = "A newer version of SigWeb is available. Please uninstall the currently installed version of SigWeb and then install the new version of SigWeb from the following link: ";
+								note.appendChild(sigweb_link);
+							}	
+						}
+					}	
+				} else{
+					//Older version of SigWeb installed that does not support retrieving the version of SigWeb (Version 1.6.0.2 and older)
+					var sigweb_link = document.createElement("a");
+					sigweb_link.href = "https://www.topazsystems.com/software/sigweb.exe";
+					sigweb_link.innerHTML = "https://www.topazsystems.com/software/sigweb.exe";
+
+					var note = document.getElementById("sigWebVrsnNote");
+					note.innerHTML = "A newer version of SigWeb is available. Please uninstall the currently installed version of SigWeb and then install the new version of SigWeb from the following link: ";
+					note.appendChild(sigweb_link);
+				}
+			}
+			else{
+				alert("Unable to communicate with SigWeb. Please confirm that SigWeb is installed and running on this PC.");
+			}
+	}
+	
+  function isSigWeb_1_6_4_0_Installed(sigWebVer){
+    var minSigWebVersionResetSupport = "1.6.4.0";
+
+    if(isOlderSigWebVersionInstalled(minSigWebVersionResetSupport, sigWebVer)){
+      console.log("SigWeb version 1.6.4.0 or higher not installed.");
+      return false;
+    }
+    return true;
+  }
+  
+  function isSigWeb_1_7_0_0_Installed(sigWebVer) {
+	var minSigWebVersionGetDaysUntilCertificateExpiresSupport = "1.7.0.0";
+	
+	if(isOlderSigWebVersionInstalled(minSigWebVersionGetDaysUntilCertificateExpiresSupport, sigWebVer)){
+      console.log("SigWeb version 1.7.0.0 or higher not installed.");
+      return false;
+    }
+    return true;
+  }
+  
+  function isSigWeb_1_7_2_0_Installed(sigWebVer) {
+	var minSigWebVersionPreflightResponsesSupport = "1.7.2.0";
+	
+	if(isOlderSigWebVersionInstalled(minSigWebVersionPreflightResponsesSupport, sigWebVer)){
+      console.log("SigWeb version 1.7.2.0 or higher not installed.");
+      return false;
+    }
+    return true;
+  }
+
+  function isOlderSigWebVersionInstalled(cmprVer, sigWebVer){    
+      return isOlderVersion(cmprVer, sigWebVer);
+  }
+
+  function isOlderVersion (oldVer, newVer) {
+    const oldParts = oldVer.split('.')
+    const newParts = newVer.split('.')
+    for (var i = 0; i < newParts.length; i++) {
+      const a = parseInt(newParts[i]) || 0
+      const b = parseInt(oldParts[i]) || 0
+      if (a < b) return true
+      if (a > b) return false
+    }
+    return false;
+  }
+
+  function onSign()
+  {
+    if(IsSigWebInstalled()){
+      var ctx = document.getElementById('cnv').getContext('2d');
+      SetDisplayXSize( 500 );
+      SetDisplayYSize( 100 );
+      SetTabletState(0, tmr);
+      SetJustifyMode(0);
+      ClearTablet();
+      if(tmr == null)
+      {
+        tmr = SetTabletState(1, ctx, 50);
+      }
+      else
+      {
+        SetTabletState(0, tmr);
+        tmr = null;
+        tmr = SetTabletState(1, ctx, 50);
+      }
+    } else{
+      alert("Unable to communicate with SigWeb. Please confirm that SigWeb is installed and running on this PC.");
+    }
+  }
+
+  function onClear()
+  {
+    ClearTablet();
+  }
+
+  function onDone()
+  {
+    if(NumberOfTabletPoints() == 0)
+    {
+      alert("Please sign before continuing");
+    }
+    else
+    {
+      SetTabletState(0, tmr);
+      //RETURN TOPAZ-FORMAT SIGSTRING
+      SetSigCompressionMode(1);
+      document.FORM1.bioSigData.value=GetSigString();
+      document.FORM1.sigStringData.value = GetSigString();
+      //this returns the signature in Topaz's own format, with biometric information
+
+
+      //RETURN BMP BYTE ARRAY CONVERTED TO BASE64 STRING
+      SetImageXSize(500);
+      SetImageYSize(100);
+      SetImagePenWidth(5);
+      GetSigImageB64(SigImageCallback);
+    }
+  }
+  
+  function SigImageCallback( str )
+  {
+    document.FORM1.sigImageData.value = str;
+    //=====================================Enviar el string en base64 al componente de React=====================================
+    window.parent.postMessage({ type: 'sigImageData', data: str }, '*');
+  }
+
+  function endDemo()
+  {
+    ClearTablet();
+    SetTabletState(0, tmr);
+  }
+
+  function close(){
+    if(resetIsSupported){
+      Reset();
+    } else{
+      endDemo();
+    }
+  }
+
+  //Perform the following actions on
+  //	1. Browser Closure
+  //	2. Tab Closure
+  //	3. Tab Refresh
+  window.onbeforeunload = function(evt){
+    close();
+    clearInterval(tmr);
+    evt.preventDefault(); //For Firefox, needed for browser closure
+  };
+</script>
+
+
+</head>
+<body>
+
+
+  <table border="1" cellpadding="0"  width="500">
+    <tr>
+      <td height="100" width="500">
+        <canvas id="cnv" name="cnv" width="500" height="100"></canvas>
+      </td>
+    </tr>
+  </table>
+
+
+  <BR>
+    <canvas name="SigImg" id="SigImg" width="500" height="100"></canvas>
+    <p id="sigWebVrsnNote" style="font-family: Arial;"></p>
+
+
+    <form action="#" name=FORM1>
+      <p>
+        <input id="SignBtn" name="SignBtn" type="button" value="Sign"  onclick="javascript:onSign()"/>&nbsp;&nbsp;&nbsp;&nbsp;
+        <input id="button1" name="ClearBtn" type="button" value="Clear" onclick="javascript:onClear()"/>&nbsp;&nbsp;&nbsp;&nbsp;
+
+        <input id="button2" name="DoneBtn" type="button" value="Done" onclick="javascript:onDone()"/>&nbsp;&nbsp;&nbsp;&nbsp;
+		
+        <INPUT TYPE=HIDDEN NAME="bioSigData">
+          <INPUT TYPE=HIDDEN NAME="sigImgData">
+            <BR>
+              <BR>
+                <TEXTAREA NAME="sigStringData" ROWS="20" COLS="50">SigString: </TEXTAREA>
+                <TEXTAREA NAME="sigImageData" ROWS="20" COLS="50">Base64 String: </TEXTAREA>
+              </p>
+            </form>
+
+            <br /><br />
+            <p id="daysUntilExpElement"></p>
+			<p id="SigWebVersion"></p>
+			<p id="SigWebTabletJSVersion"></p>
+			<p id="CertificateExpirationDate"></p>
+    </body>
+</html>
